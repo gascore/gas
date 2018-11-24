@@ -1,17 +1,52 @@
 package gas
 
+import (
+	"errors"
+)
+
+var (
+	NilData    map[string]interface{}
+	NilClasses []string
+	NilAttrs   map[string]string
+)
+
+// SendComponents check components types (string or GetChildes) and return GetChildes for component.AddChildes
+func SendComponents(components []interface{}) GetChildes {
+	// Check components types
+	for _, el := range components {
+		switch el.(type) {
+		case
+			string,
+			*Component:
+			break
+		default:
+			panic(errors.New("invalid component type (not string or Component)"))
+		}
+	}
+
+	return func(Component) []interface{} {
+		return components
+	}
+}
+
 // Context -- in context component send c.Data and c.Props to method
 type Context interface {}
 
 // Method -- struct for Component methods
 type Method func(Context)
 
+// GetChildes -- struct for Components Childes
+// In function parameter sends `this` component and you can access component data from this parameter
+//
+// Component childes can be string (or tag value) like: <h1>this text is body</h1>, and another Component
+type GetChildes func(Component) []interface{}
+
 // Component -- basic component struct
 type Component struct {
 	Data     map[string]interface{}
 	Props    map[string]interface{}
 	Methods  map[string]Method
-	Childes  []Component
+	Childes  GetChildes
 
 	Tag 	 string
 	Classes  []string
@@ -30,34 +65,36 @@ type Gas struct {
 
 
 // NewComponent create new component
-func NewComponent(data, props *map[string]interface{}) Component {
+func NewComponent(data, props map[string]interface{}) *Component {
 	// Some stuff here, but now:
-	return Component{
-		Data: *data,
-		Props: *props,
+	return &Component{
+		Data: data,
+		Props: props,
 	}
 }
 
 // AddInfo add tag, id, classes and attributes to Component
-func (c *Component) AddInfo(tag string, id string, classes *[]string, attrs *map[string]string) Component {
+func (c *Component) AddInfo(tag string, id string, classes []string, attrs map[string]string) *Component {
 	c.Tag = tag
 	c.ID = id
-	c.Classes = *classes
-	c.Attrs = *attrs
+	c.Classes = classes
+	c.Attrs = attrs
 
-	return *c
+	return c
 }
 
 // AddChildes add childes to Component
-func (c *Component) AddChildes(childes ...Component) Component {
-	c.Childes = childes
+//
+// Component childes (tag value or Component) for works often requires component.Data(.Props) or .Methods
+// and they (childes) can take this value from send in function Component
+func (c *Component) AddChildes(getChildesFunction GetChildes) *Component {
+	c.Childes = getChildesFunction
 
-	return *c
+	return c
 }
 
 // New create new gas application
 //
-// Here i will store explanations of incomprehensible things:
 //
 // All Add* methods return current component, if they don't we need to pre create all components before run NewComponent
 // it would looks like:
@@ -72,16 +109,17 @@ func (c *Component) AddChildes(childes ...Component) Component {
 //
 //		component := NewComponent(...).Add*(...).AddChildes(c1, c2, c3)
 // ` -- seems little ridiculous
-func New(components ...Component) (Gas, error) {
-	mainComponent := NewComponent(nil, nil).AddInfo("wrap", "main", nil, nil).AddChildes(components...)
-	gas := Gas{App: mainComponent}
+func New(components ...interface{}) (Gas, error) {
+	mainComponent := NewComponent(NilData, NilData).AddInfo("wrap", "main", NilClasses, NilAttrs).AddChildes(SendComponents(components))
+
+	gas := Gas{App: *mainComponent}
 
 	return gas, nil
 }
 
 
-func must(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+//func must(err error) {
+//	if err != nil {
+//		panic(err)
+//	}
+//}

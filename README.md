@@ -1,3 +1,3 @@
 # Gas
 
-### gas - golang (frontend) fraemwork based on wasm
+### gas - golang (frontend) framework based on WASM

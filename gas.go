@@ -2,6 +2,7 @@ package gas
 
 import (
 	"errors"
+	"github.com/dennwc/dom"
 )
 
 var (
@@ -59,6 +60,7 @@ type Component struct {
 // Gas -- struct for main application component
 type Gas struct {
 	App Component
+	StartPoint string // html element id where application wiil store
 
 	// Other stuff
 }
@@ -109,10 +111,15 @@ func (c *Component) AddChildes(getChildesFunction GetChildes) *Component {
 //
 //		component := NewComponent(...).Add*(...).AddChildes(c1, c2, c3)
 // ` -- seems little ridiculous
-func New(components ...interface{}) (Gas, error) {
+func New(startPoint string, components ...interface{}) (Gas, error) {
 	mainComponent := NewComponent(NilData, NilData).AddInfo("wrap", "main", NilClasses, NilAttrs).AddChildes(SendComponents(components))
 
 	gas := Gas{App: *mainComponent}
+
+	el := dom.GetDocument().GetElementById(startPoint)
+	if el == nil {
+		return Gas{},errors.New("invalid start point")
+	}
 
 	return gas, nil
 }

@@ -15,12 +15,17 @@ import (
 //		</h1
 //	`
 func main() {
-	app, _ :=
-		gas.New(gas.NewComponent(gas.NilData, gas.NilData).
-					AddInfo("h1", "#hello-world", gas.NilClasses, gas.NilAttrs).
-					AddChildes(gas.SendComponents([]interface{}{
-						"Hello, from Gas!",
-					})))
+	app, err :=
+		gas.New(
+			"app",
+			gas.NewComponent(gas.NilData, gas.NilData).
+				AddInfo("h1", "#hello-world", gas.NilClasses, gas.NilAttrs).
+				AddChildes(gas.SendComponents([]interface{}{
+					"Hello, from Gas!",
+				})))
+	if err != nil {
+		panic(err)
+	}
 
 	js.Global().Get("document").Call("getElementsByTagName", "body").Index(0).Set("innerHTML",
 		fmt.Sprintf("%s",

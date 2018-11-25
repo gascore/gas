@@ -1,6 +1,13 @@
+.idea/
+# Created by https://www.gitignore.io/api/go,code,webstorm
+# Edit at https://www.gitignore.io/?templates=go,code,webstorm
 
-# Created by https://www.gitignore.io/api/go,webstorm
-# Edit at https://www.gitignore.io/?templates=go,webstorm
+### Code ###
+# Visual Studio Code - https://code.visualstudio.com/
+.settings/
+.vscode/
+tsconfig.json
+jsconfig.json
 
 ### Go ###
 # Binaries for programs and plugins
@@ -99,4 +106,4 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
-# End of https://www.gitignore.io/api/go,webstorm
+# End of https://www.gitignore.io/api/go,code,webstorm

@@ -9,20 +9,28 @@ import (
 // This all seems very weired, BUT! this will auto generate from nice-look .gas components.
 // HelloWorld component will look like this:
 //
-//	`
-//		<h1 id=hello-world>
-//			Hello, from Gas!
-//		</h1
-//	`
+// `<h1 id=hello-world>
+//		Hello, from Gas!
+//	</h1>`
 func main() {
 	app, err :=
 		gas.New(
 			"app",
-			gas.NewComponent(gas.NilData, gas.NilData).
-				AddInfo("h1", "#hello-world", gas.NilClasses, gas.NilAttrs).
-				AddChildes(gas.SendComponents([]interface{}{
-					"Hello, from Gas!",
-				})))
+			func(p gas.Component) interface{} {
+				return gas.NewComponent(gas.NilData, gas.NilData, "h1", "#hello-world", gas.NilClasses, gas.NilAttrs).
+							AddBinds(gas.NilBinds).
+							AddChildes(
+								func(this gas.Component) interface{} {
+									return []interface{}{
+										"Hello, from Gas!",
+									}
+								})
+			},
+			func(p gas.Component) interface{} {
+				return []interface{}{
+					"Some text in main component",
+				}
+			})
 	if err != nil {
 		panic(err)
 	}

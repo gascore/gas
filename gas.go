@@ -9,26 +9,8 @@ var (
 	NilData    map[string]interface{}
 	NilClasses []string
 	NilAttrs   map[string]string
+	NilBinds   map[string]Bind
 )
-
-// SendComponents check components types (string or GetChildes) and return GetChildes for component.AddChildes
-func SendComponents(components []interface{}) GetChildes {
-	// Check components types
-	for _, el := range components {
-		switch el.(type) {
-		case
-			string,
-			*Component:
-			break
-		default:
-			panic(errors.New("invalid component type (not string or Component)"))
-		}
-	}
-
-	return func(Component) []interface{} {
-		return components
-	}
-}
 
 // Context -- in context component send c.Data and c.Props to method
 type Context interface {}
@@ -36,23 +18,38 @@ type Context interface {}
 // Method -- struct for Component methods
 type Method func(Context)
 
-// GetChildes -- struct for Components Childes
-// In function parameter sends `this` component and you can access component data from this parameter
+// GetComponent -- function returning component child
+type GetComponent func(Component) interface{}
+
+// GetChildes -- function returning component childes
+// In function parameter sends `this` component and you can get component data from this parameter
 //
-// Component childes can be string (or tag value) like: <h1>this text is body</h1>, and another Component
+// Component childes can be :
+// 1. String (or tag_value) like: <h1>this text is body</h1>
+// 2. Another component like: <h1> <GreetingText/> </h1>
 type GetChildes func(Component) []interface{}
+
+// Bind -- struct for storage component *computed* attributes.
+// It's analouge for vue `v-bind:`
+// Like: `gBind:id="c.GetDataByString("iterator") + 1024"`` 
+type Bind func(Component) string
 
 // Component -- basic component struct
 type Component struct {
-	Data     map[string]interface{}
-	Props    map[string]interface{}
-	Methods  map[string]Method
-	Childes  GetChildes
+	Data      map[string]interface{}
+	Props     map[string]interface{}
+	
+	CallBacks map[string]Method // events handlers: onClick, onHover
+	Methods   map[string]Method // user functions can call from component childes
+	
+	Childes   GetChildes
 
-	Tag 	 string
-	Classes  []string
-	ID       string
-	Attrs    map[string]string
+	Tag 	  string
+	ID        string
+	Classes   []string
+	Attrs	  map[string]string
+
+	Binds     map[string]Bind
 
 	// Other stuff
 }
@@ -67,20 +64,21 @@ type Gas struct {
 
 
 // NewComponent create new component
-func NewComponent(data, props map[string]interface{}) *Component {
+func NewComponent(data, props map[string]interface{}, tag string, id string, classes []string, attrs map[string]string) *Component {
 	// Some stuff here, but now:
 	return &Component{
 		Data: data,
 		Props: props,
+
+		Tag: tag,
+		ID: id,
+		Classes: classes,
 	}
 }
 
-// AddInfo add tag, id, classes and attributes to Component
-func (c *Component) AddInfo(tag string, id string, classes []string, attrs map[string]string) *Component {
-	c.Tag = tag
-	c.ID = id
-	c.Classes = classes
-	c.Attrs = attrs
+// AddBinds add Binds to Component
+func (c *Component) AddBinds(binds map[string]Bind) *Component {
+	c.Binds = binds
 
 	return c
 }
@@ -89,8 +87,15 @@ func (c *Component) AddInfo(tag string, id string, classes []string, attrs map[s
 //
 // Component childes (tag value or Component) for works often requires component.Data(.Props) or .Methods
 // and they (childes) can take this value from send in function Component
-func (c *Component) AddChildes(getChildesFunction GetChildes) *Component {
-	c.Childes = getChildesFunction
+func (c *Component) AddChildes(childes ...GetComponent) *Component {
+	c.Childes = func(this Component) []interface{} {
+		var compiled []interface{}
+		for _, el := range childes {
+			compiled = append(compiled, el(this))
+		}
+
+		return compiled
+	}
 
 	return c
 }
@@ -111,8 +116,8 @@ func (c *Component) AddChildes(getChildesFunction GetChildes) *Component {
 //
 //		component := NewComponent(...).Add*(...).AddChildes(c1, c2, c3)
 // ` -- seems little ridiculous
-func New(startPoint string, components ...interface{}) (Gas, error) {
-	mainComponent := NewComponent(NilData, NilData).AddInfo("wrap", "main", NilClasses, NilAttrs).AddChildes(SendComponents(components))
+func New(startPoint string, components ...GetComponent) (Gas, error) {
+	mainComponent := NewComponent(NilData, NilData, "wrap", "main", NilClasses, NilAttrs).AddBinds(NilBinds).AddChildes(components...)
 
 	gas := Gas{App: *mainComponent}
 

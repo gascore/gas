@@ -3,14 +3,15 @@ package gas
 
 import (
 	"errors"
+
 	dom "github.com/dennwc/dom"
 )
 
 // Gas -- struct for main application component
 type Gas struct {
-	App Component
+	App        Component
 	StartPoint string // html element id where application will store
-	Element *dom.Element
+	Element    *dom.Element
 
 	// Other stuff
 }
@@ -34,7 +35,7 @@ type Gas struct {
 func New(startPoint string, components ...GetComponent) (Gas, error) {
 	el := dom.GetDocument().GetElementById(startPoint)
 	if el == nil {
-		return Gas{},errors.New("invalid start point")
+		return Gas{}, errors.New("invalid start point")
 	}
 
 	mainComponent := NewComponent(NilData, NilData, "wrap", startPoint, NilClasses, NilAttrs).AddBinds(NilBinds).AddChildes(components...)
@@ -44,8 +45,9 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 	return gas, nil
 }
 
+// Init initialize gas application
 func (gas *Gas) Init() error {
-	app  := gas.App
+	app := gas.App
 	_main := gas.Element
 
 	for _, el := range app.Childes(app) {

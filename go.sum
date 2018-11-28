@@ -1,6 +1,2 @@
-github.com/dennwc/dom v0.2.1 h1:ADY36S5pLkfm+2l6mWj5XHtt/InVXZROijUG36+lMuY=
-github.com/dennwc/dom v0.2.1/go.mod h1:oFVwHbm2UiC3fpTHdNYk78qvsuvdJFnPWSBonoYGdYs=
 github.com/fatih/structs v1.1.0 h1:Q7juDM0QtcnhCpeyLGQKyg4TOIghuNXrkL32pHAUMxo=
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
-github.com/siongui/godom v0.0.0-20181006133514-8ba1cdb25192 h1:+H5lXLoRFOu/K/q8focJ8syTYjqEOaGwVJE6MpyKFPA=
-github.com/siongui/godom v0.0.0-20181006133514-8ba1cdb25192/go.mod h1:HlsL4IlMbIFM7fVEzc61bwE3Or1cNJzKZMDkO2xO9gA=

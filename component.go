@@ -3,20 +3,21 @@ package gas
 import (
 	"errors"
 	"fmt"
-	"strings"
 
-	"github.com/dennwc/dom"
+	"github.com/Sinicablyat/dom"
 )
 
 var (
 	// NilData Nil value for Component.Data and .Props
 	NilData map[string]interface{}
-	// NilClasses Nil value for Component.Classes
-	NilClasses []string
 	// NilAttrs Nil value for Component.Attrs
 	NilAttrs map[string]string
 	// NilBinds Nil value for Component.Binds
 	NilBinds map[string]Bind
+	// NilHandlers Nil value for Component.Handlers
+	NilHandlers map[string]Method
+	// NilMethods Nil value for Component.Methods
+	NilMethods map[string]Method
 )
 
 // Context -- in context component send c.Data and c.Props to method
@@ -36,7 +37,7 @@ type GetComponent func(Component) interface{}
 // 2. Another component like: <h1> <GreetingText/> </h1>
 type GetChildes func(Component) []interface{}
 
-// Bind -- struct for storage component *computed* attributes.
+// Bind -- bind catching sub component $emit and doing his buisness.
 // It's analogue for vue `v-bind:`
 // Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
 type Bind func(Component) string
@@ -46,38 +47,43 @@ type Component struct {
 	Data  map[string]interface{}
 	Props map[string]interface{}
 
-	CallBacks map[string]Method // events handlers: onClick, onHover
-	Methods   map[string]Method // user functions can call from component childes
+	Methods  map[string]Method // user functions can call from component childes
+	Handlers map[string]Method // events handlers: onClick, onHover
+	Binds    map[string]Bind   // catch sub components $emit
 
 	Childes GetChildes
 
-	Tag     string
-	ID      string
-	Classes []string
-	Attrs   map[string]string
+	Tag   string
+	Attrs map[string]string
 
-	Binds map[string]Bind
-
+	ParentC *Component
+	ParentE *dom.Element
 	// Other stuff
 }
 
 // NewComponent create new component
-func NewComponent(data, props map[string]interface{}, tag string, id string, classes []string, attrs map[string]string) *Component {
+func NewComponent(data, props map[string]interface{}, tag string, attrs map[string]string) *Component {
 	// Some stuff here, but now:
 	return &Component{
 		Data:  data,
 		Props: props,
 
-		Tag:     tag,
-		ID:      id,
-		Classes: classes,
-		Attrs:   attrs,
+		Tag:   tag,
+		Attrs: attrs,
 	}
 }
 
-// AddBinds add Binds to Component
-func (c *Component) AddBinds(binds map[string]Bind) *Component {
+// AddCatchers add Handlers and CallBack (event catchers) to Component
+func (c *Component) AddCatchers(binds map[string]Bind, handlers map[string]Method) *Component {
 	c.Binds = binds
+	c.Handlers = handlers
+
+	return c
+}
+
+// AddMethods add methods to component
+func (c *Component) AddMethods(methods map[string]Method) *Component {
+	c.Methods = methods
 
 	return c
 }
@@ -122,7 +128,9 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 			return nil, errors.New("cannot create component")
 		}
 
-		_node.SetAttribute("class", strings.Join(component.Classes, " "))
+		for attrName, attrBody := range component.Attrs {
+			_node.SetAttribute(attrName, attrBody)
+		}
 
 		for _, el := range component.Childes(*component) {
 			_child, err := CreateComponent(el)

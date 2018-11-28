@@ -4,7 +4,7 @@ package gas
 import (
 	"errors"
 
-	dom "github.com/dennwc/dom"
+	dom "github.com/Sinicablyat/dom"
 )
 
 // Gas -- struct for main application component
@@ -33,14 +33,14 @@ type Gas struct {
 //	component := NewComponent(...).Add*(...).AddChildes(c1, c2, c3)
 // ` -- seems little ridiculous
 func New(startPoint string, components ...GetComponent) (Gas, error) {
-	el := dom.GetDocument().GetElementById(startPoint)
-	if el == nil {
+	_el := dom.GetDocument().GetElementById(startPoint)
+	if _el == nil {
 		return Gas{}, errors.New("invalid start point")
 	}
 
-	mainComponent := NewComponent(NilData, NilData, "wrap", startPoint, NilClasses, NilAttrs).AddBinds(NilBinds).AddChildes(components...)
+	mainComponent := NewComponent(NilData, NilData, _el.GetTagName(), map[string]string{"id": startPoint}).AddCatchers(NilBinds, NilHandlers).AddMethods(NilMethods).AddChildes(components...)
 
-	gas := Gas{App: *mainComponent, StartPoint: startPoint, Element: el}
+	gas := Gas{App: *mainComponent, StartPoint: startPoint, Element: _el}
 
 	return gas, nil
 }

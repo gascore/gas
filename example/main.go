@@ -20,16 +20,22 @@ func main() {
 			func(p gas.Component) interface{} {
 				return gas.NewComponent(map[string]interface{}{
 					"hello": "Hello world!",
-				}, gas.NilData, "h1", "hello-world", []string{"greeting", "h1"}, gas.NilAttrs).
-					AddBinds(gas.NilBinds).
+				}, gas.NilData, "h1", map[string]string{
+					"id":    "hello-world",
+					"class": "greeting h1",
+				}).
+					AddCatchers(gas.NilBinds, gas.NilHandlers).AddMethods(gas.NilMethods).
 					AddChildes(
 						func(this gas.Component) interface{} {
 							return this.GetData("hello")
 						})
 			},
 			func(p gas.Component) interface{} {
-				return gas.NewComponent(gas.NilData, gas.NilData, "i", "italinao", []string{"greeting"}, gas.NilAttrs).
-					AddBinds(gas.NilBinds).
+				return gas.NewComponent(gas.NilData, gas.NilData, "i", map[string]string{
+					"id":    "italinao",
+					"class": "greeting",
+				}).
+					AddCatchers(gas.NilBinds, gas.NilHandlers).AddMethods(gas.NilMethods).
 					AddChildes(
 						func(p gas.Component) interface{} {
 							return "Ciao mondo!" // I'm not italian, but i love pizza

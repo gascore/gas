@@ -1,10 +1,9 @@
-// Package gas -- main package
 package gas
 
 import (
 	"errors"
 
-	dom "github.com/Sinicablyat/dom"
+	"github.com/Sinicablyat/dom"
 )
 
 // Gas -- struct for main application component
@@ -17,28 +16,24 @@ type Gas struct {
 }
 
 // New create new gas application
-//
-//
-// All Add* methods return current component, if they don't we need to pre create all components before run NewComponent
-// it would looks like:
-//
-// `
-//	c1c1 := NewComponent(...)
-//	c1c2 := NewComponent(...)
-//
-// 	c1 := NewComponent(...).AddChildes(c1c1, c1c2)
-//	c2 := NewComponent(...)
-//	c3 := NewComponent(...)
-//
-//	component := NewComponent(...).Add*(...).AddChildes(c1, c2, c3)
-// ` -- seems little ridiculous
 func New(startPoint string, components ...GetComponent) (Gas, error) {
-	_el := dom.GetDocument().GetElementById(startPoint)
+	_el := dom.Doc.GetElementById(startPoint)
 	if _el == nil {
 		return Gas{}, errors.New("invalid start point")
 	}
 
-	mainComponent := NewComponent(NilData, NilData, _el.GetTagName(), map[string]string{"id": startPoint}).AddCatchers(NilBinds, NilHandlers).AddMethods(NilMethods).AddChildes(components...)
+	mainComponent := NewComponent(
+		NilParentComponent,
+		NilData, // data
+		NilData, // props
+		NilMethods, // methods
+		NilBinds, // binds
+		NilHandlers, // handlers
+		_el.GetTagName(), // tag name
+		map[string]string{ // attributes
+			"id": startPoint,
+		},
+		components...) // components
 
 	gas := Gas{App: *mainComponent, StartPoint: startPoint, Element: _el}
 
@@ -60,6 +55,13 @@ func (gas *Gas) Init() error {
 	}
 
 	return nil
+}
+
+var signal = make(chan int)
+func KeepAlive() {
+	for {
+		<-signal
+	}
 }
 
 //func must(err error) {

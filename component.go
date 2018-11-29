@@ -3,11 +3,12 @@ package gas
 import (
 	"errors"
 	"fmt"
-
 	"github.com/Sinicablyat/dom"
 )
 
 var (
+	// NilParentComponent Nil value for Component.ParentC
+	NilParentComponent *Component
 	// NilData Nil value for Component.Data and .Props
 	NilData map[string]interface{}
 	// NilAttrs Nil value for Component.Attrs
@@ -15,7 +16,7 @@ var (
 	// NilBinds Nil value for Component.Binds
 	NilBinds map[string]Bind
 	// NilHandlers Nil value for Component.Handlers
-	NilHandlers map[string]Method
+	NilHandlers map[string]Handler
 	// NilMethods Nil value for Component.Methods
 	NilMethods map[string]Method
 )
@@ -37,18 +38,21 @@ type GetComponent func(Component) interface{}
 // 2. Another component like: <h1> <GreetingText/> </h1>
 type GetChildes func(Component) []interface{}
 
-// Bind -- bind catching sub component $emit and doing his buisness.
+// Bind -- bind catching sub component $emit and doing his business.
 // It's analogue for vue `v-bind:`
 // Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
 type Bind func(Component) string
+
+// Handler -- handler exec function when event trigger
+type Handler func(Component, dom.Event)
 
 // Component -- basic component struct
 type Component struct {
 	Data  map[string]interface{}
 	Props map[string]interface{}
 
-	Methods  map[string]Method // user functions can call from component childes
-	Handlers map[string]Method // events handlers: onClick, onHover
+	Methods  map[string]Method
+	Handlers map[string]Handler // events handlers: onClick, onHover
 	Binds    map[string]Bind   // catch sub components $emit
 
 	Childes GetChildes
@@ -56,44 +60,30 @@ type Component struct {
 	Tag   string
 	Attrs map[string]string
 
+	Element *dom.Element
+
 	ParentC *Component
-	ParentE *dom.Element
 	// Other stuff
 }
 
 // NewComponent create new component
-func NewComponent(data, props map[string]interface{}, tag string, attrs map[string]string) *Component {
+func NewComponent(pC *Component, data map[string]interface{}, props map[string]interface{}, methods map[string]Method, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
 	// Some stuff here, but now:
-	return &Component{
+	component := &Component{
 		Data:  data,
 		Props: props,
 
+		Methods: methods,
+		Handlers: handlers,
+		Binds: binds,
+
 		Tag:   tag,
 		Attrs: attrs,
+
+		ParentC: pC,
 	}
-}
 
-// AddCatchers add Handlers and CallBack (event catchers) to Component
-func (c *Component) AddCatchers(binds map[string]Bind, handlers map[string]Method) *Component {
-	c.Binds = binds
-	c.Handlers = handlers
-
-	return c
-}
-
-// AddMethods add methods to component
-func (c *Component) AddMethods(methods map[string]Method) *Component {
-	c.Methods = methods
-
-	return c
-}
-
-// AddChildes add childes to Component
-//
-// Component childes (tag value or Component) for works often requires component.Data(.Props) or .Methods
-// and they (childes) can take this value from send in function Component
-func (c *Component) AddChildes(childes ...GetComponent) *Component {
-	c.Childes = func(this Component) []interface{} {
+	component.Childes = func(this Component) []interface{} {
 		var compiled []interface{}
 		for _, el := range childes {
 			compiled = append(compiled, el(this))
@@ -102,7 +92,7 @@ func (c *Component) AddChildes(childes ...GetComponent) *Component {
 		return compiled
 	}
 
-	return c
+	return component
 }
 
 // CreateComponent render component.
@@ -129,7 +119,15 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 		}
 
 		for attrName, attrBody := range component.Attrs {
+			//if attrIsValid(attrName, component.Tag) {} // check if attribute is valid for this tag
 			_node.SetAttribute(attrName, attrBody)
+		}
+
+		for handlerName, handlerBody := range component.Handlers {
+			//if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
+			_node.AddEventListener(handlerName, func(e dom.Event) {
+				handlerBody(*component, e)
+			})
 		}
 
 		for _, el := range component.Childes(*component) {
@@ -141,6 +139,7 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 			_node.AppendChild(_child)
 		}
 
+		component.Element = _node
 		return _node, nil
 	case nil:
 		return CreateComponent("nil")
@@ -151,7 +150,7 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 }
 
 // UpdateComponent trying to update component
-func UpdateComponent(_parent dom.Element, new interface{}, old interface{}, index int) error {
+func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, index int) error {
 	// if component has created
 	if old == nil {
 		_new, err := CreateComponent(new)
@@ -202,33 +201,69 @@ func UpdateComponent(_parent dom.Element, new interface{}, old interface{}, inde
 		newChildes := new.(*Component).Childes(*new.(*Component)) // new.Childes(new)
 		oldChildes := old.(*Component).Childes(*old.(*Component)) // old.Childes(old)
 
-		for i := 0; i < len(newChildes) || i < len(oldChildes); i++ {
-			var elFromNew interface{}
-			if len(newChildes) >= i {
-				elFromNew = newChildes[i]
-			}
-
-			var elFromOld interface{}
-			if len(oldChildes) >= i {
-				elFromOld = oldChildes[i]
-			}
-
-			err = UpdateComponent(*_el, elFromNew, elFromOld, i)
-			if err != nil {
-				return err
-			}
+		err := UpdateComponentChildes(_el, newChildes, oldChildes)
+		if err != nil {
+			return err
 		}
-	} else { // new or old not components => something went wrong, but we haven't errors
-		return nil
 	}
 
-	return fmt.Errorf("UpdateComponent: invalid new or old types: %T, %T", new, old)
+	return nil
 }
 
-// GetData return data field by qury string
+// GetData return data field by query string
 func (c *Component) GetData(query string) interface{} {
 	// There will be callbacks, events, e.t.c.
-	return c.Data[query]
+	data := c.Data[query]
+	if data == nil {
+		dom.ConsoleError(fmt.Sprintf(`"%s"trying to accept nil data`, c.Tag))
+	}
+
+	return data
+}
+
+func (c *Component) SetData(query string, value interface{}) error {
+	oldChildes := c.Childes(*c)
+	c.Data[query] = value
+
+	_parent := c.ParentC.Element
+	if _parent == nil {
+		_parent = dom.Doc.GetElementById(c.ParentC.Attrs["id"])
+	}
+
+	newChildes := c.Childes(*c)
+
+	//log.Println(newChildes, oldChildes)
+
+	err := UpdateComponentChildes(c.Element, newChildes, oldChildes)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface{}) error {
+	for i := 0; i < len(newChildes) || i < len(oldChildes); i++ {
+		var elFromNew interface{}
+		if len(newChildes) >= i {
+			elFromNew = newChildes[i]
+		}
+
+		var elFromOld interface{}
+		if len(oldChildes) >= i {
+			elFromOld = oldChildes[i]
+		}
+
+		err := UpdateComponent(_el, elFromNew, elFromOld, i)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c Component) Get() Component {
+	return c
 }
 
 func isComponent(c interface{}) bool {

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Sinicablyat/dom"
+	"github.com/frankenbeanies/uuid4"
 )
 
 var (
@@ -21,21 +22,23 @@ var (
 	NilMethods map[string]Method
 )
 
-// Context -- in context component send c.Data and c.Props to method
+// Context - in context component send c.Data and c.Props to method
 type Context interface{}
 
-// Method -- struct for Component methods
+// Method - struct for Component methods
 type Method func(Context)
 
-// GetComponent -- function returning component child
+// GetComponent returns component child
 type GetComponent func(Component) interface{}
 
 // GetChildes -- function returning component childes
-// In function parameter sends `this` component and you can get component data from this parameter
+// In function parameter sends `this` component and you can get it data from this parameter
 //
-// Component childes can be :
-// 1. String (or tag_value) like: <h1>this text is body</h1>
-// 2. Another component like: <h1> <GreetingText/> </h1>
+// Component childes can be:
+//
+// 1. String (or tag_value)
+//
+// 2. Another component
 type GetChildes func(Component) []interface{}
 
 // Bind -- bind catching sub component $emit and doing his business.
@@ -60,18 +63,16 @@ type Component struct {
 	Tag   string
 	Attrs map[string]string
 
-	Element *dom.Element
+	UUID string
 
 	ParentC *Component
-	// Other stuff
 }
 
 // NewComponent create new component
-func NewComponent(pC *Component, data map[string]interface{}, props map[string]interface{}, methods map[string]Method, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
+func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
 	// Some stuff here, but now:
 	component := &Component{
 		Data:  data,
-		Props: props,
 
 		Methods: methods,
 		Handlers: handlers,
@@ -79,6 +80,8 @@ func NewComponent(pC *Component, data map[string]interface{}, props map[string]i
 
 		Tag:   tag,
 		Attrs: attrs,
+
+		UUID: uuid4.New().String(),
 
 		ParentC: pC,
 	}
@@ -95,8 +98,7 @@ func NewComponent(pC *Component, data map[string]interface{}, props map[string]i
 	return component
 }
 
-// CreateComponent render component.
-// Not Component methods, because node can be string.
+// CreateComponent render component
 func CreateComponent(node interface{}) (*dom.Element, error) {
 	switch node.(type) {
 	case string:
@@ -112,11 +114,13 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 		return _node, nil
 	case *Component:
 		component := node.(*Component)
-		_node := dom.NewElement(component.Tag)
 
+		_node := dom.NewElement(component.Tag)
 		if _node == nil {
 			return nil, errors.New("cannot create component")
 		}
+
+		_node.SetAttribute("data-i", component.UUID) // set data-i for accept element from component methods
 
 		for attrName, attrBody := range component.Attrs {
 			//if attrIsValid(attrName, component.Tag) {} // check if attribute is valid for this tag
@@ -139,7 +143,6 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 			_node.AppendChild(_child)
 		}
 
-		component.Element = _node
 		return _node, nil
 	case nil:
 		return CreateComponent("nil")
@@ -210,38 +213,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	return nil
 }
 
-// GetData return data field by query string
-func (c *Component) GetData(query string) interface{} {
-	// There will be callbacks, events, e.t.c.
-	data := c.Data[query]
-	if data == nil {
-		dom.ConsoleError(fmt.Sprintf(`"%s"trying to accept nil data`, c.Tag))
-	}
-
-	return data
-}
-
-func (c *Component) SetData(query string, value interface{}) error {
-	oldChildes := c.Childes(*c)
-	c.Data[query] = value
-
-	_parent := c.ParentC.Element
-	if _parent == nil {
-		_parent = dom.Doc.GetElementById(c.ParentC.Attrs["id"])
-	}
-
-	newChildes := c.Childes(*c)
-
-	//log.Println(newChildes, oldChildes)
-
-	err := UpdateComponentChildes(c.Element, newChildes, oldChildes)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
+// UpdateComponentChildes update component childes by new and old childes
 func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface{}) error {
 	for i := 0; i < len(newChildes) || i < len(oldChildes); i++ {
 		var elFromNew interface{}
@@ -262,9 +234,41 @@ func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface
 	return nil
 }
 
-func (c Component) Get() Component {
-	return c
+// GetData return data field by query string
+func (c *Component) GetData(query string) interface{} {
+	// There will be callbacks, events, e.t.c.
+	data := c.Data[query]
+	if data == nil {
+		dom.ConsoleError(fmt.Sprintf(`"%s"trying to accept nil data`, c.Tag))
+	}
+
+	return data
 }
+
+// SetData set data field and update component (after changes)
+func (c *Component) SetData(query string, value interface{}) error {
+	oldChildes := c.Childes(*c)
+	c.Data[query] = value
+
+	_c := c.GetElement()
+	dom.ConsoleLog(_c)
+
+	newChildes := c.Childes(*c)
+
+	err := UpdateComponentChildes(_c, newChildes, oldChildes)
+	if err != nil {
+		dom.ConsoleError(err)
+		return err
+	}
+
+	return nil
+}
+
+// GetElement return *dom.Element by component structure
+func (c Component) GetElement() *dom.Element {
+	return dom.Doc.QuerySelector(fmt.Sprintf("[data-i='%s']", c.UUID)) // select element by data-i attribute
+}
+
 
 func isComponent(c interface{}) bool {
 	_, ok := c.(*Component)
@@ -290,7 +294,7 @@ func changed(new, old interface{}) (bool, error) {
 			return false, errors.New("invalid `old`")
 		}
 
-		return newString == oldString, nil
+		return newString != oldString, nil
 	}
 
 	if isComponent(new) && isComponent(old) {
@@ -304,7 +308,7 @@ func changed(new, old interface{}) (bool, error) {
 			return false, errors.New("invalid `old`")
 		}
 
-		return newComponent == oldComponent, nil
+		return newComponent != oldComponent, nil
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)

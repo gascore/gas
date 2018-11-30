@@ -6,10 +6,11 @@ import (
 	"github.com/Sinicablyat/dom"
 )
 
-// Gas -- struct for main application component
+// Gas - main application struct
 type Gas struct {
 	App        Component
 	StartPoint string // html element id where application will store
+
 	Element    *dom.Element
 
 	// Other stuff
@@ -25,13 +26,13 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 	mainComponent := NewComponent(
 		NilParentComponent,
 		NilData, // data
-		NilData, // props
 		NilMethods, // methods
 		NilBinds, // binds
 		NilHandlers, // handlers
 		_el.GetTagName(), // tag name
 		map[string]string{ // attributes
 			"id": startPoint,
+			"data-main": "true",
 		},
 		components...) // components
 
@@ -58,6 +59,7 @@ func (gas *Gas) Init() error {
 }
 
 var signal = make(chan int)
+// KeepAlive keep alive runtime, without it application will stop (user won't be able to init events)
 func KeepAlive() {
 	for {
 		<-signal

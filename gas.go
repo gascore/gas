@@ -27,6 +27,7 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 		NilParentComponent,
 		NilData, // data
 		NilMethods, // methods
+		NilDirectives, // directives
 		NilBinds, // binds
 		NilHandlers, // handlers
 		_el.GetTagName(), // tag name
@@ -46,23 +47,41 @@ func (gas *Gas) Init() error {
 	app := gas.App
 	_main := gas.Element
 
-	for _, el := range app.Childes(app) {
+	for _, el := range app.Childes(&app) {
 		_child, err := CreateComponent(el)
 		if err != nil {
 			return err
 		}
 
-		_main.AppendChild(_child)
+		if _child != nil {
+			_main.AppendChild(_child)
+		}
 	}
 
+	dom.Doc.GetElementsByTagName("body")[0].SetAttribute("data-ready", true)
+
 	return nil
+}
+
+// WarnError log error
+func WarnError(err error) {
+	if err == nil {
+		return
+	}
+
+	dom.ConsoleError(err.Error())
 }
 
 var signal = make(chan int)
 // KeepAlive keep alive runtime, without it application will stop (user won't be able to init events)
 func KeepAlive() {
+	//var wg sync.WaitGroup
+	//wg.Add(1)
+	//go func() {
+	//	wg.Wait()
+	//}()
 	for {
-		<-signal
+		<- signal
 	}
 }
 

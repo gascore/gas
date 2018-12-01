@@ -20,6 +20,7 @@ func main() {
 						"click": 0,
 					},
 					gas.NilMethods,
+					gas.NilDirectives,
 					gas.NilBinds,
 					gas.NilHandlers,
 					"h1",
@@ -31,11 +32,12 @@ func main() {
 							&p,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilDirectives,
 							gas.NilBinds,
 							map[string]gas.Handler {
 								"click": func(c gas.Component, e dom.Event) {
 									currentClick := this.GetData("click").(int)
-									_ = this.SetData("click", currentClick+1)
+									gas.WarnError(this.SetData("click", currentClick+1))
 								},
 							},
 							"button",

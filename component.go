@@ -20,6 +20,10 @@ var (
 	NilHandlers map[string]Handler
 	// NilMethods Nil value for Component.Methods
 	NilMethods map[string]Method
+	// NilDirectives Nil value for Component.Directives
+	NilDirectives = Directives{If:NilIfDirective}
+	// NilIfDirective Nil value for Directives.If
+	NilIfDirective = func(c *Component) bool { return true } // Without returning component will never render
 )
 
 // Context - in context component send c.Data and c.Props to method
@@ -39,12 +43,18 @@ type GetComponent func(Component) interface{}
 // 1. String (or tag_value)
 //
 // 2. Another component
-type GetChildes func(Component) []interface{}
+type GetChildes func(*Component) []interface{}
 
 // Bind -- bind catching sub component $emit and doing his business.
 // It's analogue for vue `v-bind:`
 // Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
 type Bind func(Component) string
+
+// Directives
+type Directives struct {
+	If func(*Component) bool
+	For func(arr []interface{}) []Component
+}
 
 // Handler -- handler exec function when event trigger
 type Handler func(Component, dom.Event)
@@ -54,9 +64,10 @@ type Component struct {
 	Data  map[string]interface{}
 	Props map[string]interface{}
 
-	Methods  map[string]Method
-	Handlers map[string]Handler // events handlers: onClick, onHover
-	Binds    map[string]Bind   // catch sub components $emit
+	Methods    map[string]Method
+	Handlers   map[string]Handler // events handlers: onClick, onHover
+	Binds      map[string]Bind   // catch sub components $emit
+	Directives Directives
 
 	Childes GetChildes
 
@@ -69,7 +80,7 @@ type Component struct {
 }
 
 // NewComponent create new component
-func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
+func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
 	// Some stuff here, but now:
 	component := &Component{
 		Data:  data,
@@ -77,6 +88,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 		Methods: methods,
 		Handlers: handlers,
 		Binds: binds,
+		Directives: directives,
 
 		Tag:   tag,
 		Attrs: attrs,
@@ -86,10 +98,16 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 		ParentC: pC,
 	}
 
-	component.Childes = func(this Component) []interface{} {
+	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
 		for _, el := range childes {
-			compiled = append(compiled, el(this))
+			child   := el(*this)
+
+			if isComponent(child) && !I2C(child).Directives.If(I2C(child)) {
+				continue
+			}
+
+			compiled = append(compiled, child)
 		}
 
 		return compiled
@@ -98,7 +116,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 	return component
 }
 
-// CreateComponent render component
+// CreateComponent render component. Returns _el, err
 func CreateComponent(node interface{}) (*dom.Element, error) {
 	switch node.(type) {
 	case string:
@@ -113,43 +131,52 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 
 		return _node, nil
 	case *Component:
-		component := node.(*Component)
+		component := I2C(node)
 
-		_node := dom.NewElement(component.Tag)
-		if _node == nil {
+		_node, err := CreateElement(component)
+		if err != nil {
 			return nil, errors.New("cannot create component")
 		}
 
-		_node.SetAttribute("data-i", component.UUID) // set data-i for accept element from component methods
-
-		for attrName, attrBody := range component.Attrs {
-			//if attrIsValid(attrName, component.Tag) {} // check if attribute is valid for this tag
-			_node.SetAttribute(attrName, attrBody)
-		}
-
-		for handlerName, handlerBody := range component.Handlers {
-			//if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
-			_node.AddEventListener(handlerName, func(e dom.Event) {
-				handlerBody(*component, e)
-			})
-		}
-
-		for _, el := range component.Childes(*component) {
+		for _, el := range component.Childes(component) {
 			_child, err := CreateComponent(el)
 			if err != nil {
 				return nil, err
 			}
 
-			_node.AppendChild(_child)
+			if _child != nil {
+				_node.AppendChild(_child)
+			}
 		}
 
 		return _node, nil
-	case nil:
-		return CreateComponent("nil")
 	default:
-		err := fmt.Errorf("invalid component type: %T", node)
-		return nil, err
+		return nil, fmt.Errorf("invalid component type: %T", node)
 	}
+}
+
+// CreateElement create html element without childes
+func CreateElement(c *Component) (*dom.Element, error) {
+	_node := dom.NewElement(c.Tag)
+	if _node == nil {
+		return nil, errors.New("cannot create component")
+	}
+
+	_node.SetAttribute("data-i", c.UUID) // set data-i for accept element from component methods
+
+	for attrName, attrBody := range c.Attrs {
+		//if attrIsValid(attrName, component.Tag) {} // check if attribute is valid for this tag
+		_node.SetAttribute(attrName, attrBody)
+	}
+
+	for handlerName, handlerBody := range c.Handlers {
+		//if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
+		_node.AddEventListener(handlerName, func(e dom.Event) {
+			handlerBody(*c, e)
+		})
+	}
+
+	return _node, nil
 }
 
 // UpdateComponent trying to update component
@@ -161,19 +188,26 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 			return err
 		}
 
-		_parent.AppendChild(_new)
+		if _new != nil {
+			_parent.AppendChild(_new)
+		}
 
 		return nil
 	}
 
 	_childes := _parent.ChildNodes()
-	if _childes == nil {
-		return errors.New("_parent doesn't have childes")
+	if _childes == nil { return errors.New("_parent doesn't have childes") }
+
+	var _el *dom.Element
+	if len(_childes) > index { // component was hided if childes length <= index
+		_el = _childes[index]
 	}
-	if len(_childes) <= index { // check index on valid
-		return errors.New("invalid index")
+
+	newIsComponent := isComponent(new)
+	var newC *Component
+	if newIsComponent {
+		newC = I2C(new)
 	}
-	_el := _childes[index]
 
 	// if component has deleted
 	if new == nil {
@@ -193,18 +227,46 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 			return err
 		}
 
-		_old := _el
+		if _new != nil {
+			_parent.ReplaceChild(_new, _el)
+		}
 
-		_parent.ReplaceChild(_new, _old)
+		return nil
 	}
 
-	// if component childes have changed
-	// check that `new` and `old` is components
-	if isComponent(new) && isComponent(old) {
-		newChildes := new.(*Component).Childes(*new.(*Component)) // new.Childes(new)
-		oldChildes := old.(*Component).Childes(*old.(*Component)) // old.Childes(old)
+	// check if component childes updated
+	if newIsComponent {
+		_new, err := CreateComponent(new)
+		if err != nil {
+			return err
+		}
 
-		err := UpdateComponentChildes(_el, newChildes, oldChildes)
+		if _new != nil {
+			_parent.ReplaceChild(_new, _el)
+		}
+
+		return nil
+		// update element
+		//currentChildes := _el.ChildNodes() // get childes from old _el
+		//log.Println(currentChildes)
+		//
+		//_newEl, err := CreateElement(newC) // create new _el
+		//if err != nil {
+		//	return err
+		//}
+		//log.Println(_newEl)
+		//
+		//for _, _child := range currentChildes { // transfer childes from old _el to new
+		//	//_newEl.AppendChild(child)
+		//	dom.ConsoleLog(_child)
+		//	_newEl.AppendChild(_child)
+		//}
+
+		// update childes
+		newChildes := newC.Childes(newC) // new.Childes(new)
+		oldChildes := I2C(old).Childes(I2C(old)) // old.Childes(old)
+
+		err = UpdateComponentChildes(_el, newChildes, oldChildes)
 		if err != nil {
 			return err
 		}
@@ -226,6 +288,7 @@ func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface
 			elFromOld = oldChildes[i]
 		}
 
+		//if isComponent(elFromNew) && isComponent(elFromOld) {log.Println(elFromNew, elFromOld)}
 		err := UpdateComponent(_el, elFromNew, elFromOld, i)
 		if err != nil {
 			return err
@@ -233,6 +296,23 @@ func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface
 	}
 	return nil
 }
+
+// changed return true if node changed
+func changed(new, old interface{}) (bool, error) {
+	if fmt.Sprintf("%T", new) != fmt.Sprintf("%T", old) {
+		return true, nil
+	}
+
+	if isString(new) {
+		return new.(string) != old.(string), nil
+	} else if isComponent(new) {
+		return false, nil
+	}
+
+	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+}
+
+
 
 // GetData return data field by query string
 func (c *Component) GetData(query string) interface{} {
@@ -247,69 +327,40 @@ func (c *Component) GetData(query string) interface{} {
 
 // SetData set data field and update component (after changes)
 func (c *Component) SetData(query string, value interface{}) error {
-	oldChildes := c.Childes(*c)
+	oldChildes := c.Childes(c)
+
+
 	c.Data[query] = value
 
-	_c := c.GetElement()
-	dom.ConsoleLog(_c)
 
-	newChildes := c.Childes(*c)
+	newChildes := c.Childes(c)
+	_c := c.GetElement()
 
 	err := UpdateComponentChildes(_c, newChildes, oldChildes)
 	if err != nil {
-		dom.ConsoleError(err)
 		return err
 	}
 
 	return nil
 }
 
+
+
 // GetElement return *dom.Element by component structure
 func (c Component) GetElement() *dom.Element {
 	return dom.Doc.QuerySelector(fmt.Sprintf("[data-i='%s']", c.UUID)) // select element by data-i attribute
 }
 
+// I2C - convert interface{} to *Component
+func I2C(a interface{}) *Component {
+	return a.(*Component)
+}
 
 func isComponent(c interface{}) bool {
 	_, ok := c.(*Component)
 	return ok
 }
-
-func changed(new, old interface{}) (bool, error) {
-	newType := fmt.Sprintf("%T", new)
-	oldType := fmt.Sprintf("%T", old)
-
-	if newType != oldType {
-		return true, nil
-	}
-
-	if newType == "string" && newType == oldType {
-		newString, ok := new.(string)
-		if !ok {
-			return false, errors.New("invalid `new`")
-		}
-
-		oldString, ok := old.(string)
-		if !ok {
-			return false, errors.New("invalid `old`")
-		}
-
-		return newString != oldString, nil
-	}
-
-	if isComponent(new) && isComponent(old) {
-		newComponent, ok := new.(*Component)
-		if !ok {
-			return false, errors.New("invalid `new`")
-		}
-
-		oldComponent, ok := old.(*Component)
-		if !ok {
-			return false, errors.New("invalid `old`")
-		}
-
-		return newComponent != oldComponent, nil
-	}
-
-	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+func isString(c interface{}) bool {
+	_, ok := c.(string)
+	return ok
 }

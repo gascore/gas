@@ -52,10 +52,16 @@ type Bind func(Component) string
 // Catcher catching sub component $emit and doing his business  (analogue for vue `v-on:`). 
 type Catcher func(Component)
 
-// Directives struct storing component directives
+// Directives struct storing component if-directive
 type Directives struct {
 	If func(*Component) bool
-	For func(arr []interface{}) []Component
+	For ForDirective
+}
+
+// ForDirective struct for For Directive (needful because `for` want name and render function)
+type ForDirective struct {
+	Data string
+	Render func(arr []interface{}) []interface{}
 }
 
 // Handler -- handler exec function when event trigger
@@ -108,7 +114,26 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 		for _, el := range childes {
 			child   := el(*this)
 
-			if isComponent(child) && !I2C(child).Directives.If(I2C(child)) {
+			if isComponent(child) {
+				childC := I2C(child)
+				if !childC.Directives.If(childC) {
+					continue
+				}
+
+				// if for.Data doesn't exist, but render exist - it's a user problem
+				if childC.Directives.For.Data != "" {
+					dataForList, ok := childC.Data[childC.Directives.For.Data].([]interface{})
+					if !ok {
+						dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
+						continue
+					}
+
+					renderedList := childC.Directives.For.Render(dataForList)
+					for _, oneOfChildes := range renderedList {
+						compiled = append(compiled, oneOfChildes)
+					}
+				}
+
 				continue
 			}
 

@@ -7,7 +7,7 @@ import (
 
 // Example application #3
 //
-// 'directives' shows how you can use component.Directives
+// 'if-directive' shows how you can use component.Directives
 func main() {
 	app, err :=
 		gas.New(

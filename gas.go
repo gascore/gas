@@ -27,7 +27,7 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 		NilParentComponent,
 		NilData, // data
 		NilMethods, // methods
-		NilDirectives, // directives
+		NilDirectives, // if-directive
 		NilBinds, // binds
 		NilHandlers, // handlers
 		_el.GetTagName(), // tag name

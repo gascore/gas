@@ -53,9 +53,7 @@ func (gas *Gas) Init() error {
 			return err
 		}
 
-		if _child != nil {
-			_main.AppendChild(_child)
-		}
+		_main.AppendChild(_child)
 	}
 
 	dom.Doc.GetElementsByTagName("body")[0].SetAttribute("data-ready", true)

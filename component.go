@@ -29,7 +29,7 @@ var (
 type Context interface{}
 
 // Method - struct for Component methods
-type Method func(Context)
+type Method func(Context) interface{}
 
 // GetComponent returns component child
 type GetComponent func(Component) interface{}
@@ -44,10 +44,13 @@ type GetComponent func(Component) interface{}
 // 2. Another component
 type GetChildes func(*Component) []interface{}
 
-// Bind -- bind catching sub component $emit and doing his business.
-// It's analogue for vue `v-bind:`
+// Bind - dynamic component attribute (analogue for vue `v-bind:`).
+//
 // Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
 type Bind func(Component) string
+
+// Catcher catching sub component $emit and doing his business  (analogue for vue `v-on:`). 
+type Catcher func(Component)
 
 // Directives struct storing component directives
 type Directives struct {
@@ -61,11 +64,13 @@ type Handler func(Component, dom.Event)
 // Component -- basic component struct
 type Component struct {
 	Data  map[string]interface{}
-	Props map[string]interface{}
-
+	
+	Props 	 map[string]interface{}
+	Catchers map[string]Catcher // catch child components $emit
+	
 	Methods    map[string]Method
 	Handlers   map[string]Handler // events handlers: onClick, onHover
-	Binds      map[string]Bind   // catch sub components $emit
+	Binds      map[string]Bind    // dynamic attributes
 	Directives Directives
 
 	Childes GetChildes

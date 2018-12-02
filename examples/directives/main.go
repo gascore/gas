@@ -44,9 +44,9 @@ func main() {
 							},
 							func(this2 gas.Component) interface{} {
 								if this.GetData("show").(bool) {
-									return "Hide text"
-								} else {
 									return "Show text"
+								} else {
+									return "Hide text"
 								}
 							})
 					},

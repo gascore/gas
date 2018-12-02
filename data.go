@@ -1,6 +1,6 @@
 package gas
 
-import(
+import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 )
@@ -18,16 +18,16 @@ func (c *Component) GetData(query string) interface{} {
 
 // SetData set data field and update component (after changes)
 func (c *Component) SetData(query string, value interface{}) error {
-	oldChildes := c.Childes(c)
+	oldTree := renderTree(c)
 
 
 	c.Data[query] = value
 
 
-	newChildes := c.Childes(c)
+	newTree := renderTree(c)
 	_c := c.GetElement()
 
-	err := UpdateComponentChildes(_c, newChildes, oldChildes)
+	err := UpdateComponentChildes(_c, oldTree, newTree)
 	if err != nil {
 		return err
 	}

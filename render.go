@@ -1,8 +1,8 @@
 package gas
 
-import(
-	"fmt"
+import (
 	"errors"
+	"fmt"
 	"github.com/Sinicablyat/dom"
 )
 
@@ -67,6 +67,7 @@ func CreateElement(c *Component) (*dom.Element, error) {
 	return _node, nil
 }
 
+
 // UpdateComponent trying to update component
 func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, index int) error {
 	// if component has created
@@ -91,9 +92,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 
 	newIsComponent := isComponent(new)
 	var newC *Component
-	if newIsComponent {
-		newC = I2C(new)
-	}
+	if newIsComponent {newC = I2C(new)}
 
 	// if component has deleted
 	if new == nil {
@@ -130,12 +129,8 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		}
 
 		_parent.ReplaceChild(_new, _el)
-		
-		// update childes
-		newChildes := newC.Childes(newC) // new.Childes(new)
-		oldChildes := I2C(old).Childes(I2C(old)) // old.Childes(old)
 
-		err = UpdateComponentChildes(_new, newChildes, oldChildes)
+		err = UpdateComponentChildes(_new, newC.RChildes, I2C(old).RChildes)
 		if err != nil {
 			return err
 		}
@@ -157,7 +152,6 @@ func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface
 			elFromOld = oldChildes[i]
 		}
 
-		//if isComponent(elFromNew) && isComponent(elFromOld) {log.Println(elFromNew, elFromOld)}
 		err := UpdateComponent(_el, elFromNew, elFromOld, i)
 		if err != nil {
 			return err
@@ -179,4 +173,19 @@ func changed(new, old interface{}) (bool, error) {
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+}
+
+// renderTree return full rendered childes tree of component
+func renderTree(c *Component) []interface{} {
+	var childes []interface{}
+	for _, el := range c.Childes(c) {
+		if isComponent(el) {
+			elC := I2C(el)
+			elC.RChildes = renderTree(elC)
+			el = elC
+		}
+
+		childes = append(childes, el)
+	}
+	return childes
 }

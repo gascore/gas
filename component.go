@@ -74,6 +74,7 @@ type Component struct {
 	Directives Directives
 
 	Childes GetChildes
+	RChildes []interface{} // rendered childes
 
 	Tag   string
 	Attrs map[string]string

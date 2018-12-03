@@ -27,7 +27,7 @@ func (c *Component) SetData(query string, value interface{}) error {
 	newTree := renderTree(c)
 	_c := c.GetElement()
 
-	err := UpdateComponentChildes(_c, oldTree, newTree)
+	err := UpdateComponentChildes(_c, newTree, oldTree)
 	if err != nil {
 		return err
 	}

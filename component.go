@@ -61,7 +61,7 @@ type Directives struct {
 // ForDirective struct for For Directive (needful because `for` want name and render function)
 type ForDirective struct {
 	Data string
-	Render func(arr []interface{}) []interface{}
+	Render func(int, interface{}, *Component) []GetComponent
 }
 
 // Handler -- handler exec function when event trigger
@@ -112,7 +112,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
 		for _, el := range childes {
-			child   := el(*this)
+			child := el(*this)
 
 			if isComponent(child) {
 				childC := I2C(child)
@@ -122,19 +122,32 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 
 				// if for.Data doesn't exist, but render exist - it's a user problem
 				if childC.Directives.For.Data != "" {
-					dataForList, ok := childC.Data[childC.Directives.For.Data].([]interface{})
+					dataForList, ok := this.Data[childC.Directives.For.Data].([]interface{})
 					if !ok {
 						dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
 						continue
 					}
 
-					renderedList := childC.Directives.For.Render(dataForList)
-					for _, oneOfChildes := range renderedList {
-						compiled = append(compiled, oneOfChildes)
-					}
-				}
+					clearedDirective := childC.Directives
+					clearedDirective.For = ForDirective{}
 
-				continue
+					//childesList := childC.Directives.For.Render(dataForList, this)
+
+					renderer := childC.Directives.For.Render
+					for i, el := range dataForList {
+						// recreate this component with childes from FOR, without FOR directive
+						oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
+						compiled = append(compiled, oneOfComponents)
+					}
+
+					//for _, subChildes := range childesList {
+					//	// recreate this component with childes from FOR, without FOR directive
+					//	oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, subChildes...)
+					//	compiled = append(compiled, oneOfComponents)
+					//}
+
+					continue
+				}
 			}
 
 			compiled = append(compiled, child)
@@ -155,6 +168,9 @@ func (c Component) GetElement() *dom.Element {
 func I2C(a interface{}) *Component {
 	return a.(*Component)
 }
+
+// ToGetComponentList return array by many parameters, because it's pretty
+func ToGetComponentList(childes ...GetComponent) []GetComponent {return childes}
 
 func isComponent(c interface{}) bool {
 	_, ok := c.(*Component)

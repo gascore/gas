@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
 )
 
@@ -16,15 +17,15 @@ func main() {
 				return gas.NewComponent(
 					&p,
 					map[string]interface{}{
-						"arr": []interface{}{"one", "two", "three"},
+						"arr": []interface{}{"click", "here", "if you want to see some magic"},
 					},
 					gas.NilMethods,
 					gas.NilDirectives,
 					gas.NilBinds,
 					gas.NilHandlers,
-					"h1",
+					"ul",
 					map[string]string{
-						"id": "if",
+						"id": "list",
 					},
 					func(this gas.Component) interface{} {
 						return gas.NewComponent(
@@ -35,19 +36,27 @@ func main() {
 								If: gas.NilIfDirective,
 								For: gas.ForDirective{
 									Data: "arr",
-									Render: func(arr []interface{}) []interface{} {
-										var elements []interface{}
-										for i, el := range arr {
-											elements = append(elements, fmt.Sprintf("%d: %s", i, el))
-										}
-										return elements
+									Render: func(i int, el interface{}, this *gas.Component) []gas.GetComponent {
+										return gas.ToGetComponentList(
+											func(this2 gas.Component) interface{} {
+												return fmt.Sprintf("%d: %s", i+1, el)
+											},)
 									},
 								},
 							},
 							gas.NilBinds,
-							gas.NilHandlers,
-							"i",
-							gas.NilAttrs) // In components with For Directive childes are ignored
+							map[string]gas.Handler {
+								"click": func(c gas.Component, e dom.Event) {
+									arr := this.GetData("arr").([]interface{})
+									arr = append(arr, e.Type())
+									gas.WarnError(this.SetData("arr", arr))
+								},
+							},
+							"li",
+							gas.NilAttrs,) // In components with FOR Directive childes are ignored
+					},
+					func(this gas.Component) interface{} {
+						return "end of list"
 					})
 			},)
 	must(err)

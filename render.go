@@ -143,12 +143,12 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface{}) error {
 	for i := 0; i < len(newChildes) || i < len(oldChildes); i++ {
 		var elFromNew interface{}
-		if len(newChildes) >= i {
+		if len(newChildes) > i {
 			elFromNew = newChildes[i]
 		}
 
 		var elFromOld interface{}
-		if len(oldChildes) >= i {
+		if len(oldChildes) > i {
 			elFromOld = oldChildes[i]
 		}
 

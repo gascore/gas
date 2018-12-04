@@ -9,7 +9,7 @@ import (
 var (
 	// NilParentComponent Nil value for Component.ParentC
 	NilParentComponent *Component
-	// NilData Nil value for Component.Data and .Props
+	// NilData Nil value for Component.Data
 	NilData map[string]interface{}
 	// NilAttrs Nil value for Component.Attrs
 	NilAttrs map[string]string
@@ -32,7 +32,7 @@ type Context interface{}
 type Method func(Context) interface{}
 
 // GetComponent returns component child
-type GetComponent func(Component) interface{}
+type GetComponent func(*Component) interface{}
 
 // GetChildes -- function returning component childes
 // In function parameter sends `this` component and you can get it data from this parameter
@@ -67,17 +67,16 @@ type ForDirective struct {
 // Handler -- handler exec function when event trigger
 type Handler func(Component, dom.Event)
 
+
 // Component -- basic component struct
 type Component struct {
 	Data  map[string]interface{}
-	
-	Props 	 map[string]interface{}
+
 	Catchers map[string]Catcher // catch child components $emit
-	
-	Methods    map[string]Method
-	Handlers   map[string]Handler // events handlers: onClick, onHover
-	Binds      map[string]Bind    // dynamic attributes
-	Directives Directives
+	Methods    	 map[string]Method
+	Handlers     map[string]Handler // events handlers: onClick, onHover
+	Binds      	 map[string]Bind    // dynamic attributes
+	Directives 	 Directives
 
 	Childes GetChildes
 	RChildes []interface{} // rendered childes
@@ -89,6 +88,7 @@ type Component struct {
 
 	ParentC *Component
 }
+
 
 // NewComponent create new component
 func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
@@ -112,7 +112,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
 		for _, el := range childes {
-			child := el(*this)
+			child := el(this)
 
 			if isComponent(child) {
 				childC := I2C(child)
@@ -131,20 +131,12 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 					clearedDirective := childC.Directives
 					clearedDirective.For = ForDirective{}
 
-					//childesList := childC.Directives.For.Render(dataForList, this)
-
 					renderer := childC.Directives.For.Render
 					for i, el := range dataForList {
 						// recreate this component with childes from FOR, without FOR directive
 						oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
 						compiled = append(compiled, oneOfComponents)
 					}
-
-					//for _, subChildes := range childesList {
-					//	// recreate this component with childes from FOR, without FOR directive
-					//	oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, subChildes...)
-					//	compiled = append(compiled, oneOfComponents)
-					//}
 
 					continue
 				}

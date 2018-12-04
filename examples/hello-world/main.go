@@ -11,9 +11,9 @@ func main() {
 	app, err :=
 		gas.New(
 			"app",
-			func(p gas.Component) interface{} {
+			func(p *gas.Component) interface{} {
 			return gas.NewComponent(
-				&p,
+				p,
 				map[string]interface{}{
 					"hello": "Hello world!",
 				},
@@ -26,13 +26,13 @@ func main() {
 					"id":    "hello-world",
 					"class": "greeting h1",
 				},
-				func(this gas.Component) interface{} {
+				func(this *gas.Component) interface{} {
 					return this.GetData("hello")
 				})
 			},
-			func(p gas.Component) interface{} {
+			func(p *gas.Component) interface{} {
 			return gas.NewComponent(
-				&p,
+				p,
 				gas.NilData,
 				gas.NilMethods,
 				gas.NilDirectives,
@@ -44,7 +44,7 @@ func main() {
 					"class": "greeting",
 					"style": "margin-right: 12px;",
 				},
-				func(this gas.Component) interface{} {
+				func(this *gas.Component) interface{} {
 					return "Ciao mondo!" // I'm not italian, but i love films about mafia
 				})
 			},)

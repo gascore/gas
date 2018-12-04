@@ -6,16 +6,16 @@ import (
 	"github.com/Sinicablyat/gas"
 )
 
-// Example application #3
+// Example application #4
 //
 // 'if-directive' shows how you can use component.Directives
 func main() {
 	app, err :=
 		gas.New(
 			"app",
-			func(p gas.Component) interface{} {
+			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					&p,
+					p,
 					map[string]interface{}{
 						"arr": []interface{}{"click", "here", "if you want to see some magic"},
 					},
@@ -27,9 +27,9 @@ func main() {
 					map[string]string{
 						"id": "list",
 					},
-					func(this gas.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							&p,
+							p,
 							gas.NilData,
 							gas.NilMethods,
 							gas.Directives{
@@ -38,7 +38,7 @@ func main() {
 									Data: "arr",
 									Render: func(i int, el interface{}, this *gas.Component) []gas.GetComponent {
 										return gas.ToGetComponentList(
-											func(this2 gas.Component) interface{} {
+											func(this2 *gas.Component) interface{} {
 												return fmt.Sprintf("%d: %s", i+1, el)
 											},)
 									},
@@ -48,14 +48,14 @@ func main() {
 							map[string]gas.Handler {
 								"click": func(c gas.Component, e dom.Event) {
 									arr := this.GetData("arr").([]interface{})
-									arr = append(arr, e.Type())
+									arr = append(arr, "Hello!") // hello, Annoy-o-Tron
 									gas.WarnError(this.SetData("arr", arr))
 								},
 							},
 							"li",
 							gas.NilAttrs,) // In components with FOR Directive childes are ignored
 					},
-					func(this gas.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return "end of list"
 					})
 			},)

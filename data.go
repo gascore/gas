@@ -1,17 +1,9 @@
 package gas
 
-import (
-	"fmt"
-	"github.com/Sinicablyat/dom"
-)
-
 // GetData return data field by query string
 func (c *Component) GetData(query string) interface{} {
 	// There will be callbacks, events, e.t.c.
 	data := c.Data[query]
-	if data == nil {
-		dom.ConsoleError(fmt.Sprintf(`"%s"trying to accept nil data`, c.Tag))
-	}
 
 	return data
 }

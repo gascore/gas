@@ -12,9 +12,9 @@ func main() {
 	app, err :=
 		gas.New(
 			"app",
-			func(p gas.Component) interface{} {
+			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					&p,
+					p,
 					map[string]interface{}{
 						"show": true,
 					},
@@ -26,9 +26,9 @@ func main() {
 					map[string]string{
 						"id": "if",
 					},
-					func(this gas.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							&p,
+							p,
 							gas.NilData,
 							gas.NilMethods,
 							gas.NilDirectives,
@@ -42,7 +42,7 @@ func main() {
 							map[string]string{
 								"id": "if__button",
 							},
-							func(this2 gas.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								if this.GetData("show").(bool) {
 									return "Show text"
 								} else {
@@ -50,9 +50,9 @@ func main() {
 								}
 							})
 					},
-					func(this gas.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							&p,
+							p,
 							gas.NilData,
 							gas.NilMethods,
 							gas.Directives{
@@ -64,13 +64,13 @@ func main() {
 							gas.NilHandlers,
 							"i",
 							gas.NilAttrs,
-							func(this2 gas.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Hidden text"
 							})
 					},
-					func(this gas.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							&p,
+							p,
 							gas.NilData,
 							gas.NilMethods,
 							gas.Directives{
@@ -82,7 +82,7 @@ func main() {
 							gas.NilHandlers,
 							"b",
 							gas.NilAttrs,
-							func(this2 gas.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Public text"
 							})
 					})

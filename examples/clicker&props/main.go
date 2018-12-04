@@ -1,21 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
 )
 
 // Example application #2
 //
-// 'clicker' shows how you can add handlers and change component.Data
+// 'clicker&props' shows how you can add handlers, change component.Data and use external components
 func main() {
 	app, err :=
 		gas.New(
 			"app",
-			func(p gas.Component) interface{} {
+			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					&p,
+					p,
 					map[string]interface{}{
 						"click": 0,
 					},
@@ -25,11 +24,11 @@ func main() {
 					gas.NilHandlers,
 					"h1",
 					map[string]string{
-						"id": "clicker",
+						"id": "clicker&props",
 					},
-					func(this gas.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							&p,
+							p,
 							gas.NilData,
 							gas.NilMethods,
 							gas.NilDirectives,
@@ -44,12 +43,29 @@ func main() {
 							map[string]string{
 								"id": "clicker__button", // I love BEM
 							},
-							func(this2 gas.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Click me!"
 							})
 					},
-					func(this gas.Component) interface{} {
-						return fmt.Sprintf("You clicked button %d times", this.GetData("click").(int))
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							this,
+							gas.NilData,
+							gas.NilMethods,
+							gas.NilDirectives,
+							gas.NilBinds,
+							gas.NilHandlers,
+							"span",
+							map[string]string{
+								"id": "needful_wrapper",
+							},
+							func(this2 *gas.Component) interface{} {
+								return "You clicked button: "
+							},
+							func(this2 *gas.Component) interface{} {
+								// It's EXTERNAL component!
+								return GetNumberViewer(this2, this.GetData("click").(int))
+							})
 					})
 			},)
 	must(err)

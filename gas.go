@@ -2,6 +2,7 @@ package gas
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Sinicablyat/dom"
 )
@@ -27,6 +28,7 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 		NilParentComponent,
 		NilData, // data
 		NilMethods, // methods
+		NilComputeds, // computed
 		NilDirectives, // if-directive
 		NilBinds, // binds
 		NilHandlers, // handlers
@@ -68,6 +70,15 @@ func WarnError(err error) {
 	}
 
 	dom.ConsoleError(err.Error())
+}
+
+// WarnIfNot console error if !ok
+func WarnIfNot(ok bool) {
+	if ok {
+		return
+	}
+
+	dom.ConsoleError(fmt.Sprintf("invalid data type"))
 }
 
 var signal = make(chan int)

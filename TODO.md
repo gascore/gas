@@ -2,7 +2,6 @@
 
 ### A class tasks:
 
-* Props & $emit
 * v-html
 * v-model
 * is-static

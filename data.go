@@ -1,5 +1,10 @@
 package gas
 
+import (
+	"fmt"
+	"github.com/Sinicablyat/dom"
+)
+
 // GetData return data field by query string
 func (c *Component) GetData(query string) interface{} {
 	// There will be callbacks, events, e.t.c.
@@ -13,7 +18,7 @@ func (c *Component) SetData(query string, value interface{}) error {
 	oldTree := renderTree(c)
 
 
-	c.Data[query] = value
+	_ = c.SetDataFree(query, value)
 
 
 	newTree := renderTree(c)
@@ -23,6 +28,17 @@ func (c *Component) SetData(query string, value interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+// SetDataFree set data without update
+func (c *Component) SetDataFree(query string, value interface{}) error {
+	if value == nil {
+		dom.ConsoleError(fmt.Sprintf("trying to set nil value to %s field", query))
+	}
+
+	c.Data[query] = value
 
 	return nil
 }

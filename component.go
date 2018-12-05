@@ -19,6 +19,8 @@ var (
 	NilHandlers map[string]Handler
 	// NilMethods Nil value for Component.Methods
 	NilMethods map[string]Method
+	// NilComputeds Nil value for Component.Computeds
+	NilComputeds map[string]Computed
 	// NilDirectives Nil value for Component.Directives
 	NilDirectives = Directives{If:NilIfDirective}
 	// NilIfDirective Nil value for Directives.If
@@ -29,7 +31,10 @@ var (
 type Context interface{}
 
 // Method - struct for Component methods
-type Method func(Context) interface{}
+type Method func(*Component) error
+
+// Computed - struct for Component computed values
+type Computed func(*Component) (interface{}, error)
 
 // GetComponent returns component child
 type GetComponent func(*Component) interface{}
@@ -72,8 +77,11 @@ type Handler func(Component, dom.Event)
 type Component struct {
 	Data  map[string]interface{}
 
-	Catchers map[string]Catcher // catch child components $emit
 	Methods    	 map[string]Method
+	Computeds    map[string]Computed
+
+	Catchers map[string]Catcher // catch child components $emit
+
 	Handlers     map[string]Handler // events handlers: onClick, onHover
 	Binds      	 map[string]Bind    // dynamic attributes
 	Directives 	 Directives
@@ -91,12 +99,14 @@ type Component struct {
 
 
 // NewComponent create new component
-func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
+func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, computeds map[string]Computed, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
 	// Some stuff here, but now:
 	component := &Component{
 		Data:  data,
 
 		Methods: methods,
+		Computeds: computeds,
+
 		Handlers: handlers,
 		Binds: binds,
 		Directives: directives,
@@ -134,7 +144,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 					renderer := childC.Directives.For.Render
 					for i, el := range dataForList {
 						// recreate this component with childes from FOR, without FOR directive
-						oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
+						oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, computeds, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
 						compiled = append(compiled, oneOfComponents)
 					}
 

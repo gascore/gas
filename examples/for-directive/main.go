@@ -20,6 +20,7 @@ func main() {
 						"arr": []interface{}{"click", "here", "if you want to see some magic"},
 					},
 					gas.NilMethods,
+					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
 					gas.NilHandlers,
@@ -32,6 +33,7 @@ func main() {
 							p,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilComputeds,
 							gas.Directives{
 								If: gas.NilIfDirective,
 								For: gas.ForDirective{

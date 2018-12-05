@@ -19,6 +19,7 @@ func main() {
 						"show": true,
 					},
 					gas.NilMethods,
+					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
 					gas.NilHandlers,
@@ -31,6 +32,7 @@ func main() {
 							p,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilComputeds,
 							gas.NilDirectives,
 							gas.NilBinds,
 							map[string]gas.Handler {
@@ -55,6 +57,7 @@ func main() {
 							p,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilComputeds,
 							gas.Directives{
 								If: func(c *gas.Component) bool {
 									return !this.GetData("show").(bool)
@@ -73,6 +76,7 @@ func main() {
 							p,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilComputeds,
 							gas.Directives{
 								If: func(c *gas.Component) bool {
 									return this.GetData("show").(bool)

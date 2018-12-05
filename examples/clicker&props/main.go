@@ -19,6 +19,7 @@ func main() {
 						"click": 0,
 					},
 					gas.NilMethods,
+					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
 					gas.NilHandlers,
@@ -31,6 +32,7 @@ func main() {
 							p,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilComputeds,
 							gas.NilDirectives,
 							gas.NilBinds,
 							map[string]gas.Handler {
@@ -52,6 +54,7 @@ func main() {
 							this,
 							gas.NilData,
 							gas.NilMethods,
+							gas.NilComputeds,
 							gas.NilDirectives,
 							gas.NilBinds,
 							gas.NilHandlers,

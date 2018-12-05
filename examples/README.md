@@ -15,3 +15,6 @@ Hosting in [jsgo.io](https://jsgo.io) examples:
 2. [clicker&props](https://jsgo.io/86a05e9639356cfaf8fa7d132d7fb59e8f41eb14)
 3. [if-directive](https://jsgo.io/0405778772a063a3c4dd043bcc75aac72a6b9d4d)
 4. [for-directive](https://jsgo.io/299d6c35a2192707e0d14016c257bfce1542ccbb)
+5. [methods&computed-directive](https://jsgo.io/eb8b3c235e7ce813be9c6410ffc0b8cbd936a26f)
+
+Examples may be old, because recreate examples after every commits is really disrespectful to [jsgo.io](https://jsgo.io)

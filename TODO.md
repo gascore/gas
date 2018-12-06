@@ -2,10 +2,11 @@
 
 ### A class tasks:
 
-* v-html
 * v-model
+* TextNode (say no to `<span>`)
+* fix bugs in render.go
+* v-html
 * is-static
-* methods for stuff, computed for values?
 * Watchers
 
 ### B class tasks:

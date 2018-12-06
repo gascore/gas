@@ -31,10 +31,10 @@ var (
 type Context interface{}
 
 // Method - struct for Component methods
-type Method func(*Component) error
+type Method func(*Component, ...interface{}) error
 
 // Computed - struct for Component computed values
-type Computed func(*Component) (interface{}, error)
+type Computed func(*Component, ...interface{}) (interface{}, error)
 
 // GetComponent returns component child
 type GetComponent func(*Component) interface{}

@@ -5,24 +5,18 @@ import (
 	"fmt"
 )
 
+type PocketMethod func(...interface{}) error
+
+type PocketComputed func(...interface{})(interface{}, error)
+
 // Method runs a component method and updates component after
-func (c *Component) Method(name string) error {
-	method := c.Methods[name]
-	if method == nil {
+func (c *Component) Method(name string, values ...interface{}) error {
+	method, err := c.GetPocketMethod(name)
+	if err != nil {
 		return errors.New(fmt.Sprintf("invalid method name: %s", name))
 	}
 
-	oldTree := renderTree(c) // save rendered tree before
-
-	err := method(c) // run method
-	if err != nil {
-		return err
-	}
-
-	newTree := renderTree(c) // save rendered tree after
-	_c := c.GetElement()
-
-	err = UpdateComponentChildes(_c, newTree, oldTree) // update component after changes
+	err = method(values...) // run method
 	if err != nil {
 		return err
 	}
@@ -30,16 +24,60 @@ func (c *Component) Method(name string) error {
 	return nil
 }
 
-func (c *Component) Computed(name string) (interface{}, error) {
-	computed := c.Computeds[name]
-	if computed == nil {
-		return nil, errors.New(fmt.Sprintf("invalid computed name: %s", name))
+// GetPocketMethod return function returns executing method with binding component
+func (c *Component) GetPocketMethod(name string) (PocketMethod, error)  {
+	method := c.Methods[name]
+	if method == nil {
+		return nil, errors.New(fmt.Sprintf("invalid method name: %s", name))
 	}
 
-	value, err := computed(c)
+	bindingMethod := func(values ...interface{}) error {
+		oldTree := renderTree(c) // save rendered tree before
+
+		err := method(c, values...) // run method
+		if err != nil {
+			return err
+		}
+
+		newTree := renderTree(c) // save rendered tree after
+		_c := c.GetElement()
+
+		err = UpdateComponentChildes(_c, newTree, oldTree) // update component after changes
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return bindingMethod, nil
+}
+
+// Computed runs a component computed and returns values from it
+func (c *Component) Computed(name string, values ...interface{}) (interface{}, error) {
+	computed, err := c.GetPocketComputed(name)
+	if err != nil {
+		return nil, err
+	}
+
+	value, err := computed(values...)
 	if err != nil {
 		return nil, err
 	}
 
 	return value, nil
+}
+
+// GetPocketComputed return function returns executing computed with binding component
+func (c *Component) GetPocketComputed(name string) (PocketComputed, error)  {
+	computed := c.Computeds[name]
+	if computed == nil {
+		return nil, errors.New(fmt.Sprintf("invalid computed name: %s", name))
+	}
+
+	bindingComputed := func(values ...interface{}) (interface{}, error) {
+		return computed(c, values...)
+	}
+
+	return bindingComputed, nil
 }

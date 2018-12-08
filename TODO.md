@@ -1,22 +1,20 @@
 # TODO list
 
-### A class tasks:
+## A class tasks
 
-* v-model
-* TextNode (say no to `<span>`)
-* fix bugs in render.go
 * v-html
+* TextNode (say no to `<span>`)
 * is-static
 * Watchers
 
-### B class tasks:
+## B class tasks
 
 * lifecycle (created, updated, going delete)
 * template parser
 * redux-like
 * router
 
-### C class tasks:
+## C class tasks
 
 * Create normal site
 * Initial D - Deja Vu

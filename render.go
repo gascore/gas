@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Sinicablyat/dom"
+	"github.com/google/go-cmp/cmp"
+	"strconv"
 )
 
 // CreateComponent render component. Returns _el, err
@@ -64,6 +66,49 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		})
 	}
 
+	if len(c.Directives.Model.Data) != 0 && c.Tag == "input" { // model allowed only for <input>
+		_node.AddEventListener("input", func(e dom.Event) {
+			_target := e.Target()
+			inputValue := _target.GetValue("value").String()
+
+			var (
+				inputType string
+				inputValueTyped interface{}
+				err error
+			)
+			switch c.Attrs["type"] {
+			case "range", "number":
+				inputType = "int"
+				inputValueTyped, err = strconv.Atoi(inputValue)
+				if err != nil {
+					WarnError(err)
+				}
+
+				break
+			case "checkbox":
+				inputType = "bool"
+				inputValueTyped = _target.GetValue("checked").Bool()
+				break
+			default:
+				inputType = "string"
+				inputValueTyped = inputValue
+				break
+			}
+
+			this := c.Directives.Model.Component
+
+			dataValue := this.GetData(c.Directives.Model.Data)
+			if inputType != fmt.Sprintf("%T", dataValue) {
+				WarnError(errors.New("input type != data type"))
+			}
+
+			err = this.SetData(c.Directives.Model.Data, inputValueTyped)
+			if err != nil {
+				WarnError(err)
+			}
+		})
+	}
+
 	return _node, nil
 }
 
@@ -119,18 +164,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 
 	// check if component childes updated
 	if newIsComponent {
-		_new, err := CreateElement(newC)
-		if err != nil {
-			return err
-		}
-
-		for len(_el.ChildNodes()) > 0 { // transfer _old childes to _new
-			_new.AppendChild(_el.ChildNodes()[0])
-		}
-
-		_parent.ReplaceChild(_new, _el)
-
-		err = UpdateComponentChildes(_new, newC.RChildes, I2C(old).RChildes)
+		err = UpdateComponentChildes(_el, newC.RChildes, I2C(old).RChildes)
 		if err != nil {
 			return err
 		}
@@ -169,7 +203,7 @@ func changed(new, old interface{}) (bool, error) {
 	if isString(new) {
 		return new.(string) != old.(string), nil
 	} else if isComponent(new) {
-		return false, nil
+		return cmp.Equal(I2C(new), I2C(old)), nil // thank you god for the go-cmp
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)

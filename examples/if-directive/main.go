@@ -7,7 +7,7 @@ import (
 
 // Example application #3
 //
-// 'if-directive' shows how you can use component.Directives
+// 'if-directive' shows how you can use component.Directive.If
 func main() {
 	app, err :=
 		gas.New(
@@ -29,7 +29,7 @@ func main() {
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							p,
+							this,
 							gas.NilData,
 							gas.NilMethods,
 							gas.NilComputeds,
@@ -54,7 +54,7 @@ func main() {
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							p,
+							this,
 							gas.NilData,
 							gas.NilMethods,
 							gas.NilComputeds,
@@ -73,7 +73,7 @@ func main() {
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							p,
+							this,
 							gas.NilData,
 							gas.NilMethods,
 							gas.NilComputeds,

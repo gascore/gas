@@ -17,9 +17,7 @@ func (c *Component) GetData(query string) interface{} {
 func (c *Component) SetData(query string, value interface{}) error {
 	oldTree := renderTree(c)
 
-
 	_ = c.SetDataFree(query, value)
-
 
 	newTree := renderTree(c)
 	_c := c.GetElement()

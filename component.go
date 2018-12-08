@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/frankenbeanies/uuid4"
+	"strings"
 )
 
 var (
@@ -61,6 +62,12 @@ type Catcher func(Component)
 type Directives struct {
 	If func(*Component) bool
 	For ForDirective
+	Model ModelDirective
+}
+
+type ModelDirective struct {
+	Data string
+	Component *Component
 }
 
 // ForDirective struct for For Directive (needful because `for` want name and render function)
@@ -111,7 +118,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 		Binds: binds,
 		Directives: directives,
 
-		Tag:   tag,
+		Tag:   strings.ToLower(tag),
 		Attrs: attrs,
 
 		UUID: uuid4.New().String(),

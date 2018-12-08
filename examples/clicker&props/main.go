@@ -29,7 +29,7 @@ func main() {
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							p,
+							this,
 							gas.NilData,
 							gas.NilMethods,
 							gas.NilComputeds,
@@ -67,7 +67,7 @@ func main() {
 							},
 							func(this2 *gas.Component) interface{} {
 								// It's EXTERNAL component!
-								return GetNumberViewer(this2, this.GetData("click").(int))
+								return GetNumberViewer(this, this.GetData("click").(int))
 							})
 					})
 			},)

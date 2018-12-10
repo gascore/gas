@@ -90,7 +90,7 @@ func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Componen
 		gas.NilDirectives,
 		gas.NilBinds,
 		map[string]gas.Handler {
-			"click": func(c gas.Component, e dom.Event) {
+			"click": func(c *gas.Component, e dom.Event) {
 				// Of course we can use method for `this`.
 				// But if we want to pass method to child not from `this` we need to pass a pocket method/computed.
 				gas.WarnError(toggleMethod())
@@ -119,6 +119,7 @@ func getHiddenText(this *gas.Component, isShow bool, getNumber gas.PocketCompute
 			If: func(c *gas.Component) bool {
 				return !isShow
 			},
+			HTML: gas.NilHTMLDirective,
 		},
 		gas.NilBinds,
 		gas.NilHandlers,

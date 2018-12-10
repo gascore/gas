@@ -49,6 +49,7 @@ func (gas *Gas) Init() error {
 	app := gas.App
 	_main := gas.Element
 
+	_main.SetAttribute("data-i", app.UUID)
 	for _, el := range app.Childes(&app) {
 		_child, err := CreateComponent(el)
 		if err != nil {

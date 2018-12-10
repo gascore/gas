@@ -36,7 +36,7 @@ func main() {
 							gas.NilDirectives,
 							gas.NilBinds,
 							map[string]gas.Handler {
-								"click": func(c gas.Component, e dom.Event) {
+								"click": func(c *gas.Component, e dom.Event) {
 									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
 							},
@@ -62,6 +62,7 @@ func main() {
 								If: func(c *gas.Component) bool {
 									return !this.GetData("show").(bool)
 								},
+								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
 							gas.NilHandlers,
@@ -81,6 +82,7 @@ func main() {
 								If: func(c *gas.Component) bool {
 									return this.GetData("show").(bool)
 								},
+								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
 							gas.NilHandlers,

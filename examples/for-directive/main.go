@@ -45,10 +45,11 @@ func main() {
 											},)
 									},
 								},
+								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
 							map[string]gas.Handler {
-								"click": func(c gas.Component, e dom.Event) {
+								"click": func(c *gas.Component, e dom.Event) {
 									arr := this.GetData("arr").([]interface{})
 									arr = append(arr, "Hello!") // hello, Annoy-o-Tron
 									gas.WarnError(this.SetData("arr", arr))

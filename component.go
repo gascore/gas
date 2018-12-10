@@ -23,7 +23,9 @@ var (
 	// NilComputeds Nil value for Component.Computeds
 	NilComputeds map[string]Computed
 	// NilDirectives Nil value for Component.Directives
-	NilDirectives = Directives{If:NilIfDirective}
+	NilDirectives = Directives{If:NilIfDirective, HTML:NilHTMLDirective}
+	// NilHTMLDirective Nil value for Directives.HTML
+	NilHTMLDirective = HTMLDirective{Render:func(c *Component) string {return ""}}
 	// NilIfDirective Nil value for Directives.If
 	NilIfDirective = func(c *Component) bool { return true } // Without returning component will never render
 )
@@ -53,16 +55,17 @@ type GetChildes func(*Component) []interface{}
 // Bind - dynamic component attribute (analogue for vue `v-bind:`).
 //
 // Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
-type Bind func(Component) string
+type Bind func(*Component) string
 
 // Catcher catching sub component $emit and doing his business  (analogue for vue `v-on:`). 
-type Catcher func(Component)
+type Catcher func(*Component)
 
 // Directives struct storing component if-directive
 type Directives struct {
 	If func(*Component) bool
 	For ForDirective
 	Model ModelDirective
+	HTML HTMLDirective
 }
 
 type ModelDirective struct {
@@ -76,8 +79,14 @@ type ForDirective struct {
 	Render func(int, interface{}, *Component) []GetComponent
 }
 
+type HTMLDirective struct {
+	Render func(*Component) string
+
+	Rendered string // here storing rendered html for update functions
+}
+
 // Handler -- handler exec function when event trigger
-type Handler func(Component, dom.Event)
+type Handler func(*Component, dom.Event)
 
 
 // Component -- basic component struct

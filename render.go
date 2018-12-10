@@ -62,7 +62,7 @@ func CreateElement(c *Component) (*dom.Element, error) {
 	for handlerName, handlerBody := range c.Handlers {
 		//if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
 		_node.AddEventListener(handlerName, func(e dom.Event) {
-			handlerBody(*c, e)
+			handlerBody(c, e)
 		})
 	}
 
@@ -107,6 +107,12 @@ func CreateElement(c *Component) (*dom.Element, error) {
 				WarnError(err)
 			}
 		})
+	}
+
+	htmlDirective := c.Directives.HTML.Render(c)
+	if len(htmlDirective) != 0 {
+		currentInner := _node.GetValueString("innerHTML")
+		_node.SetInnerHTML(fmt.Sprintf("%s\n%s", currentInner, htmlDirective))
 	}
 
 	return _node, nil
@@ -203,7 +209,14 @@ func changed(new, old interface{}) (bool, error) {
 	if isString(new) {
 		return new.(string) != old.(string), nil
 	} else if isComponent(new) {
-		return cmp.Equal(I2C(new), I2C(old)), nil // thank you god for the go-cmp
+		newC := I2C(new)
+		oldC := I2C(old)
+
+		if newC.Directives.HTML.Rendered != oldC.Directives.HTML.Rendered {
+			return true, nil
+		}
+
+		return cmp.Equal(newC, oldC), nil // thank you god for the go-cmp
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
@@ -215,6 +228,7 @@ func renderTree(c *Component) []interface{} {
 	for _, el := range c.Childes(c) {
 		if isComponent(el) {
 			elC := I2C(el)
+			elC.Directives.HTML.Rendered = elC.Directives.HTML.Render(elC)
 			elC.RChildes = renderTree(elC)
 			el = elC
 		}

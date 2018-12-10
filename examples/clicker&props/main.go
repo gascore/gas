@@ -36,7 +36,7 @@ func main() {
 							gas.NilDirectives,
 							gas.NilBinds,
 							map[string]gas.Handler {
-								"click": func(c gas.Component, e dom.Event) {
+								"click": func(c *gas.Component, e dom.Event) {
 									currentClick := this.GetData("click").(int)
 									gas.WarnError(this.SetData("click", currentClick+1))
 								},

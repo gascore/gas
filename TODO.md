@@ -2,7 +2,6 @@
 
 ## A class tasks
 
-* v-html
 * TextNode (say no to `<span>`)
 * is-static
 * Watchers

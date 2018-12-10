@@ -32,17 +32,9 @@ func (c *Component) GetPocketMethod(name string) (PocketMethod, error)  {
 	}
 
 	bindingMethod := func(values ...interface{}) error {
-		oldTree := renderTree(c) // save rendered tree before
-
-		err := method(c, values...) // run method
-		if err != nil {
-			return err
-		}
-
-		newTree := renderTree(c) // save rendered tree after
-		_c := c.GetElement()
-
-		err = UpdateComponentChildes(_c, newTree, oldTree) // update component after changes
+		err := c.eventInUpdater(func() error {
+			return method(c, values...)
+		})
 		if err != nil {
 			return err
 		}

@@ -27,6 +27,7 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 	mainComponent := NewComponent(
 		NilParentComponent,
 		NilData, // data
+		NilWatchers, // watchers
 		NilMethods, // methods
 		NilComputeds, // computed
 		NilDirectives, // if-directive

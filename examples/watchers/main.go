@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
 )
 
-// Example application #3
+// Example application #8
 //
-// 'if-directive' shows how you can use component.Directive.If
+// 'watchers' shows how you can use component.Watchers
 func main() {
 	app, err :=
 		gas.New(
@@ -17,8 +18,21 @@ func main() {
 					p,
 					map[string]interface{}{
 						"show": true,
+						"watcherIsTriggered": false,
 					},
-					gas.NilWatchers,
+					map[string]gas.Watcher{
+						"show": func(this *gas.Component, new interface{}, old interface{}) error {
+							dom.ConsoleLog(fmt.Sprintf("Watcher is triggered! New value: %t, old value: %t", new, old))
+
+							err := this.SetDataFree("watcherIsTriggered", true)
+							if err != nil {
+								gas.WarnError(err)
+								return err
+							}
+
+							return nil
+						},
+					},
 					gas.NilMethods,
 					gas.NilComputeds,
 					gas.NilDirectives,
@@ -83,17 +97,21 @@ func main() {
 							gas.NilMethods,
 							gas.NilComputeds,
 							gas.Directives{
-								If: func(c *gas.Component) bool {
-									return this.GetData("show").(bool)
+								If: func(this2 *gas.Component) bool {
+									watcherIsTriggered, ok := this.GetData("watcherIsTriggered").(bool)
+									gas.WarnIfNot(ok)
+									return watcherIsTriggered
 								},
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
 							gas.NilHandlers,
-							"b",
-							gas.NilAttrs,
+							"strong",
+							map[string]string{
+								"style": "color: red;",
+							},
 							func(this2 *gas.Component) interface{} {
-								return "Public text"
+								return "Watcher is triggered!"
 							})
 					})
 			},)

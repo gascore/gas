@@ -17,6 +17,7 @@ func main() {
 				map[string]interface{}{
 					"hello": "Hello world!",
 				},
+				gas.NilWatchers,
 				gas.NilMethods,
 				gas.NilComputeds,
 				gas.NilDirectives,
@@ -35,6 +36,7 @@ func main() {
 			return gas.NewComponent(
 				p,
 				gas.NilData,
+				gas.NilWatchers,
 				gas.NilMethods,
 				gas.NilComputeds,
 				gas.NilDirectives,

@@ -12,6 +12,7 @@ func GetNumberViewer(this *gas.Component, values ...interface{}) interface{} {
 	return gas.NewComponent(
 		this,
 		gas.NilData,
+		gas.NilWatchers,
 		gas.NilMethods,
 		gas.NilComputeds,
 		gas.NilDirectives,

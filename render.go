@@ -216,7 +216,7 @@ func changed(new, old interface{}) (bool, error) {
 			return true, nil
 		}
 
-		return cmp.Equal(newC, oldC), nil // thank you god for the go-cmp
+		return !cmp.Equal(newC, oldC), nil // thank you god for the go-cmp
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
@@ -228,8 +228,10 @@ func renderTree(c *Component) []interface{} {
 	for _, el := range c.Childes(c) {
 		if isComponent(el) {
 			elC := I2C(el)
+
 			elC.Directives.HTML.Rendered = elC.Directives.HTML.Render(elC)
 			elC.RChildes = renderTree(elC)
+
 			el = elC
 		}
 

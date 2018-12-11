@@ -20,6 +20,7 @@ func main() {
 						"show": true,
 						"number": 1,
 					},
+					gas.NilWatchers,
 					// What the difference between Methods and Computed?
 					// Methods will do business things.
 					// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
@@ -85,6 +86,7 @@ func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Componen
 	return gas.NewComponent(
 		this,
 		gas.NilData,
+		gas.NilWatchers,
 		gas.NilMethods,
 		gas.NilComputeds,
 		gas.NilDirectives,
@@ -113,6 +115,7 @@ func getHiddenText(this *gas.Component, isShow bool, getNumber gas.PocketCompute
 	return gas.NewComponent(
 		this,
 		gas.NilData,
+		gas.NilWatchers,
 		gas.NilMethods,
 		gas.NilComputeds,
 		gas.Directives{

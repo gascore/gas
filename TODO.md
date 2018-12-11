@@ -2,13 +2,12 @@
 
 ## A class tasks
 
+* lifecycle (created, updated, going delete)
+* go-cmp doesnt work (maybe)
 * TextNode (say no to `<span>`)
-* is-static
-* Watchers
 
 ## B class tasks
 
-* lifecycle (created, updated, going delete)
 * template parser
 * redux-like
 * router

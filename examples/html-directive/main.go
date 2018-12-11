@@ -40,6 +40,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						"helloText": `<h1>To see article click button!</h1>`,
 						"isArticleActive": false,
 					},
+					gas.NilWatchers,
 					gas.NilMethods,
 					gas.NilComputeds,
 					gas.NilDirectives,
@@ -51,6 +52,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						return gas.NewComponent(
 							this,
 							gas.NilData,
+							gas.NilWatchers,
 							gas.NilMethods,
 							gas.NilComputeds,
 							gas.NilDirectives,
@@ -78,6 +80,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						return gas.NewComponent(
 							this,
 							gas.NilData,
+							gas.NilWatchers,
 							gas.NilMethods,
 							gas.NilComputeds,
 							gas.Directives{

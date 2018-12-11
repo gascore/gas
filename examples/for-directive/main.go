@@ -19,6 +19,7 @@ func main() {
 					map[string]interface{}{
 						"arr": []interface{}{"click", "here", "if you want to see some magic"},
 					},
+					gas.NilWatchers,
 					gas.NilMethods,
 					gas.NilComputeds,
 					gas.NilDirectives,
@@ -32,6 +33,7 @@ func main() {
 						return gas.NewComponent(
 							this,
 							gas.NilData,
+							gas.NilWatchers,
 							gas.NilMethods,
 							gas.NilComputeds,
 							gas.Directives{

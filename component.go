@@ -12,6 +12,8 @@ var (
 	NilParentComponent *Component
 	// NilData Nil value for Component.Data
 	NilData map[string]interface{}
+	// NilWatchers Nil value for Component.Watchers
+	NilWatchers map[string]Watcher
 	// NilAttrs Nil value for Component.Attrs
 	NilAttrs map[string]string
 	// NilBinds Nil value for Component.Binds
@@ -68,6 +70,7 @@ type Directives struct {
 	HTML HTMLDirective
 }
 
+// ModelDirective struct for Model directive
 type ModelDirective struct {
 	Data string
 	Component *Component
@@ -79,6 +82,7 @@ type ForDirective struct {
 	Render func(int, interface{}, *Component) []GetComponent
 }
 
+// HTMLDirective struct for HTML Directive - storing render function and pre rendered render
 type HTMLDirective struct {
 	Render func(*Component) string
 
@@ -88,10 +92,13 @@ type HTMLDirective struct {
 // Handler -- handler exec function when event trigger
 type Handler func(*Component, dom.Event)
 
+// Watcher -- function triggering after component data changed
+type Watcher func(*Component, interface{}, interface{})error // (this, new, old)
 
 // Component -- basic component struct
 type Component struct {
 	Data  map[string]interface{}
+	Watchers map[string]Watcher
 
 	Methods    	 map[string]Method
 	Computeds    map[string]Computed
@@ -115,10 +122,11 @@ type Component struct {
 
 
 // NewComponent create new component
-func NewComponent(pC *Component, data map[string]interface{}, methods map[string]Method, computeds map[string]Computed, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
+func NewComponent(pC *Component, data map[string]interface{}, watchers map[string]Watcher, methods map[string]Method, computeds map[string]Computed, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
 	// Some stuff here, but now:
 	component := &Component{
 		Data:  data,
+		Watchers: watchers,
 
 		Methods: methods,
 		Computeds: computeds,
@@ -160,7 +168,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 					renderer := childC.Directives.For.Render
 					for i, el := range dataForList {
 						// recreate this component with childes from FOR, without FOR directive
-						oneOfComponents := NewComponent(childC.ParentC, childC.Data, childC.Methods, computeds, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
+						oneOfComponents := NewComponent(childC.ParentC, childC.Data, watchers, childC.Methods, computeds, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
 						compiled = append(compiled, oneOfComponents)
 					}
 
@@ -178,7 +186,7 @@ func NewComponent(pC *Component, data map[string]interface{}, methods map[string
 }
 
 // GetElement return *dom.Element by component structure
-func (c Component) GetElement() *dom.Element {
+func (c *Component) GetElement() *dom.Element {
 	return dom.Doc.QuerySelector(fmt.Sprintf("[data-i='%s']", c.UUID)) // select element by data-i attribute
 }
 

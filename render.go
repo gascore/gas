@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/google/go-cmp/cmp"
+	"reflect"
 	"strconv"
 )
 
@@ -115,6 +116,13 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		_node.SetInnerHTML(fmt.Sprintf("%s\n%s", currentInner, htmlDirective))
 	}
 
+	if c.Hooks.BeforeCreate != nil {
+		err := c.Hooks.BeforeCreate(c)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return _node, nil
 }
 
@@ -129,6 +137,17 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		}
 
 		_parent.AppendChild(_new)
+
+		if isComponent(new) && I2C(new).Hooks.Created != nil {
+			newC := I2C(new)
+
+			err := newC.eventInUpdater(func() error {
+				return newC.Hooks.Created(newC)
+			})
+			if err != nil {
+				return err
+			}
+		}
 
 		return nil
 	}
@@ -148,6 +167,13 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	// if component has deleted
 	if new == nil {
 		_parent.RemoveChild(_el)
+
+		if isComponent(old) && I2C(old).Hooks.Destroyed != nil {
+			err := I2C(old).Hooks.Destroyed(I2C(old))
+			if err != nil {
+				return err
+			}
+		}
 
 		return nil
 	}
@@ -216,10 +242,34 @@ func changed(new, old interface{}) (bool, error) {
 			return true, nil
 		}
 
-		return !cmp.Equal(newC, oldC), nil // thank you god for the go-cmp
+		return !isComponentsEquals(newC, oldC), nil // thank you god for the go-cmp
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+}
+
+func isComponentsEquals(new, old *Component) bool {
+	// sometimes i'm sad that i chose strict-type pl
+	daE := cmp.Equal(new.Data, old.Data)
+	wE := cmp.Equal(new.Watchers, old.Watchers)
+	//mE := cmp.Equal(new.Methods, old.Methods)
+	mE := true
+	//coE := cmp.Equal(new.Computeds, old.Computeds)
+	coE := true
+	caE := cmp.Equal(new.Catchers, old.Catchers)
+	hE := cmp.Equal(new.Handlers, old.Handlers)
+	bE := cmp.Equal(new.Binds, old.Binds)
+
+	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
+	diFE := cmp.Equal(new.Directives.For, old.Directives.For)
+	diME := cmp.Equal(new.Directives.Model, old.Directives.Model)
+	diHE := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
+	diE := diIfE && diFE && diME && diHE // Directives
+
+	tE := new.Tag == old.Tag
+	aE := cmp.Equal(new.Attrs, old.Attrs)
+
+	return daE && wE && mE && coE && caE && hE && bE && diE && tE && aE
 }
 
 // renderTree return full rendered childes tree of component

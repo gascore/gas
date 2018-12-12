@@ -32,6 +32,7 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 		NilComputeds, // computed
 		NilDirectives, // if-directive
 		NilBinds, // binds
+		NilHooks, // hooks
 		NilHandlers, // handlers
 		_el.GetTagName(), // tag name
 		map[string]string{ // attributes

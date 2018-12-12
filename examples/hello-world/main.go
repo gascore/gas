@@ -22,6 +22,7 @@ func main() {
 				gas.NilComputeds,
 				gas.NilDirectives,
 				gas.NilBinds,
+				gas.NilHooks,
 				gas.NilHandlers,
 				"h1",
 				map[string]string{
@@ -41,6 +42,7 @@ func main() {
 				gas.NilComputeds,
 				gas.NilDirectives,
 				gas.NilBinds,
+				gas.NilHooks,
 				gas.NilHandlers,
 				"i",
 				map[string]string{

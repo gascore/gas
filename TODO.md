@@ -2,14 +2,12 @@
 
 ## A class tasks
 
-* lifecycle (created, updated, going delete)
-* add isEquals functiom for components (ususe in changed)
-* go-cmp doesnt work (maybe)
+* nil value for Directives
 * TextNode (say no to `<span>`)
 
 ## B class tasks
 
-* template parser
+* jsx-like parser
 * redux-like
 * router
 

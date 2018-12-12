@@ -55,6 +55,7 @@ func main() {
 					},
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"h1",
 					map[string]string{
@@ -91,6 +92,7 @@ func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Componen
 		gas.NilComputeds,
 		gas.NilDirectives,
 		gas.NilBinds,
+		gas.NilHooks,
 		map[string]gas.Handler {
 			"click": func(c *gas.Component, e dom.Event) {
 				// Of course we can use method for `this`.
@@ -125,6 +127,7 @@ func getHiddenText(this *gas.Component, isShow bool, getNumber gas.PocketCompute
 			HTML: gas.NilHTMLDirective,
 		},
 		gas.NilBinds,
+		gas.NilHooks,
 		gas.NilHandlers,
 		"i",
 		gas.NilAttrs,

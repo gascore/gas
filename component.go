@@ -18,6 +18,8 @@ var (
 	NilAttrs map[string]string
 	// NilBinds Nil value for Component.Binds
 	NilBinds map[string]Bind
+	// NilHooks Nil value for Component.Hooks
+	NilHooks Hooks
 	// NilHandlers Nil value for Component.Handlers
 	NilHandlers map[string]Handler
 	// NilMethods Nil value for Component.Methods
@@ -43,6 +45,16 @@ type Computed func(*Component, ...interface{}) (interface{}, error)
 
 // GetComponent returns component child
 type GetComponent func(*Component) interface{}
+
+// Hooks component lifecycle hooks
+type Hooks struct {
+	Created 	 Hook // have auto-update
+	BeforeCreate Hook
+	Destroyed 	 Hook
+}
+
+// Hook - lifecycle hook
+type Hook func(*Component) error
 
 // GetChildes -- function returning component childes
 // In function parameter sends `this` component and you can get it data from this parameter
@@ -95,6 +107,7 @@ type Handler func(*Component, dom.Event)
 // Watcher -- function triggering after component data changed
 type Watcher func(*Component, interface{}, interface{})error // (this, new, old)
 
+
 // Component -- basic component struct
 type Component struct {
 	Data  map[string]interface{}
@@ -103,6 +116,7 @@ type Component struct {
 	Methods    	 map[string]Method
 	Computeds    map[string]Computed
 
+	Hooks    Hooks // lifecycle hooks
 	Catchers map[string]Catcher // catch child components $emit
 
 	Handlers     map[string]Handler // events handlers: onClick, onHover
@@ -122,7 +136,7 @@ type Component struct {
 
 
 // NewComponent create new component
-func NewComponent(pC *Component, data map[string]interface{}, watchers map[string]Watcher, methods map[string]Method, computeds map[string]Computed, directives Directives, binds map[string]Bind, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
+func NewComponent(pC *Component, data map[string]interface{}, watchers map[string]Watcher, methods map[string]Method, computeds map[string]Computed, directives Directives, binds map[string]Bind, hooks Hooks, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
 	// Some stuff here, but now:
 	component := &Component{
 		Data:  data,
@@ -131,7 +145,9 @@ func NewComponent(pC *Component, data map[string]interface{}, watchers map[strin
 		Methods: methods,
 		Computeds: computeds,
 
+		Hooks: hooks,
 		Handlers: handlers,
+
 		Binds: binds,
 		Directives: directives,
 
@@ -168,7 +184,7 @@ func NewComponent(pC *Component, data map[string]interface{}, watchers map[strin
 					renderer := childC.Directives.For.Render
 					for i, el := range dataForList {
 						// recreate this component with childes from FOR, without FOR directive
-						oneOfComponents := NewComponent(childC.ParentC, childC.Data, watchers, childC.Methods, computeds, clearedDirective, childC.Binds, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
+						oneOfComponents := NewComponent(childC.ParentC, childC.Data, watchers, childC.Methods, computeds, clearedDirective, childC.Binds, hooks, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
 						compiled = append(compiled, oneOfComponents)
 					}
 

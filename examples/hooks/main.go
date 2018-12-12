@@ -5,9 +5,9 @@ import (
 	"github.com/Sinicablyat/gas"
 )
 
-// Example application #2
+// Example application #9
 //
-// 'clicker&props' shows how you can add handlers, change component.Data and use external components
+// 'hooks' shows how you can use component.Hooks
 func main() {
 	app, err :=
 		gas.New(
@@ -16,18 +16,23 @@ func main() {
 				return gas.NewComponent(
 					p,
 					map[string]interface{}{
-						"click": 0,
+						"show": true,
 					},
 					gas.NilWatchers,
 					gas.NilMethods,
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
-					gas.NilHooks,
+					gas.Hooks{
+						BeforeCreate: func(this *gas.Component) error {
+							dom.ConsoleLog("Component is being created!")
+							return nil
+						},
+					},
 					gas.NilHandlers,
 					"h1",
 					map[string]string{
-						"id": "clicker&props",
+						"id": "hooks",
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
@@ -41,16 +46,19 @@ func main() {
 							gas.NilHooks,
 							map[string]gas.Handler {
 								"click": func(c *gas.Component, e dom.Event) {
-									currentClick := this.GetData("click").(int)
-									gas.WarnError(this.SetData("click", currentClick+1))
+									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
 							},
 							"button",
 							map[string]string{
-								"id": "clicker__button", // I love BEM
+								"id": "hooks__button",
 							},
 							func(this2 *gas.Component) interface{} {
-								return "Click me!"
+								if this.GetData("show").(bool) {
+									return "Show text"
+								} else {
+									return "Hide text"
+								}
 							})
 					},
 					func(this *gas.Component) interface{} {
@@ -60,20 +68,28 @@ func main() {
 							gas.NilWatchers,
 							gas.NilMethods,
 							gas.NilComputeds,
-							gas.NilDirectives,
+							gas.Directives{
+								If: func(c *gas.Component) bool {
+									return !this.GetData("show").(bool)
+								},
+								HTML: gas.NilHTMLDirective,
+							},
 							gas.NilBinds,
-							gas.NilHooks,
+							gas.Hooks{
+								Created: func(this2 *gas.Component) error {
+									dom.ConsoleLog("Hidden text is created!")
+									return nil
+								},
+								Destroyed: func(this2 *gas.Component) error {
+									dom.ConsoleLog("Hidden text was destroyed!")
+									return nil
+								},
+							},
 							gas.NilHandlers,
-							"span",
-							map[string]string{
-								"id": "needful_wrapper",
-							},
+							"i",
+							gas.NilAttrs,
 							func(this2 *gas.Component) interface{} {
-								return "You clicked button: "
-							},
-							func(this2 *gas.Component) interface{} {
-								// It's EXTERNAL component!
-								return GetNumberViewer(this, this.GetData("click").(int))
+								return "Hidden text"
 							})
 					})
 			},)

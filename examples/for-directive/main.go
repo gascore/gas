@@ -24,6 +24,7 @@ func main() {
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"ul",
 					map[string]string{
@@ -50,6 +51,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							map[string]gas.Handler {
 								"click": func(c *gas.Component, e dom.Event) {
 									arr := this.GetData("arr").([]interface{})

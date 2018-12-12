@@ -23,6 +23,7 @@ func main() {
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"div",
 					map[string]string{
@@ -35,7 +36,7 @@ func main() {
 						return fmt.Sprintf("Your text: %s", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
@@ -53,6 +54,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"input",
 							gas.NilAttrs)
@@ -69,6 +71,7 @@ func main() {
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"div",
 					map[string]string{
@@ -81,7 +84,7 @@ func main() {
 						return fmt.Sprintf("Your color: %s", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
@@ -99,6 +102,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"input",
 							map[string]string{
@@ -117,6 +121,7 @@ func main() {
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"div",
 					map[string]string{
@@ -129,7 +134,7 @@ func main() {
 						return fmt.Sprintf("Your range: %d", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
@@ -147,6 +152,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"input",
 							map[string]string{
@@ -165,6 +171,7 @@ func main() {
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"div",
 					map[string]string{
@@ -177,7 +184,7 @@ func main() {
 						return fmt.Sprintf("Your checkbox: %t", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
@@ -195,6 +202,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"input",
 							map[string]string{

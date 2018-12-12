@@ -37,6 +37,7 @@ func main() {
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"h1",
 					map[string]string{
@@ -51,6 +52,7 @@ func main() {
 							gas.NilComputeds,
 							gas.NilDirectives,
 							gas.NilBinds,
+							gas.NilHooks,
 							map[string]gas.Handler {
 								"click": func(c *gas.Component, e dom.Event) {
 									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
@@ -82,6 +84,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"i",
 							gas.NilAttrs,
@@ -105,6 +108,7 @@ func main() {
 								HTML: gas.NilHTMLDirective,
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"strong",
 							map[string]string{

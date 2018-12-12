@@ -45,6 +45,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 					gas.NilComputeds,
 					gas.NilDirectives,
 					gas.NilBinds,
+					gas.NilHooks,
 					gas.NilHandlers,
 					"main",
 					gas.NilAttrs,
@@ -57,6 +58,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 							gas.NilComputeds,
 							gas.NilDirectives,
 							gas.NilBinds,
+							gas.NilHooks,
 							map[string]gas.Handler{
 								"click": func(this2 *gas.Component, e dom.Event) {
 									currentIsArticleActive := this.GetData("isArticleActive").(bool)
@@ -100,6 +102,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 								},},
 							},
 							gas.NilBinds,
+							gas.NilHooks,
 							gas.NilHandlers,
 							"article",
 							map[string]string{

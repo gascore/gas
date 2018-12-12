@@ -19,5 +19,6 @@ Hosting in [jsgo.io](https://jsgo.io) examples:
 6. [model-directive](https://jsgo.io/ae08a55e99976c6955397cb4c159d9448fc0bbd2)
 7. [html-directive](https://jsgo.io/b88bbca5d3810b68ae43d70246a13a1e1ab3966f)
 8. [watchers](https://jsgo.io/504d3346d93b1fbb26b5ac39eb223f9469b85920)
+9. [hooks](https://jsgo.io/4b60a5e05f197fef610d7b05fb305038f9896f2d)
 
 Examples may be old, because recreate examples after every commits is really disrespectful to [jsgo.io](https://jsgo.io)

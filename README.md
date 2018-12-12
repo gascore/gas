@@ -1,6 +1,6 @@
-# Gas
+# Gas - golang (frontend) framework based on WASM
 
-## gas - golang (frontend) framework based on WASM
+![Gas logo](https://raw.githubusercontent.com/Sinicablyat/gas/master/logo.png)
 
 Documentation: [godoc.org](https://godoc.org/github.com/Sinicablyat/gas)
 

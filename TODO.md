@@ -9,6 +9,8 @@
 ## B class tasks
 
 * jsx-like parser
+* split gas-core and gas-wasm-dom
+* add gojs support (gas-gojs-dom)
 * redux-like
 * router
 

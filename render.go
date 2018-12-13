@@ -110,8 +110,9 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		})
 	}
 
-	htmlDirective := c.Directives.HTML.Render(c)
-	if len(htmlDirective) != 0 {
+
+	if c.Directives.HTML.Render != nil {
+		htmlDirective := c.Directives.HTML.Render(c)
 		currentInner := _node.GetValueString("innerHTML")
 		_node.SetInnerHTML(fmt.Sprintf("%s\n%s", currentInner, htmlDirective))
 	}
@@ -141,9 +142,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		if isComponent(new) && I2C(new).Hooks.Created != nil {
 			newC := I2C(new)
 
-			err := newC.eventInUpdater(func() error {
-				return newC.Hooks.Created(newC)
-			})
+			err := newC.Hooks.Created(newC)
 			if err != nil {
 				return err
 			}
@@ -250,26 +249,33 @@ func changed(new, old interface{}) (bool, error) {
 
 func isComponentsEquals(new, old *Component) bool {
 	// sometimes i'm sad that i chose strict-type pl
-	daE := cmp.Equal(new.Data, old.Data)
-	wE := cmp.Equal(new.Watchers, old.Watchers)
-	//mE := cmp.Equal(new.Methods, old.Methods)
-	mE := true
-	//coE := cmp.Equal(new.Computeds, old.Computeds)
-	coE := true
+	daE := true // cmp.Equal(new.Data, old.Data)
+	wE  := cmp.Equal(new.Watchers, old.Watchers)
+	mE  := true // cmp.Equal(new.Methods, old.Methods)
+	coE := true // cmp.Equal(new.Computeds, old.Computeds)
 	caE := cmp.Equal(new.Catchers, old.Catchers)
-	hE := cmp.Equal(new.Handlers, old.Handlers)
-	bE := cmp.Equal(new.Binds, old.Binds)
+
+	hE := compareHooks(new.Hooks, old.Hooks)
+	bE := reflect.DeepEqual(new.Binds, old.Binds)
 
 	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
-	diFE := cmp.Equal(new.Directives.For, old.Directives.For)
-	diME := cmp.Equal(new.Directives.Model, old.Directives.Model)
-	diHE := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
-	diE := diIfE && diFE && diME && diHE // Directives
+	diFE  := cmp.Equal(new.Directives.For, old.Directives.For)
+	diME  := (new.Directives.Model.Data == old.Directives.Model.Data) && (new.Directives.Model.Component == old.Directives.Model.Component)
+	diHE  := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
+	diE   := diIfE && diFE && diME && diHE // Directives
 
 	tE := new.Tag == old.Tag
 	aE := cmp.Equal(new.Attrs, old.Attrs)
 
 	return daE && wE && mE && coE && caE && hE && bE && diE && tE && aE
+}
+
+func compareHooks(new, old Hooks) bool {
+	created := cmp.Equal(new.Created, old.Created)
+	beforeCreate := cmp.Equal(new.BeforeCreate, old.BeforeCreate)
+	destroyed := cmp.Equal(new.Destroyed, old.Destroyed)
+
+	return created && beforeCreate && destroyed
 }
 
 // renderTree return full rendered childes tree of component
@@ -279,7 +285,10 @@ func renderTree(c *Component) []interface{} {
 		if isComponent(el) {
 			elC := I2C(el)
 
-			elC.Directives.HTML.Rendered = elC.Directives.HTML.Render(elC)
+			if elC.Directives.HTML.Render != nil {
+				elC.Directives.HTML.Rendered = elC.Directives.HTML.Render(elC)
+			}
+
 			elC.RChildes = renderTree(elC)
 
 			el = elC

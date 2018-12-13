@@ -12,13 +12,13 @@ How to run example:
 Hosting in [jsgo.io](https://jsgo.io) examples:
 
 1. [hello-world](https://jsgo.io/7cee3f268b32e689adec58180c6b5a58cbbe7e3d)
-2. [clicker&props](https://jsgo.io/cba7cd18a58d36064570aa892d73ab7135108c04)
-3. [if-directive](https://jsgo.io/1a513c621a603f87db8ace4ccee1796487d8e3f5)
-4. [for-directive](https://jsgo.io/f5357ba62e07ec7b202d8c995fd70049a74e18d9)
-5. [methods&computed-directive](https://jsgo.io/514aeba3c8946fbe76a6c31f0e868ce20c37dd48)
-6. [model-directive](https://jsgo.io/ae08a55e99976c6955397cb4c159d9448fc0bbd2)
-7. [html-directive](https://jsgo.io/b88bbca5d3810b68ae43d70246a13a1e1ab3966f)
-8. [watchers](https://jsgo.io/504d3346d93b1fbb26b5ac39eb223f9469b85920)
-9. [hooks](https://jsgo.io/4b60a5e05f197fef610d7b05fb305038f9896f2d)
+2. [clicker&props](https://jsgo.io/202399c6de0417ed6ad04a2a41a905daa12a7bb9)
+3. [if-directive](https://jsgo.io/6a8fee78e0c4605b6fd44f6998f309ecd54c710a)
+4. [for-directive](https://jsgo.io/38e21fd3ab62cb5180f85bfdd828980b6f63fd9e)
+5. [methods&computed-directive](https://jsgo.io/30c02c0912c530f39f60668f8654f6708eb3b86e)
+6. [model-directive](https://jsgo.io/f78d4b41e4f3ce09c0a6292c97d67cb07f5743ac)
+7. [html-directive](https://jsgo.io/5c8bae28c8ed6a55bd976d316467e68281b10d88)
+8. [watchers](https://jsgo.io/b22cf57dadda640f5d7a1d4d59eae35e2a2477aa)
+9. [hooks](https://jsgo.io/50e0c07878cbfffbc386abaa6d15d3da94eba50f)
 
 Examples may be old, because recreate examples after every commits is really disrespectful to [jsgo.io](https://jsgo.io)

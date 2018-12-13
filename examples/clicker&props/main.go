@@ -14,40 +14,30 @@ func main() {
 			"app",
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"click": 0,
-					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"h1",
-					map[string]string{
-						"id": "clicker&props",
+					&gas.Component{
+						ParentC:p,
+						Data: map[string]interface{}{
+							"click": 0,
+						},
+						Tag: "h1",
+						Attrs: map[string]string{
+							"id": "clicker&props",
+						},
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.NilDirectives,
-							gas.NilBinds,
-							gas.NilHooks,
-							map[string]gas.Handler {
-								"click": func(c *gas.Component, e dom.Event) {
-									currentClick := this.GetData("click").(int)
-									gas.WarnError(this.SetData("click", currentClick+1))
+							&gas.Component{
+								ParentC: this,
+								Handlers: map[string]gas.Handler {
+									"click": func(c *gas.Component, e dom.Event) {
+										currentClick := this.GetData("click").(int)
+										gas.WarnError(this.SetData("click", currentClick+1))
+									},
 								},
-							},
-							"button",
-							map[string]string{
-								"id": "clicker__button", // I love BEM
+								Tag: "button",
+								Attrs: map[string]string{
+									"id": "clicker__button", // I love BEM
+								},
 							},
 							func(this2 *gas.Component) interface{} {
 								return "Click me!"
@@ -55,18 +45,12 @@ func main() {
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.NilDirectives,
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"span",
-							map[string]string{
-								"id": "needful_wrapper",
+							&gas.Component{
+								ParentC: this,
+								Tag: "span",
+								Attrs: map[string]string{
+									"id": "needful_wrapper",
+								},
 							},
 							func(this2 *gas.Component) interface{} {
 								return "You clicked button: "

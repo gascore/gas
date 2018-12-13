@@ -54,7 +54,11 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 // eventInUpdater runs your event and trying to update component after it
 func (c *Component) eventInUpdater(event func()error) error {
 	oldTree := renderTree(c)
-	oldHtmlDirective := c.Directives.HTML.Render(c)
+
+	var oldHtmlDirective string
+	if c.Directives.HTML.Render != nil {
+		oldHtmlDirective = c.Directives.HTML.Render(c)
+	}
 
 	err := event() // your event
 	if err != nil {
@@ -62,7 +66,12 @@ func (c *Component) eventInUpdater(event func()error) error {
 	}
 
 	newTree := renderTree(c)
-	newHtmlDirective := c.Directives.HTML.Render(c)
+
+	var newHtmlDirective string
+	if c.Directives.HTML.Render != nil {
+		newHtmlDirective = c.Directives.HTML.Render(c)
+	}
+
 	_c := c.GetElement()
 
 	if oldHtmlDirective != newHtmlDirective {

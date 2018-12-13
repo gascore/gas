@@ -14,21 +14,16 @@ func main() {
 			"app",
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"foo": "",
-					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"div",
-					map[string]string{
-						"id": "model__text",
-						"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					&gas.Component{
+						ParentC: p,
+						Data: map[string]interface{}{
+							"foo": "",
+						},
+						Tag: "div",
+						Attrs: map[string]string{
+							"id": "model__text",
+							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+						},
 					},
 					func(this *gas.Component) interface{} {
 						foo, ok := this.GetData("foo").(string)
@@ -36,47 +31,36 @@ func main() {
 						return fmt.Sprintf("Your text: %s", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: gas.NilIfDirective,
-								Model: gas.ModelDirective{
-									Data: "foo",
-									Component: this,
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									Model: gas.ModelDirective{
+										Data: "foo",
+										Component: this,
+									},
 								},
-								HTML: gas.NilHTMLDirective,
-							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"input",
-							gas.NilAttrs)
+								Tag: "input",
+							})
 					},)
 			},
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"foo": "",
-					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"div",
-					map[string]string{
-						"id": "model__color",
-						"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					&gas.Component{
+						ParentC: p,
+						Data:
+						map[string]interface{}{
+							"foo": "",
+						},
+						Tag: "div",
+						Attrs:
+						map[string]string{
+							"id": "model__color",
+							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+						},
 					},
 					func(this *gas.Component) interface{} {
 						foo, ok := this.GetData("foo").(string)
@@ -84,49 +68,37 @@ func main() {
 						return fmt.Sprintf("Your color: %s", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: gas.NilIfDirective,
-								Model: gas.ModelDirective{
-									Data: "foo",
-									Component: this,
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									Model: gas.ModelDirective{
+										Data: "foo",
+										Component: this,
+									},
 								},
-								HTML: gas.NilHTMLDirective,
-							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"input",
-							map[string]string{
-								"type": "color",
+								Tag: "input",
+								Attrs: map[string]string{
+									"type": "color",
+								},
 							})
 					},)
 			},
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"foo": int(0),
-					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"div",
-					map[string]string{
-						"id": "model__range",
-						"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					&gas.Component{
+						ParentC: p,
+						Data: map[string]interface{}{
+							"foo": int(0),
+						},
+						Tag: "div",
+						Attrs: map[string]string{
+							"id": "model__range",
+							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+						},
 					},
 					func(this *gas.Component) interface{} {
 						foo, ok := this.GetData("foo").(int)
@@ -134,49 +106,37 @@ func main() {
 						return fmt.Sprintf("Your range: %d", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: gas.NilIfDirective,
-								Model: gas.ModelDirective{
-									Data: "foo",
-									Component: this,
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									Model: gas.ModelDirective{
+										Data: "foo",
+										Component: this,
+									},
 								},
-								HTML: gas.NilHTMLDirective,
-							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"input",
-							map[string]string{
-								"type": "range",
+								Tag: "input",
+								Attrs: map[string]string{
+									"type": "range",
+								},
 							})
 					},)
 			},
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"foo": false,
-					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"div",
-					map[string]string{
-						"id": "model__date",
-						"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					&gas.Component{
+						ParentC: p,
+						Data: map[string]interface{}{
+							"foo": false,
+						},
+						Tag: "div",
+						Attrs: map[string]string{
+							"id": "model__date",
+							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+						},
 					},
 					func(this *gas.Component) interface{} {
 						foo, ok := this.GetData("foo").(bool)
@@ -184,29 +144,22 @@ func main() {
 						return fmt.Sprintf("Your checkbox: %t", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(this, gas.NilData, gas.NilWatchers, gas.NilMethods, gas.NilComputeds, gas.NilDirectives, gas.NilBinds, gas.NilHooks, gas.NilHandlers, "br", gas.NilAttrs)
+						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: gas.NilIfDirective,
-								Model: gas.ModelDirective{
-									Data: "foo",
-									Component: this,
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									Model: gas.ModelDirective{
+										Data: "foo",
+										Component: this,
+									},
 								},
-								HTML: gas.NilHTMLDirective,
-							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"input",
-							map[string]string{
-								"type": "checkbox",
+								Tag: "input",
+								Attrs: map[string]string{
+									"type": "checkbox",
+								},
 							})
 					},)
 			},

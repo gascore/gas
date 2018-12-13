@@ -10,18 +10,12 @@ import (
 // For reference from not parent component you can use `values` (they will reload).
 func GetNumberViewer(this *gas.Component, values ...interface{}) interface{} {
 	return gas.NewComponent(
-		this,
-		gas.NilData,
-		gas.NilWatchers,
-		gas.NilMethods,
-		gas.NilComputeds,
-		gas.NilDirectives,
-		gas.NilBinds,
-		gas.NilHooks,
-		gas.NilHandlers,
-		"i",
-		map[string]string{
-			"id": "needful_wrapper--number-viewer",
+		&gas.Component{
+			ParentC: this,
+			Tag: "i",
+			Attrs: map[string]string{
+				"id": "needful_wrapper--number-viewer",
+			},
 		},
 		func(this3 *gas.Component) interface{} {
 			return fmt.Sprintf("%d times", values[0])

@@ -14,39 +14,29 @@ func main() {
 			"app",
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"show": true,
-					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"h1",
-					map[string]string{
-						"id": "if",
+					&gas.Component{
+						ParentC: p,
+						Data: map[string]interface{}{
+							"show": true,
+						},
+						Tag: "h1",
+						Attrs: map[string]string{
+							"id": "if",
+						},
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.NilDirectives,
-							gas.NilBinds,
-							gas.NilHooks,
-							map[string]gas.Handler {
-								"click": func(c *gas.Component, e dom.Event) {
-									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+							&gas.Component{
+								ParentC: this,
+								Handlers: map[string]gas.Handler {
+									"click": func(c *gas.Component, e dom.Event) {
+										gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+									},
 								},
-							},
-							"button",
-							map[string]string{
-								"id": "if__button",
+								Tag: "button",
+								Attrs: map[string]string{
+									"id": "if__button",
+								},
 							},
 							func(this2 *gas.Component) interface{} {
 								if this.GetData("show").(bool) {
@@ -58,44 +48,30 @@ func main() {
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: func(c *gas.Component) bool {
-									return !this.GetData("show").(bool)
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									If: func(c *gas.Component) bool {
+										return !this.GetData("show").(bool)
+									},
 								},
-								HTML: gas.NilHTMLDirective,
+								Tag: "i",
 							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"i",
-							gas.NilAttrs,
 							func(this2 *gas.Component) interface{} {
 								return "Hidden text"
 							})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: func(c *gas.Component) bool {
-									return this.GetData("show").(bool)
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									If: func(c *gas.Component) bool {
+										return this.GetData("show").(bool)
+									},
 								},
-								HTML: gas.NilHTMLDirective,
+								Tag: "b",
 							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"b",
-							gas.NilAttrs,
 							func(this2 *gas.Component) interface{} {
 								return "Public text"
 							})

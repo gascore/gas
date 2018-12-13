@@ -25,19 +25,12 @@ func New(startPoint string, components ...GetComponent) (Gas, error) {
 	}
 
 	mainComponent := NewComponent(
-		NilParentComponent,
-		NilData, // data
-		NilWatchers, // watchers
-		NilMethods, // methods
-		NilComputeds, // computed
-		NilDirectives, // if-directive
-		NilBinds, // binds
-		NilHooks, // hooks
-		NilHandlers, // handlers
-		_el.GetTagName(), // tag name
-		map[string]string{ // attributes
-			"id": startPoint,
-			"data-main": "true",
+		&Component{
+			Tag: _el.GetTagName(), // tag name
+			Attrs: map[string]string{ // attributes
+				"id": startPoint,
+				"data-main": "true",
+			},
 		},
 		components...) // components
 

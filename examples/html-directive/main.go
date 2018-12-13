@@ -14,10 +14,11 @@ func main() {
 			"app",
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
-					p,
-					map[string]interface{}{
-						"articleText":
-						`
+					&gas.Component{
+						ParentC: p,
+						Data: map[string]interface{}{
+							"articleText":
+							`
 <h1>
 	Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 </h1>
@@ -37,36 +38,23 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 <h3>
 	Nulla facilisi. Donec mattis auctor finibus.
 </h3>`,
-						"helloText": `<h1>To see article click button!</h1>`,
-						"isArticleActive": false,
+							"helloText": `<h1>To see article click button!</h1>`,
+							"isArticleActive": false,
+						},
+						Tag: "main",
 					},
-					gas.NilWatchers,
-					gas.NilMethods,
-					gas.NilComputeds,
-					gas.NilDirectives,
-					gas.NilBinds,
-					gas.NilHooks,
-					gas.NilHandlers,
-					"main",
-					gas.NilAttrs,
 					func(this *gas.Component) interface{} { // don't use childes if you have v-html
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.NilDirectives,
-							gas.NilBinds,
-							gas.NilHooks,
-							map[string]gas.Handler{
-								"click": func(this2 *gas.Component, e dom.Event) {
-									currentIsArticleActive := this.GetData("isArticleActive").(bool)
-									gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
+							&gas.Component{
+								ParentC: this,
+								Handlers: map[string]gas.Handler{
+									"click": func(this2 *gas.Component, e dom.Event) {
+										currentIsArticleActive := this.GetData("isArticleActive").(bool)
+										gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
+									},
 								},
+								Tag: "button",
 							},
-							"button",
-							gas.NilAttrs,
 							func(this2 *gas.Component) interface{} {
 								isArticleActive, ok := this.GetData("isArticleActive").(bool)
 								gas.WarnIfNot(ok)
@@ -80,36 +68,30 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
-							this,
-							gas.NilData,
-							gas.NilWatchers,
-							gas.NilMethods,
-							gas.NilComputeds,
-							gas.Directives{
-								If: gas.NilIfDirective,
-								HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
-									isArticleActive, ok := this.GetData("isArticleActive").(bool)
+							&gas.Component{
+								ParentC: this,
+								Directives: gas.Directives{
+									HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
+										isArticleActive, ok := this.GetData("isArticleActive").(bool)
 
-									var html string
-									if isArticleActive {
-										html, ok = this.GetData("articleText").(string)
-									} else {
-										html, ok = this.GetData("helloText").(string)
-									}
-									gas.WarnIfNot(ok)
+										var html string
+										if isArticleActive {
+											html, ok = this.GetData("articleText").(string)
+										} else {
+											html, ok = this.GetData("helloText").(string)
+										}
+										gas.WarnIfNot(ok)
 
-									return html
-								},},
-							},
-							gas.NilBinds,
-							gas.NilHooks,
-							gas.NilHandlers,
-							"article",
-							map[string]string{
-								"id": "article",
-								"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
-							})})
-			})
+										return html
+									},},
+								},
+								Tag: "article",
+								Attrs: map[string]string{
+									"id": "article",
+									"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
+								},
+							})},
+				)})
 	must(err)
 
 	err = app.Init()

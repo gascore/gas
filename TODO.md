@@ -2,8 +2,9 @@
 
 ## A class tasks
 
-* nil value for Directives
+* Add Binds
 * TextNode (say no to `<span>`)
+* Add update, beforeUpdate, beforeDestroy hooks (someones will need it)
 
 ## B class tasks
 

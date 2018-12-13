@@ -8,8 +8,6 @@ import (
 )
 
 var (
-	// NilParentComponent Nil value for Component.ParentC
-	NilParentComponent *Component
 	// NilData Nil value for Component.Data
 	NilData map[string]interface{}
 	// NilWatchers Nil value for Component.Watchers
@@ -27,11 +25,7 @@ var (
 	// NilComputeds Nil value for Component.Computeds
 	NilComputeds map[string]Computed
 	// NilDirectives Nil value for Component.Directives
-	NilDirectives = Directives{If:NilIfDirective, HTML:NilHTMLDirective}
-	// NilHTMLDirective Nil value for Directives.HTML
-	NilHTMLDirective = HTMLDirective{Render:func(c *Component) string {return ""}}
-	// NilIfDirective Nil value for Directives.If
-	NilIfDirective = func(c *Component) bool { return true } // Without returning component will never render
+	NilDirectives Directives
 )
 
 // Context - in context component send c.Data and c.Props to method
@@ -134,30 +128,9 @@ type Component struct {
 	ParentC *Component
 }
 
-
-// NewComponent create new component
-func NewComponent(pC *Component, data map[string]interface{}, watchers map[string]Watcher, methods map[string]Method, computeds map[string]Computed, directives Directives, binds map[string]Bind, hooks Hooks, handlers map[string]Handler, tag string, attrs map[string]string, childes ...GetComponent) *Component {
-	// Some stuff here, but now:
-	component := &Component{
-		Data:  data,
-		Watchers: watchers,
-
-		Methods: methods,
-		Computeds: computeds,
-
-		Hooks: hooks,
-		Handlers: handlers,
-
-		Binds: binds,
-		Directives: directives,
-
-		Tag:   strings.ToLower(tag),
-		Attrs: attrs,
-
-		UUID: uuid4.New().String(),
-
-		ParentC: pC,
-	}
+func NewComponent(component *Component, childes ...GetComponent) *Component {
+	component.Tag = strings.ToLower(component.Tag)
+	component.UUID = uuid4.New().String()
 
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
@@ -166,12 +139,12 @@ func NewComponent(pC *Component, data map[string]interface{}, watchers map[strin
 
 			if isComponent(child) {
 				childC := I2C(child)
-				if !childC.Directives.If(childC) {
+				if childC.Directives.If != nil && !childC.Directives.If(childC) {
 					continue
 				}
 
 				// if for.Data doesn't exist, but render exist - it's a user problem
-				if childC.Directives.For.Data != "" {
+				if childC.Directives.For.Render != nil {
 					dataForList, ok := this.Data[childC.Directives.For.Data].([]interface{})
 					if !ok {
 						dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
@@ -184,7 +157,22 @@ func NewComponent(pC *Component, data map[string]interface{}, watchers map[strin
 					renderer := childC.Directives.For.Render
 					for i, el := range dataForList {
 						// recreate this component with childes from FOR, without FOR directive
-						oneOfComponents := NewComponent(childC.ParentC, childC.Data, watchers, childC.Methods, computeds, clearedDirective, childC.Binds, hooks, childC.Handlers, childC.Tag, childC.Attrs, renderer(i, el, this)...)
+
+						c := &Component{
+							ParentC: childC.ParentC,
+							Data: childC.Data,
+							Watchers: component.Watchers,
+							Methods: childC.Methods,
+							Computeds: component.Computeds,
+							Directives: clearedDirective,
+							Binds: childC.Binds,
+							Hooks: component.Hooks,
+							Handlers: childC.Handlers,
+							Tag: childC.Tag,
+							Attrs: childC.Attrs,
+						}
+
+						oneOfComponents := NewComponent(c, renderer(i, el, this)...)
 						compiled = append(compiled, oneOfComponents)
 					}
 

@@ -45,6 +45,8 @@ type Hooks struct {
 	Created 	 Hook // have auto-update
 	BeforeCreate Hook
 	Destroyed 	 Hook
+	BeforeUpdate Hook
+	Updated		 Hook
 }
 
 // Hook - lifecycle hook
@@ -131,6 +133,10 @@ type Component struct {
 }
 
 func NewComponent(component *Component, childes ...GetComponent) *Component {
+	if component.Tag == "" {
+		component.Tag = "div"
+	}
+
 	component.Tag = strings.ToLower(component.Tag)
 	component.UUID = uuid4.New().String()
 

@@ -122,13 +122,6 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		_node.SetInnerHTML(fmt.Sprintf("%s\n%s", currentInner, htmlDirective))
 	}
 
-	if c.Hooks.BeforeCreate != nil {
-		err := c.Hooks.BeforeCreate(c)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return _node, nil
 }
 
@@ -142,8 +135,17 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 			return err
 		}
 
+		// BeforeCreate hook
+		if I2C(new).Hooks.BeforeCreate != nil {
+			err := I2C(new).Hooks.BeforeCreate(I2C(new))
+			if err != nil {
+				return err
+			}
+		}
+
 		_parent.AppendChild(_new)
 
+		// Created hook
 		if isComponent(new) && I2C(new).Hooks.Created != nil {
 			newC := I2C(new)
 
@@ -172,6 +174,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	if new == nil {
 		_parent.RemoveChild(_el)
 
+		// Destroyed hook
 		if isComponent(old) && I2C(old).Hooks.Destroyed != nil {
 			err := I2C(old).Hooks.Destroyed(I2C(old))
 			if err != nil {
@@ -188,12 +191,28 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		return err
 	}
 	if isChanged {
+		// BeforeUpdate hook
+		if isComponent(new) && I2C(new).Hooks.BeforeUpdate != nil {
+			err := I2C(new).Hooks.BeforeUpdate(I2C(new))
+			if err != nil {
+				return err
+			}
+		}
+
 		_new, err := CreateComponent(new)
 		if err != nil {
 			return err
 		}
 
 		_parent.ReplaceChild(_new, _el)
+
+		// Updated hook
+		if isComponent(new) && I2C(new).Hooks.Updated != nil {
+			err := I2C(new).Hooks.Updated(I2C(new))
+			if err != nil {
+				return err
+			}
+		}
 
 		return nil
 	}

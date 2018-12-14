@@ -3,7 +3,6 @@
 ## A class tasks
 
 * TextNode (say no to `<span>`)
-* Add update, beforeUpdate, beforeDestroy hooks (someones will need it)
 
 ## B class tasks
 

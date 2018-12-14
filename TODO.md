@@ -2,7 +2,6 @@
 
 ## A class tasks
 
-* Add Binds
 * TextNode (say no to `<span>`)
 * Add update, beforeUpdate, beforeDestroy hooks (someones will need it)
 

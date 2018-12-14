@@ -56,7 +56,12 @@ func CreateElement(c *Component) (*dom.Element, error) {
 	_node.SetAttribute("data-i", c.UUID) // set data-i for accept element from component methods
 
 	for attrName, attrBody := range c.Attrs {
-		//if attrIsValid(attrName, component.Tag) {} // check if attribute is valid for this tag
+		//if !attrIsValid(attrName, component.Tag) {continue} // check if attribute is valid for this tag
+		_node.SetAttribute(attrName, attrBody)
+	}
+
+	for attrName, bindBody := range c.Binds {
+		attrBody := bindBody(c)
 		_node.SetAttribute(attrName, attrBody)
 	}
 
@@ -256,7 +261,7 @@ func isComponentsEquals(new, old *Component) bool {
 	caE := cmp.Equal(new.Catchers, old.Catchers)
 
 	hE := compareHooks(new.Hooks, old.Hooks)
-	bE := reflect.DeepEqual(new.Binds, old.Binds)
+	bE := compareBinds(new.renderedBinds, old.renderedBinds)
 
 	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
 	diFE  := cmp.Equal(new.Directives.For, old.Directives.For)
@@ -278,6 +283,20 @@ func compareHooks(new, old Hooks) bool {
 	return created && beforeCreate && destroyed
 }
 
+func compareBinds(new, old map[string]string) bool {
+	if len(new) != len(old) {
+		return false
+	}
+
+	for newKey, newValue := range new {
+		if newValue != old[newKey] {
+			return false
+		}
+	}
+
+	return true
+}
+
 // renderTree return full rendered childes tree of component
 func renderTree(c *Component) []interface{} {
 	var childes []interface{}
@@ -287,6 +306,16 @@ func renderTree(c *Component) []interface{} {
 
 			if elC.Directives.HTML.Render != nil {
 				elC.Directives.HTML.Rendered = elC.Directives.HTML.Render(elC)
+			}
+
+			if elC.Binds != nil {
+				if elC.renderedBinds == nil {
+					elC.renderedBinds = map[string]string{}
+				}
+
+				for bindKey, bindValue := range elC.Binds { // render binds
+					elC.renderedBinds[bindKey] = bindValue(elC)
+				}
 			}
 
 			elC.RChildes = renderTree(elC)

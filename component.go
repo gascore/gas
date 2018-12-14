@@ -113,8 +113,10 @@ type Component struct {
 	Hooks    Hooks // lifecycle hooks
 	Catchers map[string]Catcher // catch child components $emit
 
-	Handlers     map[string]Handler // events handlers: onClick, onHover
-	Binds      	 map[string]Bind    // dynamic attributes
+	Handlers      map[string]Handler // events handlers: onClick, onHover
+	Binds      	  map[string]Bind    // dynamic attributes
+	renderedBinds map[string]string // store binds for changed func
+
 	Directives 	 Directives
 
 	Childes GetChildes

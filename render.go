@@ -136,7 +136,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		}
 
 		// BeforeCreate hook
-		if I2C(new).Hooks.BeforeCreate != nil {
+		if isComponent(new) && I2C(new).Hooks.BeforeCreate != nil {
 			err := I2C(new).Hooks.BeforeCreate(I2C(new))
 			if err != nil {
 				return err
@@ -162,16 +162,16 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	if _childes == nil { return errors.New("_parent doesn't have childes") }
 
 	var _el *dom.Element
-	if len(_childes) > index { // component was hided if childes length <= index
+	if len(_childes) > index || (len(_childes) >= index && isComponent(new)) { // component was hided if childes length <= index
 		_el = _childes[index]
 	}
 
+	newC 		   := &Component{}
 	newIsComponent := isComponent(new)
-	var newC *Component
 	if newIsComponent {newC = I2C(new)}
 
 	// if component has deleted
-	if new == nil {
+	if new == nil && _el != nil {
 		_parent.RemoveChild(_el)
 
 		// Destroyed hook
@@ -192,7 +192,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	}
 	if isChanged {
 		// BeforeUpdate hook
-		if isComponent(new) && I2C(new).Hooks.BeforeUpdate != nil {
+		if newIsComponent && I2C(new).Hooks.BeforeUpdate != nil {
 			err := I2C(new).Hooks.BeforeUpdate(I2C(new))
 			if err != nil {
 				return err
@@ -207,7 +207,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		_parent.ReplaceChild(_new, _el)
 
 		// Updated hook
-		if isComponent(new) && I2C(new).Hooks.Updated != nil {
+		if newIsComponent && I2C(new).Hooks.Updated != nil {
 			err := I2C(new).Hooks.Updated(I2C(new))
 			if err != nil {
 				return err
@@ -219,6 +219,10 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 
 	// check if component childes updated
 	if newIsComponent {
+		if newC.Directives.Model.Component != nil { // update input value
+			_el.SetValue("value", newC.Directives.Model.Component.Data[newC.Directives.Model.Data])
+		}
+
 		err = UpdateComponentChildes(_el, newC.RChildes, I2C(old).RChildes)
 		if err != nil {
 			return err

@@ -38,6 +38,7 @@ func main() {
 													return fmt.Sprintf("%d: %s", i+1, el)
 												},)
 										},
+										Component: this,
 									},
 								},
 								Handlers: map[string]gas.Handler {

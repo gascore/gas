@@ -16,7 +16,7 @@ func (c *Component) GetData(query string) interface{} {
 // SetData set data field and update component (after changes)
 func (c *Component) SetData(query string, value interface{}) error {
 	oldValue := c.Data[query]
-	err := c.eventInUpdater(func() error {
+	err := c.DoWithUpdate(func() error {
 		err := c.SetDataFree(query, value)
 		if err != nil {
 			return err
@@ -51,8 +51,8 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 	return nil
 }
 
-// eventInUpdater runs your event and trying to update component after it
-func (c *Component) eventInUpdater(event func()error) error {
+// DoWithUpdate runs your event and trying to update component after it
+func (c *Component) DoWithUpdate(event func()error) error {
 	oldTree := renderTree(c)
 
 	var oldHtmlDirective string

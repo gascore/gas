@@ -87,6 +87,7 @@ type ModelDirective struct {
 // ForDirective struct for For Directive (needful because `for` want name and render function)
 type ForDirective struct {
 	Data string
+	Component *Component
 	Render func(int, interface{}, *Component) []GetComponent
 }
 
@@ -138,7 +139,6 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 	}
 
 	component.Tag = strings.ToLower(component.Tag)
-	component.UUID = uuid4.New().String()
 
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
@@ -152,8 +152,8 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 				}
 
 				// if for.Data doesn't exist, but render exist - it's a user problem
-				if childC.Directives.For.Render != nil {
-					dataForList, ok := this.Data[childC.Directives.For.Data].([]interface{})
+				if len(childC.Directives.For.Data) != 0 {
+					dataForList, ok := childC.Directives.For.Component.Data[childC.Directives.For.Data].([]interface{})
 					if !ok {
 						dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
 						continue
@@ -192,6 +192,11 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 		}
 
 		return compiled
+	}
+
+	component.UUID = uuid4.New().String()
+	if component.Tag == "li" {
+		//log.Println(component.UUID)
 	}
 
 	return component

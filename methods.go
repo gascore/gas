@@ -32,7 +32,7 @@ func (c *Component) GetPocketMethod(name string) (PocketMethod, error)  {
 	}
 
 	bindingMethod := func(values ...interface{}) error {
-		err := c.eventInUpdater(func() error {
+		err := c.DoWithUpdate(func() error {
 			return method(c, values...)
 		})
 		if err != nil {

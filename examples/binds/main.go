@@ -46,21 +46,9 @@ func main() {
 											foo, ok := this.GetData("foo").(int)
 											gas.WarnIfNot(ok)
 
-											var color string
-											switch {
-											case foo%10 == 0:
-												color = "background-color: red;"
-											case foo%4 == 0:
-												color = "background-color: green;"
-											case foo%2 == 0:
-												color = "background-color: blue;"
-											default:
-												color = "background-color: purple;"
-											}
-
 											// REMEMBER!
 											// Bind attributes appends over normal attributes, you will lose your normal attribute value
-											return fmt.Sprintf("%s; %s", this2.Attrs["style"], color)
+											return fmt.Sprintf("%s; background-color: rgb(%d, %d, %d)", this2.Attrs["style"], foo, 255-foo, foo)
 										},
 									},
 									Attrs: map[string]string{
@@ -78,7 +66,7 @@ func main() {
 										Tag: "i",
 									},
 									func(this3 *gas.Component) interface{} {
-										return "// if the number is a multiple of 10 - red, 4 - green, 2 - blue, other - purple"
+										return "// color: rgb(x, 255-x, x)"
 									})
 							},)
 					},
@@ -98,6 +86,8 @@ func main() {
 								Tag: "input",
 								Attrs: map[string]string{
 									"type": "range",
+									"min": "0",
+									"max": "255",
 								},
 							})
 					},)

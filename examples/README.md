@@ -20,7 +20,7 @@ Hosting in [jsgo.io](https://jsgo.io) examples:
 7. [html-directive](https://jsgo.io/5c8bae28c8ed6a55bd976d316467e68281b10d88)
 8. [watchers](https://jsgo.io/b22cf57dadda640f5d7a1d4d59eae35e2a2477aa)
 9. [hooks](https://jsgo.io/50e0c07878cbfffbc386abaa6d15d3da94eba50f)
-10. [binds](https://jsgo.io/a872bf056277214e742270aa61421cace16d8710)
+10. [binds](https://jsgo.io/2ad5f321893fa973ba688354b87d4d532127b9b5)
 11. [TODO](https://jsgo.io/e0732a78ed0bfc6f596b6e1d12473c6344ad8b66)
 
 Examples may be old, because recreate examples after every commits is really disrespectful to [jsgo.io](https://jsgo.io)

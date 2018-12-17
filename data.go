@@ -15,8 +15,8 @@ func (c *Component) GetData(query string) interface{} {
 
 // SetData set data field and update component (after changes)
 func (c *Component) SetData(query string, value interface{}) error {
-	oldValue := c.Data[query]
 	err := c.DoWithUpdate(func() error {
+		oldValue := c.Data[query]
 		err := c.SetDataFree(query, value)
 		if err != nil {
 			return err

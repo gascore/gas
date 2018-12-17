@@ -70,7 +70,6 @@ func main() {
 										return !this.GetData("show").(bool)
 									},
 								},
-								Binds: gas.NilBinds,
 								Tag: "i",
 							},
 							func(this2 *gas.Component) interface{} {

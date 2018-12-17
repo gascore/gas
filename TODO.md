@@ -2,6 +2,12 @@
 
 ## A class tasks
 
+* -doWithUpdate
+* v-show (by css)
+* v-once
+* mounted, beforeMount
+* v-on:click.***
+* v-on:keyup.***
 * TextNode (say no to `<span>`)
 
 ## B class tasks

@@ -7,27 +7,6 @@ import (
 	"strings"
 )
 
-var (
-	// NilData Nil value for Component.Data
-	NilData map[string]interface{}
-	// NilWatchers Nil value for Component.Watchers
-	NilWatchers map[string]Watcher
-	// NilAttrs Nil value for Component.Attrs
-	NilAttrs map[string]string
-	// NilBinds Nil value for Component.Binds
-	NilBinds map[string]Bind
-	// NilHooks Nil value for Component.Hooks
-	NilHooks Hooks
-	// NilHandlers Nil value for Component.Handlers
-	NilHandlers map[string]Handler
-	// NilMethods Nil value for Component.Methods
-	NilMethods map[string]Method
-	// NilComputeds Nil value for Component.Computeds
-	NilComputeds map[string]Computed
-	// NilDirectives Nil value for Component.Directives
-	NilDirectives Directives
-)
-
 // Context - in context component send c.Data and c.Props to method
 type Context interface{}
 

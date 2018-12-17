@@ -170,8 +170,12 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	newIsComponent := isComponent(new)
 	if newIsComponent {newC = I2C(new)}
 
+	if _el == nil { // here current element will exist
+		return nil
+	}
+	
 	// if component has deleted
-	if new == nil && _el != nil {
+	if new == nil {
 		_parent.RemoveChild(_el)
 
 		// Destroyed hook

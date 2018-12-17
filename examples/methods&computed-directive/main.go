@@ -25,24 +25,17 @@ func main() {
 						// Methods will do business things.
 						// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
 						Methods: map[string]gas.Method{
-							//	Component updates after method is ended.
-							//	Therefore we can change data millions times, but it will updates once.
-							//	And u should know it
 							"toggle": func(this *gas.Component, values ...interface{}) error {
-								// in methods we call only SetDataFree because we don't need updates component after changes
-								_ = this.SetDataFree("show", !this.GetData("show").(bool))
-								_ = this.SetDataFree("show", !this.GetData("show").(bool))
-								_ = this.SetDataFree("show", !this.GetData("show").(bool))
-								_ = this.SetDataFree("show", !this.GetData("show").(bool))
-								_ = this.SetDataFree("show", !this.GetData("show").(bool))
+								_ = this.SetData("show", !this.GetData("show").(bool))
 
 								if this.GetData("show").(bool) {
-									_ = this.SetDataFree("number", this.GetData("number").(int)+1)
+									_ = this.SetData("number", this.GetData("number").(int)+1)
 								}
 
 								return nil
 							},
 						},
+						// Computeds can be cached
 						Computeds: map[string]gas.Computed{
 							"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
 								dom.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))

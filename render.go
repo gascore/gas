@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/google/go-cmp/cmp"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"

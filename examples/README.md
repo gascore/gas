@@ -12,8 +12,8 @@ How to run example:
 Hosting in [jsgo.io](https://jsgo.io) examples:
 
 1. [hello-world](https://jsgo.io/7cee3f268b32e689adec58180c6b5a58cbbe7e3d)
-2. [clicker&props](https://jsgo.io/202399c6de0417ed6ad04a2a41a905daa12a7bb9)
-3. [if-directive](https://jsgo.io/6a8fee78e0c4605b6fd44f6998f309ecd54c710a)
+2. [clicker&props](https://jsgo.io/c2ad9dbef88187435edb1e8e0a545711b2988061)
+3. [if-directive](https://jsgo.io/ae00ac3717bea4247450f0525777c78c9e0932d6)
 4. [for-directive](https://jsgo.io/38e21fd3ab62cb5180f85bfdd828980b6f63fd9e)
 5. [methods&computed-directive](https://jsgo.io/30c02c0912c530f39f60668f8654f6708eb3b86e)
 6. [model-directive](https://jsgo.io/f78d4b41e4f3ce09c0a6292c97d67cb07f5743ac)

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/google/go-cmp/cmp"
+	"log"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 // CreateComponent render component. Returns _el, err
@@ -53,6 +55,9 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		return nil, errors.New("cannot create component")
 	}
 
+	if c.Directives.Show != nil && !c.Directives.Show(c) {
+		doElHidden(_node)
+	}
 	_node.SetAttribute("data-i", c.UUID) // set data-i for accept element from component methods
 
 	for attrName, attrBody := range c.Attrs {
@@ -67,6 +72,45 @@ func CreateElement(c *Component) (*dom.Element, error) {
 
 	for handlerName, handlerBody := range c.Handlers {
 		//if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
+
+		handlerNameParsed := strings.Split(handlerName, ".")
+		if len(handlerNameParsed) == 2 {
+			handlerType := handlerNameParsed[0]
+			handlerTarget := handlerNameParsed[1]
+			switch handlerType {
+			case "keyup":
+				_node.AddEventListener(handlerType, func(e dom.Event) {
+					if handlerTarget == strings.ToLower(e.GetValueString("key")) {
+						handlerBody(c, e)
+					}
+				})
+			case "click":
+				var useTr = false
+				handlerTargetInt, err := strconv.Atoi(handlerTarget)
+				if err != nil {
+					useTr = true
+				}
+
+				_node.AddEventListener(handlerType, func(e dom.Event) {
+					buttonClick, err := parseInt(strings.ToLower(e.GetValueString("button")))
+					if err != nil {
+						WarnError(errors.New("invalid onClick button value"))
+						return
+					}
+
+					if useTr {
+						if handlerTarget == parseClickButton(buttonClick) {
+							handlerBody(c, e)
+						}
+					} else {
+						if handlerTargetInt == buttonClick {
+							handlerBody(c, e)
+						}
+					}
+				})
+			}
+		}
+		
 		_node.AddEventListener(handlerName, func(e dom.Event) {
 			handlerBody(c, e)
 		})
@@ -227,6 +271,14 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 			_el.SetValue("value", newC.Directives.Model.Component.Data[newC.Directives.Model.Data])
 		}
 
+		if newC.Directives.Show != nil {
+			if !newC.Directives.Show(newC) {
+				doElHidden(_el)
+			} else {
+				doElVisible(_el)
+			}
+		}
+
 		err = UpdateComponentChildes(_el, newC.RChildes, I2C(old).RChildes)
 		if err != nil {
 			return err
@@ -353,4 +405,35 @@ func renderTree(c *Component) []interface{} {
 		childes = append(childes, el)
 	}
 	return childes
+}
+
+func doElHidden(_el *dom.Element) {
+	//_el.Style().Set("visibility", "hidden")
+	_el.Style().Set("display", "none")
+}
+
+func doElVisible(_el *dom.Element) {
+	//_el.Style().Set("visibility", "visible")
+	_el.Style().Set("display", "")
+}
+
+func parseClickButton(button int) string {
+	switch button {
+	case 0:
+		return "left"
+	case 1:
+		return "middle"
+	case 2:
+		return "right"
+	default:
+		return "unknown"
+	}
+}
+
+func parseInt(a string) (int, error) {
+	if a == "" {
+		return 0, nil
+	}
+
+	return strconv.Atoi(a)
 }

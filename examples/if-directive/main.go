@@ -51,7 +51,8 @@ func main() {
 							&gas.Component{
 								ParentC: this,
 								Directives: gas.Directives{
-									If: func(c *gas.Component) bool {
+									// If `Directives.Show == false` set `display: none` to element styles
+									Show: func(c *gas.Component) bool {
 										return !this.GetData("show").(bool)
 									},
 								},

@@ -52,6 +52,7 @@ type Catcher func(*Component)
 // Directives struct storing component if-directive
 type Directives struct {
 	If func(*Component) bool
+	Show func(*Component) bool
 	For ForDirective
 	Model ModelDirective
 	HTML HTMLDirective
@@ -174,9 +175,6 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 	}
 
 	component.UUID = uuid4.New().String()
-	if component.Tag == "li" {
-		//log.Println(component.UUID)
-	}
 
 	return component
 }

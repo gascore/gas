@@ -2,6 +2,8 @@
 
 ## A class tasks
 
+* fix for list edit in todo
+* fix model directive in todo
 * TextNode (say no to `<span>`)
 
 ## B class tasks

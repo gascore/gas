@@ -54,9 +54,8 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		return nil, errors.New("cannot create component")
 	}
 
-	if c.Directives.Show != nil && !c.Directives.Show(c) {
-		doElHidden(_node)
-	}
+	c.setShow(_node)
+
 	_node.SetAttribute("data-i", c.UUID) // set data-i for accept element from component methods
 
 	for attrName, attrBody := range c.Attrs {
@@ -115,7 +114,7 @@ func CreateElement(c *Component) (*dom.Element, error) {
 		})
 	}
 
-	if len(c.Directives.Model.Data) != 0 && c.Tag == "input" { // model allowed only for <input>
+	if len(c.Directives.Model.Data) != 0 && (c.Tag == "input" || c.Tag == "textarea" || c.Tag == "select") { // model allowed only for <input>
 		_node.AddEventListener("input", func(e dom.Event) {
 			_target := e.Target()
 			inputValue := _target.GetValue("value").String()
@@ -270,13 +269,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 			_el.SetValue("value", newC.Directives.Model.Component.Data[newC.Directives.Model.Data])
 		}
 
-		if newC.Directives.Show != nil {
-			if !newC.Directives.Show(newC) {
-				doElHidden(_el)
-			} else {
-				doElVisible(_el)
-			}
-		}
+		newC.setShow(_el)
 
 		err = UpdateComponentChildes(_el, newC.RChildes, I2C(old).RChildes)
 		if err != nil {
@@ -404,6 +397,16 @@ func renderTree(c *Component) []interface{} {
 		childes = append(childes, el)
 	}
 	return childes
+}
+
+func (c *Component) setShow(_el *dom.Element) {
+	if c.Directives.Show != nil {
+		if !c.Directives.Show(c) {
+			doElHidden(_el)
+		} else {
+			doElVisible(_el)
+		}
+	}
 }
 
 func doElHidden(_el *dom.Element) {

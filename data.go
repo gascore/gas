@@ -91,3 +91,16 @@ func (c *Component) DoWithUpdate(event func()error) error {
 
 	return nil
 }
+
+// Rerender rerender current component
+func (c *Component) Rerender() error {
+	_c := c.GetElement()
+	_newC, err := CreateComponent(c)
+	if err != nil {
+		return err
+	}
+
+	c.ParentC.GetElement().ReplaceChild(_newC, _c)
+
+	return nil
+}

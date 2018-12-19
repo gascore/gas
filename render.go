@@ -170,7 +170,7 @@ func CreateElement(c *Component) (*dom.Element, error) {
 }
 
 
-// UpdateComponent trying to update component
+// UpdateComponent trying to Update component
 func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, index int) error {
 	// if component has created
 	if old == nil {
@@ -267,7 +267,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 
 	// check if component childes updated
 	if newIsComponent {
-		if newC.Directives.Model.Component != nil { // update input value
+		if newC.Directives.Model.Component != nil { // Update input value
 			_el.SetValue("value", newC.Directives.Model.Component.Data[newC.Directives.Model.Data])
 		}
 
@@ -282,7 +282,7 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	return nil
 }
 
-// UpdateComponentChildes update component childes by new and old childes
+// UpdateComponentChildes Update component childes by new and old childes
 func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface{}) error {
 	for i := 0; i < len(newChildes) || i < len(oldChildes); i++ {
 		var elFromNew interface{}

@@ -44,7 +44,7 @@ func main() {
 								}
 								removedItem := list[i]
 
-								err := this.DoWithUpdate(func() error {return this.SetData("current", remove(list, i))})
+								err := this.DataDeleteFromArray("current", i)
 								if err != nil {
 									return err
 								}
@@ -74,10 +74,7 @@ func main() {
 									return errors.New("invalid task")
 								}
 
-								list := this.GetData(listTypeS).([]interface{})
-								list  = append(list, newTask)
-
-								err := this.SetData(listTypeS, list)
+								err := this.DataAddToArray(listTypeS, newTask)
 								if err != nil {
 									return err
 								}
@@ -121,17 +118,7 @@ func main() {
 									return errors.New("invalid new value")
 								}
 
-								list, ok := this.GetData("current").([]interface{})
-								if !ok {
-									return errors.New("invalid current list")
-								}
-
-								err := this.SetData("current", addItem(list, i, newValue))
-								if err != nil {
-									return err
-								}
-
-								err = this.Rerender()
+								err := this.DataEditArray("current", i, newValue)
 								if err != nil {
 									return err
 								}
@@ -329,6 +316,9 @@ footer a {
 									&gas.Component{
 										ParentC: p,
 										Directives: gas.Directives{
+											If: func(p *gas.Component) bool {
+												return this.GetData("currentList").(string) == "0"
+											},
 											Model: gas.ModelDirective{
 												Data: "currentText",
 												Component: this,
@@ -570,8 +560,11 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 										},
 										Handlers: map[string]gas.Handler{
 											"keyup.enter": func(p *gas.Component, e dom.Event) {
+												newValue := this2.GetData("newValue")
+
 												gas.WarnError(this2.SetData("isEditing", false))
-												gas.WarnError(this.Method("edit", i, this2.GetData("newValue")))
+												gas.WarnError(this.Method("edit", i, newValue))
+												value = newValue
 											},
 										},
 									},
@@ -605,19 +598,6 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 				},
 			},
 		})
-}
-
-func remove(a []interface{}, i int) []interface{} {
-	copy(a[i:], a[i+1:]) // Shift a[i+1:] left one index
-	a[len(a)-1] = ""     // Erase last element (write zero value)
-	a = a[:len(a)-1]     // Truncate slice
-
-	return a
-}
-
-func addItem(a []interface{}, i int, newValue string) []interface{} {
-	a[i] = newValue
-	return a
 }
 
 func must(err error) {

@@ -21,7 +21,7 @@ type GetComponent func(*Component) interface{}
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created 	 Hook // have auto-update
+	Created 	 Hook // have auto-Update
 	BeforeCreate Hook
 	Destroyed 	 Hook
 	BeforeUpdate Hook
@@ -75,7 +75,7 @@ type ForDirective struct {
 type HTMLDirective struct {
 	Render func(*Component) string
 
-	Rendered string // here storing rendered html for update functions
+	Rendered string // here storing rendered html for Update functions
 }
 
 // Handler -- handler exec function when event trigger

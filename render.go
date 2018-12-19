@@ -115,6 +115,10 @@ func CreateElement(c *Component) (*dom.Element, error) {
 	}
 
 	if len(c.Directives.Model.Data) != 0 && (c.Tag == "input" || c.Tag == "textarea" || c.Tag == "select") { // model allowed only for <input>
+		this  := c.Directives.Model.Component
+		dataS := c.Directives.Model.Data
+
+		_node.SetValue("value", this.GetData(dataS))
 		_node.AddEventListener("input", func(e dom.Event) {
 			_target := e.Target()
 			inputValue := _target.GetValue("value").String()
@@ -143,14 +147,12 @@ func CreateElement(c *Component) (*dom.Element, error) {
 				break
 			}
 
-			this := c.Directives.Model.Component
-
-			dataValue := this.GetData(c.Directives.Model.Data)
+			dataValue := this.GetData(dataS)
 			if inputType != fmt.Sprintf("%T", dataValue) {
 				WarnError(errors.New("input type != data type"))
 			}
 
-			err = this.SetData(c.Directives.Model.Data, inputValueTyped)
+			err = this.SetData(dataS, inputValueTyped)
 			if err != nil {
 				WarnError(err)
 			}

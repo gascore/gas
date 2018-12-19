@@ -542,7 +542,7 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 										Handlers: map[string]gas.Handler{
-											"click.left": func(p *gas.Component, e dom.Event) {
+											"dblclick": func(p *gas.Component, e dom.Event) {
 												gas.WarnError(this2.SetData("newValue", value))
 												gas.WarnError(this2.SetData("isEditing", true))
 											},

@@ -132,99 +132,7 @@ func main() {
 						},
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								ParentC:this,
-								Tag:"style",
-								Attrs: map[string]string{"type": "text/css"},
-								Directives: gas.Directives{
-									HTML: gas.HTMLDirective{
-										Render: func(this2 *gas.Component) string {
-											return `
-#todo {
-	width: 50%;
-	margin: 0 auto;
-}
-
-#main {
-	border: 1px solid #dedede;
-	padding: 8px 16px 8px 16px;
-}
-
-ul {
-	padding: 0;
-	list-style-type: none;
-	padding-left: 0;
-	margin-left: 0;
-}
-
-ul li {
-	display: flex;
-	margin: 4px 0 8px 0;
-	padding: 4px 8px;
-	border-bottom: 1px solid #dedede;
-
-	font-size: 18px;
-}
-
-ul li button {
-	border: 0;
-	padding: 0;
-	background-color: inherit;
-	cursor: pointer;
-}
-ul li button#submit:hover, button#submit:focus {
-	color: #009966;
-}
-ul li button#delete:hover, button#delete:focus {
-	color: #ff0033;
-}
-
-ul li button#submit {
-	margin: 0 12px 0 0;
-}
-
-ul li button#delete {
-	margin: 0 0 0 auto;
-}
-
-nav {
-	margin-bottom: 8px;
-}
-
-nav button {
-	margin-right: 6px;
-	border: 0;
-	padding: 0;
-	color: #009966;
-	background-color: inherit;
-	text-decoration: underline;
-	cursor: pointer;
-}
-nav button:focus, nav button:hover, nav button.active {
-	color: #00CC99;
-}
-
-#new {
-	width: auto;
-}
-
-footer {
-	margin-top: 18px;
-	color: gray;
-	font-size: 12px;
-	text-align: center;
-}
-footer div {
-	margin-bottom: 4px;
-}
-footer a {
-	margin: 0 4px;
-	color: inherit;
-}
-
-`
-						}}}})
+						return getStyleEl(this)
 					},
 					func (this *gas.Component) interface{} {
 						return gas.NewComponent(
@@ -242,73 +150,13 @@ footer a {
 										Tag: "nav",
 									},
 									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												ParentC: p,
-												Tag: "button",
-												Handlers: map[string]gas.Handler{
-													"click": func(p *gas.Component, e dom.Event) {
-														gas.WarnError(this.SetData("currentList", "0"))
-													},
-												},
-												Binds: map[string]gas.Bind{
-													"class": func(p *gas.Component) string {
-														if this.GetData("currentList").(string) == "0" {
-															return "active"
-														}
-														return ""
-													},
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return "Current"
-											})
+										return getNavEl(this, "0", "Current")
 									},
 									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												ParentC: p,
-												Tag: "button",
-												Handlers: map[string]gas.Handler{
-													"click": func(p *gas.Component, e dom.Event) {
-														gas.WarnError(this.SetData("currentList", "1"))
-													},
-												},
-												Binds: map[string]gas.Bind{
-													"class": func(p *gas.Component) string {
-														if this.GetData("currentList").(string) == "1" {
-															return "active"
-														}
-														return ""
-													},
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return "Completed"
-											})
+										return getNavEl(this, "1", "Completed")
 									},
 									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												ParentC: p,
-												Tag: "button",
-												Handlers: map[string]gas.Handler{
-													"click": func(p *gas.Component, e dom.Event) {
-														gas.WarnError(this.SetData("currentList", "2"))
-													},
-												},
-												Binds: map[string]gas.Bind{
-													"class": func(p *gas.Component) string {
-														if this.GetData("currentList").(string) == "2" {
-															return "active"
-														}
-														return ""
-													},
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return "Deleted"
-											})
+										return getNavEl(this, "2", "Deleted")
 									},)
 							},
 							func (p *gas.Component) interface{} {
@@ -348,62 +196,14 @@ footer a {
 									},
 									// Because i don't need wrap `this` and ul `this` i can overwrite this variable
 									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												ParentC: p,
-												Directives:gas.Directives{
-													Show: func(p *gas.Component) bool {
-														return this.GetData("currentList") == "0"
-													},
-												},
-												Tag: "ul",
-												Attrs: map[string]string{
-													"id": "list__current",
-													"class": "list",
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return getLi(p, this, 0)
-											})
+										return getList(p, this, 0)
 									},
 									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												ParentC: p,
-												Tag: "ul",
-												Directives:gas.Directives{
-													Show: func(p *gas.Component) bool {
-														return this.GetData("currentList") == "1"
-													},
-												},
-												Attrs: map[string]string{
-													"id": "list__done",
-													"class": "list",
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return getLi(p, this, 1)
-											})
+										return getList(p, this, 1)
 									},
 									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												ParentC: p,
-												Tag: "ul",
-												Directives:gas.Directives{
-													Show: func(p *gas.Component) bool {
-														return this.GetData("currentList") == "2"
-													},
-												},
-												Attrs: map[string]string{
-													"id": "list__deleted",
-													"class": "list",
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return getLi(p, this, 2)
-											})
-									})
+										return getList(p, this, 2)
+									},)
 							},)
 					},
 					func (this *gas.Component) interface{} {
@@ -474,6 +274,26 @@ footer a {
 	gas.KeepAlive()
 }
 
+func getList(p *gas.Component, this *gas.Component, index int) interface{} {
+	return gas.NewComponent(
+		&gas.Component{
+			ParentC: p,
+			Directives:gas.Directives{
+				Show: func(p *gas.Component) bool {
+					return this.GetData("currentList") == fmt.Sprintf("%d", index)
+				},
+			},
+			Tag: "ul",
+			Attrs: map[string]string{
+				"id": "list__current",
+				"class": "list",
+			},
+		},
+		func(p *gas.Component) interface{} {
+			return getLi(p, this, index)
+		})
+}
+
 func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 	// listType: 0 - current, 1 - done, 2 - deleted tasks
 	var listTypeS string
@@ -533,6 +353,10 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 										},
 										Handlers: map[string]gas.Handler{
 											"dblclick": func(p *gas.Component, e dom.Event) {
+												if listType != 0 {
+													return
+												}
+
 												gas.WarnError(this2.SetData("newValue", value))
 												gas.WarnError(this2.SetData("isEditing", true))
 											},
@@ -599,6 +423,138 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 			},
 		})
 }
+
+func getStyleEl(p *gas.Component) interface{} {
+	return gas.NewComponent(
+	&gas.Component{
+		ParentC:p,
+		Tag:"style",
+		Attrs: map[string]string{"type": "text/css"},
+		Directives: gas.Directives{
+			HTML: gas.HTMLDirective{
+				Render: func(this2 *gas.Component) string {
+					return `
+#todo {
+	width: 50%;
+	margin: 0 auto;
+}
+
+#main {
+	border: 1px solid #dedede;
+	border-radius: 4px;
+	padding: 0px 0px 4px 0px;
+}
+
+#main:childes {
+	color: red;
+}
+
+ul {
+	padding: 0 16px;
+	list-style-type: none;
+	margin-left: 0;
+}
+
+ul li {
+	display: flex;
+	padding: 4px 8px;
+	border-bottom: 1px solid #dedede;
+
+	font-size: 18px;
+}
+
+ul li button {
+	border: 0;
+	padding: 0;
+	background-color: inherit;
+	cursor: pointer;
+}
+ul li button#submit:hover, button#submit:focus {
+	color: #009966;
+}
+ul li button#delete:hover, button#delete:focus {
+	color: #ff0033;
+}
+
+ul li button#submit {
+	margin: 0 12px 0 0;
+}
+
+ul li button#delete {
+	margin: 0 0 0 auto;
+}
+
+nav {
+	padding: 6px 16px;
+	margin-bottom: 8px;
+	border-bottom: 1px solid #dedede;
+	background-color: #f1f1f1;
+}
+
+nav button {
+	margin-right: 6px;
+	border: 0;
+	padding: 0;
+	color: #009966;
+	background-color: inherit;
+	cursor: pointer;
+}
+nav button:focus, nav button:hover {
+	color: #00CC99;
+}
+nav button.active {
+	text-decoration: underline;
+}
+
+#new {
+	margin: 0 16px;
+}
+
+footer {
+	margin-top: 18px;
+	color: gray;
+	font-size: 12px;
+	text-align: center;
+}
+footer div {
+	margin-bottom: 4px;
+}
+footer a {
+	margin: 0 4px;
+	color: inherit;
+}
+
+`
+				},
+			},
+		},
+	})
+}
+
+func getNavEl(this *gas.Component, index, name string) interface{} {
+	return gas.NewComponent(
+		&gas.Component{
+			ParentC: this,
+			Tag: "button",
+			Handlers: map[string]gas.Handler{
+				"click": func(p *gas.Component, e dom.Event) {
+					gas.WarnError(this.SetData("currentList", index))
+				},
+			},
+			Binds: map[string]gas.Bind{
+				"class": func(p *gas.Component) string {
+					if this.GetData("currentList").(string) == index {
+						return "active"
+					}
+					return ""
+				},
+			},
+		},
+		func(p *gas.Component) interface{} {
+			return name
+		})
+}
+
 
 func must(err error) {
 	if err != nil {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gojs"
+	"github.com/Sinicablyat/gas-gojs"
 )
 
 // Example application #1
@@ -11,7 +11,7 @@ import (
 func main() {
 	app, err :=
 		gas.New(
-			gojs.GetBackEnd(),
+			gas_gojs.GetBackEnd(),
 			"app",
 			func(p *gas.Component) interface{} {
 			return gas.NewComponent(

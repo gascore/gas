@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/wasm"
+	"github.com/Sinicablyat/gas-wasm"
 )
 
 // Example application #2
@@ -11,7 +11,7 @@ import (
 func main() {
 	app, err :=
 		gas.New(
-			wasm.GetBackEnd(),
+			gas_wasm.GetBackEnd(),
 			"app",
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(

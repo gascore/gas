@@ -4,19 +4,20 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas/core"
+	"github.com/Sinicablyat/wasm"
 )
 
 // Example application #5
 //
 // 'methods&computed' shows how you can use component.Methods and component.Computed.
 func main() {
-	app, err := // as you can see i love 'clicker' example
-		gas.NewWasm(
+	app, err :=
+		gas.New(
+			wasm.GetBackEnd(),
 			"app",
-			func(p *core.Component) interface{} {
-				return core.NewComponent(
-					&core.Component{
+			func(p *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"show": true,
@@ -25,8 +26,8 @@ func main() {
 						// What the difference between Methods and Computed?
 						// Methods will do business things.
 						// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
-						Methods: map[string]core.Method{
-							"toggle": func(this *core.Component, values ...interface{}) error {
+						Methods: map[string]gas.Method{
+							"toggle": func(this *gas.Component, values ...interface{}) error {
 								_ = this.SetData("show", !this.GetData("show").(bool))
 
 								if this.GetData("show").(bool) {
@@ -37,8 +38,8 @@ func main() {
 							},
 						},
 						// Computeds can be cached
-						Computeds: map[string]core.Computed{
-							"number": func(this *core.Component, values ...interface{}) (interface{}, error) {
+						Computeds: map[string]gas.Computed{
+							"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
 								dom.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
 
 								currentNumber, ok := this.GetData("number").(int)
@@ -52,7 +53,7 @@ func main() {
 							"id": "M&C",
 						},
 					},
-					func(this *core.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						// For pass method or computed to sub component you need to get a *pocket* version.
 						// Pocket method/computed can be executed in sub component, in sub sub component, in e.t.c.
 						pocketToggle, err := this.GetPocketMethod("toggle")
@@ -60,7 +61,7 @@ func main() {
 
 						return getButton(this, pocketToggle)
 					},
-					func(this *core.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						pocketNumber, err := this.GetPocketComputed("number")
 						gas.WarnError(err)
 
@@ -74,12 +75,12 @@ func main() {
 	gas.KeepAlive()
 }
 
-func getButton(this *core.Component, toggleMethod core.PocketMethod) *core.Component {
-	return core.NewComponent(
-		&core.Component{
+func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Component {
+	return gas.NewComponent(
+		&gas.Component{
 			ParentC: this,
-			Handlers: map[string]core.Handler {
-				"click": func(c *core.Component, e dom.Event) {
+			Handlers: map[string]gas.Handler {
+				"click": func(c *gas.Component, e interface{}) {
 					// Of course we can use method for `this`.
 					// But if we want to pass method to child not from `this` we need to pass a pocket method/computed.
 					gas.WarnError(toggleMethod())
@@ -91,7 +92,7 @@ func getButton(this *core.Component, toggleMethod core.PocketMethod) *core.Compo
 					"id": "M&C__button",
 				},
 		},
-		func(this2 *core.Component) interface{} {
+		func(this2 *gas.Component) interface{} {
 			if this.GetData("show").(bool) {
 				return "Show text"
 			} else {
@@ -100,21 +101,21 @@ func getButton(this *core.Component, toggleMethod core.PocketMethod) *core.Compo
 		})
 }
 
-func getHiddenText(this *core.Component, isShow bool, getNumber core.PocketComputed) *core.Component {
-	return core.NewComponent(
-		&core.Component{
+func getHiddenText(this *gas.Component, isShow bool, getNumber gas.PocketComputed) *gas.Component {
+	return gas.NewComponent(
+		&gas.Component{
 			ParentC: this,
-			Directives: core.Directives{
-				If: func(c *core.Component) bool {
+			Directives: gas.Directives{
+				If: func(c *gas.Component) bool {
 					return !isShow
 				},
 			},
 			Tag: "i",
 		},
-		func(this2 *core.Component) interface{} {
+		func(this2 *gas.Component) interface{} {
 			return "Hidden text"
 		},
-		func (this2 *core.Component) interface{} {
+		func (this2 *gas.Component) interface{} {
 			value, err := getNumber("something for computed")
 			gas.WarnError(err) // always check for error
 			return fmt.Sprintf("  (%s)", value)

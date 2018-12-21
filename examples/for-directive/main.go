@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas/core"
+	"github.com/Sinicablyat/wasm"
 )
 
 // Example application #4
@@ -12,11 +11,12 @@ import (
 // 'if-directive' shows how you can use component.Directive.For
 func main() {
 	app, err :=
-		gas.NewWasm(
+		gas.New(
+			wasm.GetBackEnd(),
 			"app",
-			func(p *core.Component) interface{} {
-				return core.NewComponent(
-					&core.Component{
+			func(p *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"arr": []interface{}{"click", "here", "if you want to see some magic"},
@@ -26,24 +26,24 @@ func main() {
 							"id": "list",
 						},
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Directives: core.Directives{
-									For: core.ForDirective{
+								Directives: gas.Directives{
+									For: gas.ForDirective{
 										Data: "arr",
-										Render: func(i int, el interface{}, this *core.Component) []core.GetComponent {
+										Render: func(i int, el interface{}, this *gas.Component) []gas.GetComponent {
 											return gas.ToGetComponentList(
-												func(this2 *core.Component) interface{} {
+												func(this2 *gas.Component) interface{} {
 													return fmt.Sprintf("%d: %s", i+1, el)
 												},)
 										},
 										Component: this,
 									},
 								},
-								Handlers: map[string]core.Handler {
-									"click": func(c *core.Component, e dom.Event) {
+								Handlers: map[string]gas.Handler {
+									"click": func(c *gas.Component, e interface{}) {
 										arr := this.GetData("arr").([]interface{})
 										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
 										gas.WarnError(this.SetData("arr", arr))
@@ -52,7 +52,7 @@ func main() {
 								Tag: "li",
 							}) // In components with FOR Directive childes are ignored
 					},
-					func(this *core.Component) interface{} {
+					func(this *gas.Component) interface{} {
 						return "end of list"
 					})
 			},)

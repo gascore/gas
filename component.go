@@ -1,8 +1,6 @@
-package core
+package gas
 
 import (
-	"fmt"
-	"github.com/Sinicablyat/dom"
 	"github.com/frankenbeanies/uuid4"
 	"strings"
 )
@@ -79,7 +77,7 @@ type HTMLDirective struct {
 }
 
 // Handler -- handler exec function when event trigger
-type Handler func(*Component, dom.Event)
+type Handler func(*Component, interface{})
 
 // Watcher -- function triggering after component data changed
 type Watcher func(*Component, interface{}, interface{})error // (this, new, old)
@@ -135,7 +133,7 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 				if len(childC.Directives.For.Data) != 0 {
 					dataForList, ok := childC.Directives.For.Component.Data[childC.Directives.For.Data].([]interface{})
 					if !ok {
-						dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
+						//dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
 						continue
 					}
 

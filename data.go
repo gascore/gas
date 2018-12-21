@@ -1,8 +1,7 @@
-package core
+package gas
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/dom"
 	"github.com/pkg/errors"
 )
 
@@ -44,7 +43,7 @@ func (c *Component) SetData(query string, value interface{}) error {
 // SetDataFree set data without Update
 func (c *Component) SetDataFree(query string, value interface{}) error {
 	if value == nil {
-		dom.ConsoleError(fmt.Sprintf("trying to set nil value to %s field", query))
+		return fmt.Errorf("trying to set nil value to %s field", query)
 	}
 
 	c.Data[query] = value

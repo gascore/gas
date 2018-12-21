@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas/core"
+	"github.com/Sinicablyat/wasm"
 )
 
 // Example application #8
@@ -12,18 +12,19 @@ import (
 // 'watchers' shows how you can use component.Watchers
 func main() {
 	app, err :=
-		gas.NewWasm(
+		gas.New(
+			wasm.GetBackEnd(),
 			"app",
-			func(p *core.Component) interface{} {
-				return core.NewComponent(
-					&core.Component{
+			func(p *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"show": true,
 							"watcherIsTriggered": false,
 						},
-						Watchers: map[string]core.Watcher{
-							"show": func(this *core.Component, new interface{}, old interface{}) error {
+						Watchers: map[string]gas.Watcher{
+							"show": func(this *gas.Component, new interface{}, old interface{}) error {
 								dom.ConsoleLog(fmt.Sprintf("Watcher is triggered! New value: %t, old value: %t", new, old))
 
 								err := this.SetDataFree("watcherIsTriggered", true)
@@ -40,12 +41,12 @@ func main() {
 							"id": "if",
 						},
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Handlers: map[string]core.Handler {
-									"click": func(c *core.Component, e dom.Event) {
+								Handlers: map[string]gas.Handler {
+									"click": func(c *gas.Component, e interface{}) {
 										gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 									},
 								},
@@ -54,7 +55,7 @@ func main() {
 									"id": "if__button",
 								},
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								if this.GetData("show").(bool) {
 									return "Show text"
 								} else {
@@ -62,27 +63,27 @@ func main() {
 								}
 							})
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Directives: core.Directives{
-									If: func(c *core.Component) bool {
+								Directives: gas.Directives{
+									If: func(c *gas.Component) bool {
 										return !this.GetData("show").(bool)
 									},
 								},
 								Tag: "i",
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Hidden text"
 							})
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Directives: core.Directives{
-									If: func(this2 *core.Component) bool {
+								Directives: gas.Directives{
+									If: func(this2 *gas.Component) bool {
 										watcherIsTriggered, ok := this.GetData("watcherIsTriggered").(bool)
 										gas.WarnIfNot(ok)
 										return watcherIsTriggered
@@ -93,7 +94,7 @@ func main() {
 									"style": "color: red;",
 								},
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Watcher is triggered!"
 							})
 					})

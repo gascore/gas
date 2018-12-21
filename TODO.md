@@ -2,12 +2,12 @@
 
 ## A class tasks
 
+* add full gojs support
 * TextNode (say no to `<span>`)
 
 ## B class tasks
 
 * jsx-like parser
-* add gojs support (gas-gojs-dom)
 * redux-like
 * router
 

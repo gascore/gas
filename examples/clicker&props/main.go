@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas/core"
+	"github.com/Sinicablyat/wasm"
 )
 
 // Example application #2
@@ -11,17 +10,18 @@ import (
 // 'clicker&props' shows how you can add handlers, change component.Data and use external components
 func main() {
 	app, err :=
-		gas.NewWasm(
+		gas.New(
+			wasm.GetBackEnd(),
 			"app",
-			func(p *core.Component) interface{} {
-				return core.NewComponent(
-					&core.Component{
+			func(p *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
 						ParentC:p,
 						Data: map[string]interface{}{
 							"click": 0,
 						},
-						Methods: map[string]core.Method{
-							"addClick": func(this *core.Component, i ...interface{}) error {
+						Methods: map[string]gas.Method{
+							"addClick": func(this *gas.Component, i ...interface{}) error {
 								currentClick := this.GetData("click").(int)
 								gas.WarnError(this.SetData("click", currentClick+1))
 								return nil
@@ -32,28 +32,28 @@ func main() {
 							"id": "clicker&props",
 						},
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Handlers: map[string]core.Handler {
-									"click.left": func(this2 *core.Component, e dom.Event) {
+								Handlers: map[string]gas.Handler {
+									"click.left": func(this2 *gas.Component, e interface{}) {
 										gas.WarnError(this.Method("addClick"))
 									},
 									// you need to click button once (for target it)
-									"keyup.control": func(this2 *core.Component, e dom.Event) {
+									"keyup.control": func(this2 *gas.Component, e interface{}) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.a": func(this2 *core.Component, e dom.Event) {
+									"keyup.a": func(this2 *gas.Component, e interface{}) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.s": func(this2 *core.Component, e dom.Event) {
+									"keyup.s": func(this2 *gas.Component, e interface{}) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.d": func(this2 *core.Component, e dom.Event) {
+									"keyup.d": func(this2 *gas.Component, e interface{}) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.f": func(this2 *core.Component, e dom.Event) {
+									"keyup.f": func(this2 *gas.Component, e interface{}) {
 										gas.WarnError(this.Method("addClick"))
 									},
 								},
@@ -62,23 +62,23 @@ func main() {
 									"id": "clicker__button", // I love BEM
 								},
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Click me!"
 							})
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
 								Tag: "span",
 								Attrs: map[string]string{
 									"id": "needful_wrapper",
 								},
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "You clicked button: "
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								// It's EXTERNAL component!
 								return GetNumberViewer(this, this.GetData("click").(int))
 							})

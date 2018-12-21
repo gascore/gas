@@ -1,4 +1,4 @@
-package core
+package gas
 
 // Gas - main application struct
 type Gas struct {
@@ -21,12 +21,4 @@ type BackEnd interface {
 
 	GetElement(*Component) interface{}
 	GetGasEl(*Gas) interface{}
-}
-
-// idk how i can do it better
-var be BackEnd
-
-// SetBackEnd set backend in core package
-func SetBackEnd(backEnd BackEnd) {
-	be = backEnd
 }

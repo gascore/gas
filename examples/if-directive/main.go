@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas/core"
+	"github.com/Sinicablyat/wasm"
 )
 
 // Example application #3
@@ -11,11 +10,12 @@ import (
 // 'if-directive' shows how you can use component.Directive.If
 func main() {
 	app, err :=
-		gas.NewWasm(
+		gas.New(
+			wasm.GetBackEnd(),
 			"app",
-			func(p *core.Component) interface{} {
-				return core.NewComponent(
-					&core.Component{
+			func(p *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"show": true,
@@ -25,12 +25,12 @@ func main() {
 							"id": "if",
 						},
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Handlers: map[string]core.Handler {
-									"click": func(c *core.Component, e dom.Event) {
+								Handlers: map[string]gas.Handler {
+									"click": func(c *gas.Component, e interface{}) {
 										gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 									},
 								},
@@ -39,7 +39,7 @@ func main() {
 									"id": "if__button",
 								},
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								if this.GetData("show").(bool) {
 									return "Show text"
 								} else {
@@ -47,34 +47,34 @@ func main() {
 								}
 							})
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Directives: core.Directives{
+								Directives: gas.Directives{
 									// If `Directives.Show == false` set `display: none` to element styles
-									Show: func(c *core.Component) bool {
+									Show: func(c *gas.Component) bool {
 										return !this.GetData("show").(bool)
 									},
 								},
 								Tag: "i",
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Hidden text"
 							})
 					},
-					func(this *core.Component) interface{} {
-						return core.NewComponent(
-							&core.Component{
+					func(this *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
 								ParentC: this,
-								Directives: core.Directives{
-									If: func(c *core.Component) bool {
+								Directives: gas.Directives{
+									If: func(c *gas.Component) bool {
 										return this.GetData("show").(bool)
 									},
 								},
 								Tag: "b",
 							},
-							func(this2 *core.Component) interface{} {
+							func(this2 *gas.Component) interface{} {
 								return "Public text"
 							})
 					})

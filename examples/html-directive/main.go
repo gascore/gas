@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
+	"github.com/Sinicablyat/gas/core"
 )
 
 // Example application #7
@@ -10,11 +11,11 @@ import (
 // 'html-directive' shows how you can use component.Directive.HTML
 func main() {
 	app, err :=
-		gas.New(
+		gas.NewWasm(
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"articleText":
@@ -43,19 +44,19 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						},
 						Tag: "main",
 					},
-					func(this *gas.Component) interface{} { // don't use childes if you have v-html
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} { // don't use childes if you have v-html
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Handlers: map[string]gas.Handler{
-									"click": func(this2 *gas.Component, e dom.Event) {
+								Handlers: map[string]core.Handler{
+									"click": func(this2 *core.Component, e dom.Event) {
 										currentIsArticleActive := this.GetData("isArticleActive").(bool)
 										gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
 									},
 								},
 								Tag: "button",
 							},
-							func(this2 *gas.Component) interface{} {
+							func(this2 *core.Component) interface{} {
 								isArticleActive, ok := this.GetData("isArticleActive").(bool)
 								gas.WarnIfNot(ok)
 
@@ -66,12 +67,12 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 								}
 							})
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Directives: gas.Directives{
-									HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
+								Directives: core.Directives{
+									HTML: core.HTMLDirective{Render: func(this2 *core.Component) string {
 										isArticleActive, ok := this.GetData("isArticleActive").(bool)
 
 										var html string
@@ -94,7 +95,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 				)})
 	must(err)
 
-	err = app.Init()
+	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/Sinicablyat/gas"
+	"github.com/Sinicablyat/gas/core"
 )
 
 // Example application #6
@@ -10,11 +11,11 @@ import (
 // 'model-directive' shows how you can use component.Directive.Model
 func main() {
 	app, err :=
-		gas.New(
+		gas.NewWasm(
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"foo": "",
@@ -25,20 +26,20 @@ func main() {
 							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 						},
 					},
-					func(this *gas.Component) interface{} {
+					func(this *core.Component) interface{} {
 						foo, ok := this.GetData("foo").(string)
 						gas.WarnIfNot(ok)
 						return fmt.Sprintf("Your text: %s", foo)
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+					func(this *core.Component) interface{} {
+						return core.NewComponent(&core.Component{ParentC: this, Tag: "br"})
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
+								Directives: core.Directives{
+									Model: core.ModelDirective{
 										Data: "foo",
 										Component: this,
 									},
@@ -47,9 +48,9 @@ func main() {
 							})
 					},)
 			},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data:
 						map[string]interface{}{
@@ -62,20 +63,20 @@ func main() {
 							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 						},
 					},
-					func(this *gas.Component) interface{} {
+					func(this *core.Component) interface{} {
 						foo, ok := this.GetData("foo").(string)
 						gas.WarnIfNot(ok)
 						return fmt.Sprintf("Your color: %s", foo)
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+					func(this *core.Component) interface{} {
+						return core.NewComponent(&core.Component{ParentC: this, Tag: "br"})
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
+								Directives: core.Directives{
+									Model: core.ModelDirective{
 										Data: "foo",
 										Component: this,
 									},
@@ -87,9 +88,9 @@ func main() {
 							})
 					},)
 			},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"foo": int(0),
@@ -100,20 +101,20 @@ func main() {
 							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 						},
 					},
-					func(this *gas.Component) interface{} {
+					func(this *core.Component) interface{} {
 						foo, ok := this.GetData("foo").(int)
 						gas.WarnIfNot(ok)
 						return fmt.Sprintf("Your range: %d", foo)
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+					func(this *core.Component) interface{} {
+						return core.NewComponent(&core.Component{ParentC: this, Tag: "br"})
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
+								Directives: core.Directives{
+									Model: core.ModelDirective{
 										Data: "foo",
 										Component: this,
 									},
@@ -125,9 +126,9 @@ func main() {
 							})
 					},)
 			},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"foo": false,
@@ -138,20 +139,20 @@ func main() {
 							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 						},
 					},
-					func(this *gas.Component) interface{} {
+					func(this *core.Component) interface{} {
 						foo, ok := this.GetData("foo").(bool)
 						gas.WarnIfNot(ok)
 						return fmt.Sprintf("Your checkbox: %t", foo)
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+					func(this *core.Component) interface{} {
+						return core.NewComponent(&core.Component{ParentC: this, Tag: "br"})
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
+								Directives: core.Directives{
+									Model: core.ModelDirective{
 										Data: "foo",
 										Component: this,
 									},
@@ -166,7 +167,7 @@ func main() {
 			)
 	must(err)
 
-	err = app.Init()
+	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()
 }

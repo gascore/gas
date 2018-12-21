@@ -1,62 +1,59 @@
 package gas
 
 import (
-	"errors"
 	"fmt"
+	"github.com/Sinicablyat/gas/core"
+	"github.com/Sinicablyat/gas/wasm"
+	"github.com/frankenbeanies/uuid4"
 
 	"github.com/Sinicablyat/dom"
 )
 
-// Gas - main application struct
-type Gas struct {
-	App        Component
-	StartPoint string // html element id where application will store
+var be core.BackEnd
 
-	Element    *dom.Element
+// New create new gas application with custom backend
+func New(backEnd core.BackEnd, startPoint string, components ...core.GetComponent) (core.Gas, error) {
+	core.SetBackEnd(backEnd)
+	be = backEnd
 
-	// Other stuff
-}
-
-// New create new gas application
-func New(startPoint string, components ...GetComponent) (Gas, error) {
-	_el := dom.Doc.GetElementById(startPoint)
-	if _el == nil {
-		return Gas{}, errors.New("invalid start point")
+	tagName, err := be.New(startPoint)
+	if err != nil {
+		return core.Gas{}, err
 	}
 
-	mainComponent := NewComponent(
-		&Component{
-			Tag: _el.GetTagName(), // tag name
-			Attrs: map[string]string{ // attributes
+	mainComponent := core.NewComponent(
+		&core.Component{
+			Tag: tagName,
+			Attrs: map[string]string{
 				"id": startPoint,
 				"data-main": "true",
 			},
-		},
-		components...) // components
+			UUID: uuid4.New().String(),
+		}, components...)
 
-	gas := Gas{App: *mainComponent, StartPoint: startPoint, Element: _el}
+	gas := core.Gas{App: *mainComponent, StartPoint: startPoint}
 
 	return gas, nil
 }
 
+// NewWasm create new gas application with wasm backend
+func NewWasm(startPoint string, components ...core.GetComponent) (core.Gas, error) {
+	return New(wasm.GetBackEnd(), startPoint, components...)
+}
+
 // Init initialize gas application
-func (gas *Gas) Init() error {
-	app := gas.App
-	_main := gas.Element
-
-	_main.SetAttribute("data-i", app.UUID)
-	for _, el := range app.Childes(&app) {
-		_child, err := CreateComponent(el)
-		if err != nil {
-			return err
-		}
-
-		_main.AppendChild(_child)
+func Init(gas core.Gas) error {
+	err := be.Init(gas)
+	if err != nil {
+		return err
 	}
 
-	dom.Doc.GetElementsByTagName("body")[0].SetAttribute("data-ready", true)
-
 	return nil
+}
+
+// ToGetComponentList return array by many parameters, because it's pretty
+func ToGetComponentList(childes ...core.GetComponent) []core.GetComponent {
+	return childes
 }
 
 // WarnError log error
@@ -78,20 +75,10 @@ func WarnIfNot(ok bool) {
 }
 
 var signal = make(chan int)
+
 // KeepAlive keep alive runtime, without it application will stop (user won't be able to init events)
 func KeepAlive() {
-	//var wg sync.WaitGroup
-	//wg.Add(1)
-	//go func() {
-	//	wg.Wait()
-	//}()
 	for {
 		<- signal
 	}
 }
-
-//func must(err error) {
-//	if err != nil {
-//		panic(err)
-//	}
-//}

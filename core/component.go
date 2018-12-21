@@ -1,4 +1,4 @@
-package gas
+package core
 
 import (
 	"fmt"
@@ -98,7 +98,7 @@ type Component struct {
 
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds      	  map[string]Bind    // dynamic attributes
-	renderedBinds map[string]string // store binds for changed func
+	RenderedBinds map[string]string // store binds for changed func
 
 	Directives 	 Directives
 
@@ -125,7 +125,7 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 		for _, el := range childes {
 			child := el(this)
 
-			if isComponent(child) {
+			if IsComponent(child) {
 				childC := I2C(child)
 				if childC.Directives.If != nil && !childC.Directives.If(childC) {
 					continue
@@ -180,8 +180,8 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 }
 
 // GetElement return *dom.Element by component structure
-func (c *Component) GetElement() *dom.Element {
-	return dom.Doc.QuerySelector(fmt.Sprintf("[data-i='%s']", c.UUID)) // select element by data-i attribute
+func (c *Component) GetElement() interface{} {
+	return be.GetElement(c)
 }
 
 // I2C - convert interface{} to *Component
@@ -189,14 +189,12 @@ func I2C(a interface{}) *Component {
 	return a.(*Component)
 }
 
-// ToGetComponentList return array by many parameters, because it's pretty
-func ToGetComponentList(childes ...GetComponent) []GetComponent {return childes}
 
-func isComponent(c interface{}) bool {
+func IsComponent(c interface{}) bool {
 	_, ok := c.(*Component)
 	return ok
 }
-func isString(c interface{}) bool {
+func IsString(c interface{}) bool {
 	_, ok := c.(string)
 	return ok
 }

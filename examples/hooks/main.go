@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
+	"github.com/Sinicablyat/gas/core"
 )
 
 // Example application #9
@@ -11,18 +12,18 @@ import (
 // 'hooks' shows how you can use component.Hooks
 func main() {
 	app, err :=
-		gas.New(
+		gas.NewWasm(
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"show":    true,
 							"counter": 0,
 						},
-						Hooks: gas.Hooks{
-							BeforeCreate: func(this *gas.Component) error {
+						Hooks: core.Hooks{
+							BeforeCreate: func(this *core.Component) error {
 								dom.ConsoleLog("Component is being created!")
 								return nil
 							},
@@ -32,12 +33,12 @@ func main() {
 							"id": "hooks",
 						},
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Handlers: map[string]gas.Handler {
-									"click": func(c *gas.Component, e dom.Event) {
+								Handlers: map[string]core.Handler {
+									"click": func(c *core.Component, e dom.Event) {
 										gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 									},
 								},
@@ -46,7 +47,7 @@ func main() {
 									"id": "hooks__button",
 								},
 							},
-							func(this2 *gas.Component) interface{} {
+							func(this2 *core.Component) interface{} {
 								if this.GetData("show").(bool) {
 									return "Show text"
 								} else {
@@ -54,37 +55,37 @@ func main() {
 								}
 							})
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
 								Directives:
-									gas.Directives{
-										If: func(c *gas.Component) bool {
+									core.Directives{
+										If: func(c *core.Component) bool {
 											return !this.GetData("show").(bool)
 										},
 									},
 								Hooks:
-									gas.Hooks{
-										Created: func(this2 *gas.Component) error {
+									core.Hooks{
+										Created: func(this2 *core.Component) error {
 											dom.ConsoleLog("Hidden text is created!")
 											return this.SetData("counter", this.GetData("counter").(int)+1)
 										},
-										Destroyed: func(this2 *gas.Component) error {
+										Destroyed: func(this2 *core.Component) error {
 											dom.ConsoleLog("Hidden text was destroyed!")
 											return nil
 										},
 									},
 								Tag: "i",
 							},
-							func(this2 *gas.Component) interface{} {
+							func(this2 *core.Component) interface{} {
 								return "Hidden text " + fmt.Sprintf("(you show hidden text %d times)", this.GetData("counter"))
 							},)
 					})
 			},)
 	must(err)
 
-	err = app.Init()
+	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()
 }

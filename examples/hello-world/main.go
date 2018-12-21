@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Sinicablyat/gas"
+	"github.com/Sinicablyat/gas/core"
 )
 
 // Example application #1
@@ -9,11 +10,11 @@ import (
 // 'hello-world' shows how you can create components, component.Data and component.Attributes
 func main() {
 	app, err :=
-		gas.New(
+		gas.NewWasm(
 			"app",
-			func(p *gas.Component) interface{} {
-			return gas.NewComponent(
-				&gas.Component{
+			func(p *core.Component) interface{} {
+			return core.NewComponent(
+				&core.Component{
 					ParentC: p,
 					Data:
 						map[string]interface{}{
@@ -26,13 +27,13 @@ func main() {
 							"class": "greeting h1",
 						},
 				},
-				func(this *gas.Component) interface{} {
+				func(this *core.Component) interface{} {
 					return this.GetData("hello")
 				})
 			},
-			func(p *gas.Component) interface{} {
-			return gas.NewComponent(
-				&gas.Component{
+			func(p *core.Component) interface{} {
+			return core.NewComponent(
+				&core.Component{
 					ParentC:p,
 					Tag: "i",
 					Attrs:
@@ -42,13 +43,13 @@ func main() {
 							"style": "margin-right: 12px;",
 						},
 				},
-				func(this *gas.Component) interface{} {
+				func(this *core.Component) interface{} {
 					return "Ciao mondo!" // I'm not italian, but i love films about mafia
 				})
 			},)
 	must(err)
 
-	err = app.Init()
+	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()
 }

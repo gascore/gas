@@ -1,4 +1,4 @@
-package gas
+package core
 
 import (
 	"fmt"
@@ -55,7 +55,7 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 
 // getOldValues return `old` values for component update
 func (c *Component) getOldValues() ([]interface{}, string) {
-	oldTree := renderTree(c)
+	oldTree := be.RenderTree(c)
 
 	var oldHtmlDirective string
 	if c.Directives.HTML.Render != nil {
@@ -79,26 +79,23 @@ func (c *Component) DoWithUpdate(event func()error) error {
 
 // Update update component
 func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error {
-	newTree := renderTree(c)
+	newTree := be.RenderTree(c)
 
 	var newHtmlDirective string
 	if c.Directives.HTML.Render != nil {
 		newHtmlDirective = c.Directives.HTML.Render(c)
 	}
 
-	_c := c.GetElement()
-
 	if oldHtmlDirective != newHtmlDirective {
-		_updatedC, err := CreateComponent(c)
+		err := be.ReCreate(c)
 		if err != nil {
 			return err
 		}
 
-		c.ParentC.GetElement().ReplaceChild(_updatedC, _c)
 		return nil
 	}
 
-	err := UpdateComponentChildes(_c, newTree, oldTree)
+	err := be.UpdateComponentChildes(c, newTree, oldTree)
 	if err != nil {
 		return err
 	}

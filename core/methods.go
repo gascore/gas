@@ -1,4 +1,4 @@
-package gas
+package core
 
 import (
 	"errors"

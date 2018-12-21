@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
+	"github.com/Sinicablyat/gas/core"
 )
 
 // Example application #11
@@ -12,11 +13,11 @@ import (
 // 'todo' shows how you how to build basic TODO example
 func main() {
 	app, err :=
-		gas.New(
+		gas.NewWasm(
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"currentList": "0",
@@ -26,8 +27,8 @@ func main() {
 							"done":    []interface{}{},
 							"deleted": []interface{}{},
 						},
-						Methods: map[string]gas.Method{
-							"delete": func(this *gas.Component, values ...interface{}) error {
+						Methods: map[string]core.Method{
+							"delete": func(this *core.Component, values ...interface{}) error {
 								i, ok := values[0].(int)
 								if !ok {
 									return errors.New("invalid index")
@@ -63,7 +64,7 @@ func main() {
 
 								return nil
 							},
-							"append": func(this *gas.Component, values ...interface{}) error {
+							"append": func(this *core.Component, values ...interface{}) error {
 								listTypeS, ok := values[0].(string)
 								if !ok {
 									return errors.New("invalid list type")
@@ -85,7 +86,7 @@ func main() {
 
 								return nil
 							},
-							"markAsDone": func(this *gas.Component, values ...interface{}) error {
+							"markAsDone": func(this *core.Component, values ...interface{}) error {
 								i, ok := values[0].(int)
 								if !ok {
 									return errors.New("invalid index")
@@ -107,7 +108,7 @@ func main() {
 
 								return nil
 							},
-							"edit": func(this *gas.Component, values ...interface{}) error {
+							"edit": func(this *core.Component, values ...interface{}) error {
 								i, ok := values[0].(int)
 								if !ok {
 									return errors.New("invalid index")
@@ -131,50 +132,50 @@ func main() {
 							"id": "todo",
 						},
 					},
-					func(this *gas.Component) interface{} {
+					func(this *core.Component) interface{} {
 						return getStyleEl(this)
 					},
-					func (this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func (this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC:this,
 								Tag: "div",
 								Attrs: map[string]string{
 									"id": "main",
 								},
 							},
-							func (p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func (p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										ParentC: p,
 										Tag: "nav",
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return getNavEl(this, "0", "Current")
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return getNavEl(this, "1", "Completed")
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return getNavEl(this, "2", "Deleted")
 									},)
 							},
-							func (p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func (p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										ParentC: p,
-										Directives: gas.Directives{
-											If: func(p *gas.Component) bool {
+										Directives: core.Directives{
+											If: func(p *core.Component) bool {
 												return this.GetData("currentList").(string) == "0"
 											},
-											Model: gas.ModelDirective{
+											Model: core.ModelDirective{
 												Data: "currentText",
 												Component: this,
 											},
 										},
 										Tag: "input",
-										Handlers: map[string]gas.Handler{
-											"keyup.enter": func(p *gas.Component, e dom.Event) {
+										Handlers: map[string]core.Handler{
+											"keyup.enter": func(p *core.Component, e dom.Event) {
 												currentText := this.GetData("currentText").(string)
 												if len(currentText) == 0 {
 													return
@@ -189,78 +190,78 @@ func main() {
 										},
 									})
 							},
-							func (p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func (p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										ParentC: p,
 									},
 									// Because i don't need wrap `this` and ul `this` i can overwrite this variable
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return getList(p, this, 0)
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return getList(p, this, 1)
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return getList(p, this, 2)
 									},)
 							},)
 					},
-					func (this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func (this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC:this,
 								Tag:"footer",
 							},
-							func(p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func(p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										ParentC:p,
 										Tag:"div",
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return "Double-click to edit a task"
 									})
 							},
-							func(p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func(p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										ParentC:p,
 										Tag:"div",
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return "Created by"
 									},
-									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
+									func(p *core.Component) interface{} {
+										return core.NewComponent(
+											&core.Component{
 												Tag: "a",
 												Attrs: map[string]string{
 													"href": "https://sinicablyat.github.io/",
 													"target": "_blank",
 												},
 											},
-											func(p *gas.Component) interface{} {
+											func(p *core.Component) interface{} {
 												return "Noskov Artem"
 											})
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return "with"
 									},
-									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
+									func(p *core.Component) interface{} {
+										return core.NewComponent(
+											&core.Component{
 												Tag: "a",
 												Attrs: map[string]string{
 													"href": "https://sinicablyat.github.io/gas",
 													"target": "_blank",
 												},
 											},
-											func(p *gas.Component) interface{} {
+											func(p *core.Component) interface{} {
 												return "GAS"
 											})
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return "and love"
 									},)
 							})
@@ -269,17 +270,17 @@ func main() {
 		)
 	must(err)
 
-	err = app.Init()
+	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()
 }
 
-func getList(p *gas.Component, this *gas.Component, index int) interface{} {
-	return gas.NewComponent(
-		&gas.Component{
+func getList(p *core.Component, this *core.Component, index int) interface{} {
+	return core.NewComponent(
+		&core.Component{
 			ParentC: p,
-			Directives:gas.Directives{
-				Show: func(p *gas.Component) bool {
+			Directives:core.Directives{
+				Show: func(p *core.Component) bool {
 					return this.GetData("currentList") == fmt.Sprintf("%d", index)
 				},
 			},
@@ -289,12 +290,12 @@ func getList(p *gas.Component, this *gas.Component, index int) interface{} {
 				"class": "list",
 			},
 		},
-		func(p *gas.Component) interface{} {
+		func(p *core.Component) interface{} {
 			return getLi(p, this, index)
 		})
 }
 
-func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
+func getLi(p *core.Component, this *core.Component, listType int) interface{} {
 	// listType: 0 - current, 1 - done, 2 - deleted tasks
 	var listTypeS string
 	switch listType {
@@ -306,31 +307,31 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 		listTypeS = "deleted"
 	}
 
-	return gas.NewComponent(
-		&gas.Component{
+	return core.NewComponent(
+		&core.Component{
 			ParentC: p,
 			Tag: "li",
 			Data: map[string]interface{}{
 				"isEditing": false,
 				"newValue": "no",
 			},
-			Directives:gas.Directives{
-				For:gas.ForDirective{
+			Directives:core.Directives{
+				For:core.ForDirective{
 					Data: listTypeS,
 					Component: this,
-					Render: func(i int, value interface{}, p *gas.Component) []gas.GetComponent {
+					Render: func(i int, value interface{}, p *core.Component) []core.GetComponent {
 						return gas.ToGetComponentList(
-							func(p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func(p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										Tag: "button",
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
+										Directives:core.Directives{
+											If: func(p *core.Component) bool {
 												return listType == 0
 											},
 										},
-										Handlers: map[string]gas.Handler{
-											"click": func(this5 *gas.Component, e dom.Event) {
+										Handlers: map[string]core.Handler{
+											"click": func(this5 *core.Component, e dom.Event) {
 												gas.WarnError(this.Method("markAsDone", i))
 											},
 										},
@@ -338,21 +339,21 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											"id": "submit",
 										},
 									},
-									func(this3 *gas.Component) interface{} {
-										return gas.NewComponent(&gas.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-check"}})
+									func(this3 *core.Component) interface{} {
+										return core.NewComponent(&core.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-check"}})
 									})
 							},
-							func(this2 *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func(this2 *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										Tag: "i",
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
+										Directives:core.Directives{
+											If: func(p *core.Component) bool {
 												return !this2.GetData("isEditing").(bool)
 											},
 										},
-										Handlers: map[string]gas.Handler{
-											"dblclick": func(p *gas.Component, e dom.Event) {
+										Handlers: map[string]core.Handler{
+											"dblclick": func(p *core.Component, e dom.Event) {
 												if listType != 0 {
 													return
 												}
@@ -362,28 +363,28 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return fmt.Sprintf("%s", value)
 									})
 							},
-							func(this2 *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func(this2 *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										Tag: "input",
 										Attrs: map[string]string{
 											"style": "margin-right: 8px",
 										},
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
+										Directives:core.Directives{
+											If: func(p *core.Component) bool {
 												return this2.GetData("isEditing").(bool)
 											},
-											Model:gas.ModelDirective{
+											Model:core.ModelDirective{
 												Component: this2,
 												Data: "newValue",
 											},
 										},
-										Handlers: map[string]gas.Handler{
-											"keyup.enter": func(p *gas.Component, e dom.Event) {
+										Handlers: map[string]core.Handler{
+											"keyup.enter": func(p *core.Component, e dom.Event) {
 												newValue := this2.GetData("newValue")
 
 												gas.WarnError(this2.SetData("isEditing", false))
@@ -392,21 +393,21 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 									},
-									func(p *gas.Component) interface{} {
+									func(p *core.Component) interface{} {
 										return fmt.Sprintf("%s", value)
 									})
 							},
-							func(p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
+							func(p *core.Component) interface{} {
+								return core.NewComponent(
+									&core.Component{
 										Tag: "button",
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
+										Directives:core.Directives{
+											If: func(p *core.Component) bool {
 												return listType == 0
 											},
 										},
-										Handlers: map[string]gas.Handler{
-											"click": func(this5 *gas.Component, e dom.Event) {
+										Handlers: map[string]core.Handler{
+											"click": func(this5 *core.Component, e dom.Event) {
 												gas.WarnError(this.Method("delete", i, true))
 											},
 										},
@@ -414,8 +415,8 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											"id": "delete",
 										},
 									},
-									func(this3 *gas.Component) interface{} {
-										return gas.NewComponent(&gas.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-trash-alt "}})
+									func(this3 *core.Component) interface{} {
+										return core.NewComponent(&core.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-trash-alt "}})
 									})
 							},)
 					},
@@ -424,15 +425,15 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 		})
 }
 
-func getStyleEl(p *gas.Component) interface{} {
-	return gas.NewComponent(
-	&gas.Component{
+func getStyleEl(p *core.Component) interface{} {
+	return core.NewComponent(
+	&core.Component{
 		ParentC:p,
 		Tag:"style",
 		Attrs: map[string]string{"type": "text/css"},
-		Directives: gas.Directives{
-			HTML: gas.HTMLDirective{
-				Render: func(this2 *gas.Component) string {
+		Directives: core.Directives{
+			HTML: core.HTMLDirective{
+				Render: func(this2 *core.Component) string {
 					return `
 #todo {
 	width: 50%;
@@ -531,18 +532,18 @@ footer a {
 	})
 }
 
-func getNavEl(this *gas.Component, index, name string) interface{} {
-	return gas.NewComponent(
-		&gas.Component{
+func getNavEl(this *core.Component, index, name string) interface{} {
+	return core.NewComponent(
+		&core.Component{
 			ParentC: this,
 			Tag: "button",
-			Handlers: map[string]gas.Handler{
-				"click": func(p *gas.Component, e dom.Event) {
+			Handlers: map[string]core.Handler{
+				"click": func(p *core.Component, e dom.Event) {
 					gas.WarnError(this.SetData("currentList", index))
 				},
 			},
-			Binds: map[string]gas.Bind{
-				"class": func(p *gas.Component) string {
+			Binds: map[string]core.Bind{
+				"class": func(p *core.Component) string {
 					if this.GetData("currentList").(string) == index {
 						return "active"
 					}
@@ -550,7 +551,7 @@ func getNavEl(this *gas.Component, index, name string) interface{} {
 				},
 			},
 		},
-		func(p *gas.Component) interface{} {
+		func(p *core.Component) interface{} {
 			return name
 		})
 }

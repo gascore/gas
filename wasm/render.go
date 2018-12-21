@@ -1,17 +1,19 @@
-package gas
+package wasm
 
 import (
 	"errors"
 	"fmt"
 	"github.com/Sinicablyat/dom"
-	"github.com/google/go-cmp/cmp"
-	"reflect"
+	"github.com/Sinicablyat/gas/core"
 	"strconv"
 	"strings"
 )
 
+// nil backend. Need for call out-methods
+var be BackEnd
+
 // CreateComponent render component. Returns _el, err
-func CreateComponent(node interface{}) (*dom.Element, error) {
+func (w BackEnd) CreateComponent(node interface{}) (*dom.Element, error) {
 	switch node.(type) {
 	case string:
 		nodeS := node.(string)
@@ -24,8 +26,8 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 		_node.SetTextContent(nodeS)
 
 		return _node, nil
-	case *Component:
-		component := I2C(node)
+	case *core.Component:
+		component := core.I2C(node)
 
 		_node, err := CreateElement(component)
 		if err != nil {
@@ -33,7 +35,7 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 		}
 
 		for _, el := range component.Childes(component) {
-			_child, err := CreateComponent(el)
+			_child, err := w.CreateComponent(el)
 			if err != nil {
 				return nil, err
 			}
@@ -48,13 +50,13 @@ func CreateComponent(node interface{}) (*dom.Element, error) {
 }
 
 // CreateElement create html element without childes
-func CreateElement(c *Component) (*dom.Element, error) {
+func CreateElement(c *core.Component) (*dom.Element, error) {
 	_node := dom.NewElement(c.Tag)
 	if _node == nil {
 		return nil, errors.New("cannot create component")
 	}
 
-	c.setShow(_node)
+	setShow(c, _node)
 
 	_node.SetAttribute("data-i", c.UUID) // set data-i for accept element from component methods
 
@@ -92,7 +94,7 @@ func CreateElement(c *Component) (*dom.Element, error) {
 				_node.AddEventListener(handlerType, func(e dom.Event) {
 					buttonClick, err := parseInt(strings.ToLower(e.GetValueString("button")))
 					if err != nil {
-						WarnError(errors.New("invalid onClick button value"))
+						//log.Error("invalid onClick button value")
 						return
 					}
 
@@ -133,7 +135,8 @@ func CreateElement(c *Component) (*dom.Element, error) {
 				inputType = "int"
 				inputValueTyped, err = strconv.Atoi(inputValue)
 				if err != nil {
-					WarnError(err)
+					//WarnError(err)
+					return
 				}
 
 				break
@@ -149,12 +152,14 @@ func CreateElement(c *Component) (*dom.Element, error) {
 
 			dataValue := this.GetData(dataS)
 			if inputType != fmt.Sprintf("%T", dataValue) {
-				WarnError(errors.New("input type != data type"))
+				//WarnError(errors.New("input type != data type"))
+				return
 			}
 
 			err = this.SetData(dataS, inputValueTyped)
 			if err != nil {
-				WarnError(err)
+				//WarnError(err)
+				return
 			}
 		})
 	}
@@ -174,14 +179,14 @@ func CreateElement(c *Component) (*dom.Element, error) {
 func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, index int) error {
 	// if component has created
 	if old == nil {
-		_new, err := CreateComponent(new)
+		_new, err := be.CreateComponent(new)
 		if err != nil {
 			return err
 		}
 
 		// BeforeCreate hook
-		if isComponent(new) && I2C(new).Hooks.BeforeCreate != nil {
-			err := I2C(new).Hooks.BeforeCreate(I2C(new))
+		if core.IsComponent(new) && core.I2C(new).Hooks.BeforeCreate != nil {
+			err := core.I2C(new).Hooks.BeforeCreate(core.I2C(new))
 			if err != nil {
 				return err
 			}
@@ -190,8 +195,8 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		_parent.AppendChild(_new)
 
 		// Created hook
-		if isComponent(new) && I2C(new).Hooks.Created != nil {
-			newC := I2C(new)
+		if core.IsComponent(new) && core.I2C(new).Hooks.Created != nil {
+			newC := core.I2C(new)
 
 			err := newC.Hooks.Created(newC)
 			if err != nil {
@@ -206,13 +211,13 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	if _childes == nil { return errors.New("_parent doesn't have childes") }
 
 	var _el *dom.Element
-	if len(_childes) > index || (len(_childes) >= index && isComponent(new)) { // component was hided if childes length <= index
+	if len(_childes) > index { // component was hided if childes length <= index
 		_el = _childes[index]
 	}
 
-	newC 		   := &Component{}
-	newIsComponent := isComponent(new)
-	if newIsComponent {newC = I2C(new)}
+	newC 		   := &core.Component{}
+	newIsComponent := core.IsComponent(new)
+	if newIsComponent {newC = core.I2C(new)}
 
 	if _el == nil { // here current element will exist
 		return nil
@@ -223,8 +228,8 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		_parent.RemoveChild(_el)
 
 		// Destroyed hook
-		if isComponent(old) && I2C(old).Hooks.Destroyed != nil {
-			err := I2C(old).Hooks.Destroyed(I2C(old))
+		if core.IsComponent(old) && core.I2C(old).Hooks.Destroyed != nil {
+			err := core.I2C(old).Hooks.Destroyed(core.I2C(old))
 			if err != nil {
 				return err
 			}
@@ -233,21 +238,22 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		return nil
 	}
 
-	// if component has changed
-	isChanged, err := changed(new, old)
+	// if component has Changed
+	isChanged, err := core.Changed(new, old)
 	if err != nil {
 		return err
 	}
 	if isChanged {
 		// BeforeUpdate hook
-		if newIsComponent && I2C(new).Hooks.BeforeUpdate != nil {
-			err := I2C(new).Hooks.BeforeUpdate(I2C(new))
+		if newIsComponent && core.I2C(new).Hooks.BeforeUpdate != nil {
+			newC := core.I2C(new)
+			err := newC.Hooks.BeforeUpdate(newC)
 			if err != nil {
 				return err
 			}
 		}
 
-		_new, err := CreateComponent(new)
+		_new, err := be.CreateComponent(new)
 		if err != nil {
 			return err
 		}
@@ -255,8 +261,8 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 		_parent.ReplaceChild(_new, _el)
 
 		// Updated hook
-		if newIsComponent && I2C(new).Hooks.Updated != nil {
-			err := I2C(new).Hooks.Updated(I2C(new))
+		if newIsComponent && newC.Hooks.Updated != nil {
+			err := newC.Hooks.Updated(newC)
 			if err != nil {
 				return err
 			}
@@ -271,9 +277,9 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 			_el.SetValue("value", newC.Directives.Model.Component.Data[newC.Directives.Model.Data])
 		}
 
-		newC.setShow(_el)
+		setShow(newC, _el)
 
-		err = UpdateComponentChildes(_el, newC.RChildes, I2C(old).RChildes)
+		err = DeepUpdateComponentChildes(_el, newC.RChildes, core.I2C(old).RChildes)
 		if err != nil {
 			return err
 		}
@@ -282,8 +288,14 @@ func UpdateComponent(_parent *dom.Element, new interface{}, old interface{}, ind
 	return nil
 }
 
-// UpdateComponentChildes Update component childes by new and old childes
-func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface{}) error {
+// UpdateComponentChildes start point for update component childes from core
+func (w BackEnd) UpdateComponentChildes(c *core.Component, newChildes, oldChildes []interface{}) error {
+	_el := c.GetElement().(*dom.Element)
+	return DeepUpdateComponentChildes(_el, newChildes, oldChildes)
+}
+
+// DeepUpdateComponentChildes Update component childes by new and old childes
+func DeepUpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface{}) error {
 	for i := 0; i < len(newChildes) || i < len(oldChildes); i++ {
 		var elFromNew interface{}
 		if len(newChildes) > i {
@@ -303,95 +315,29 @@ func UpdateComponentChildes(_el *dom.Element, newChildes, oldChildes []interface
 	return nil
 }
 
-// changed return true if node changed
-func changed(new, old interface{}) (bool, error) {
-	if fmt.Sprintf("%T", new) != fmt.Sprintf("%T", old) {
-		return true, nil
-	}
 
-	if isString(new) {
-		return new.(string) != old.(string), nil
-	} else if isComponent(new) {
-		newC := I2C(new)
-		oldC := I2C(old)
-
-		if newC.Directives.HTML.Rendered != oldC.Directives.HTML.Rendered {
-			return true, nil
-		}
-
-		return !isComponentsEquals(newC, oldC), nil // thank you god for the go-cmp
-	}
-
-	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
-}
-
-func isComponentsEquals(new, old *Component) bool {
-	// sometimes i'm sad that i chose strict-type pl
-	daE := true // cmp.Equal(new.Data, old.Data)
-	wE  := cmp.Equal(new.Watchers, old.Watchers)
-	mE  := true // cmp.Equal(new.Methods, old.Methods)
-	coE := true // cmp.Equal(new.Computeds, old.Computeds)
-	caE := cmp.Equal(new.Catchers, old.Catchers)
-
-	hE := compareHooks(new.Hooks, old.Hooks)
-	bE := compareBinds(new.renderedBinds, old.renderedBinds)
-
-	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
-	diFE  := cmp.Equal(new.Directives.For, old.Directives.For)
-	diME  := (new.Directives.Model.Data == old.Directives.Model.Data) && (new.Directives.Model.Component == old.Directives.Model.Component)
-	diHE  := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
-	diE   := diIfE && diFE && diME && diHE // Directives
-
-	tE := new.Tag == old.Tag
-	aE := cmp.Equal(new.Attrs, old.Attrs)
-
-	return daE && wE && mE && coE && caE && hE && bE && diE && tE && aE
-}
-
-func compareHooks(new, old Hooks) bool {
-	created := cmp.Equal(new.Created, old.Created)
-	beforeCreate := cmp.Equal(new.BeforeCreate, old.BeforeCreate)
-	destroyed := cmp.Equal(new.Destroyed, old.Destroyed)
-
-	return created && beforeCreate && destroyed
-}
-
-func compareBinds(new, old map[string]string) bool {
-	if len(new) != len(old) {
-		return false
-	}
-
-	for newKey, newValue := range new {
-		if newValue != old[newKey] {
-			return false
-		}
-	}
-
-	return true
-}
-
-// renderTree return full rendered childes tree of component
-func renderTree(c *Component) []interface{} {
+// RenderTree return full rendered childes tree of component
+func (w BackEnd) RenderTree(c *core.Component) []interface{} {
 	var childes []interface{}
 	for _, el := range c.Childes(c) {
-		if isComponent(el) {
-			elC := I2C(el)
+		if core.IsComponent(el) {
+			elC := core.I2C(el)
 
 			if elC.Directives.HTML.Render != nil {
 				elC.Directives.HTML.Rendered = elC.Directives.HTML.Render(elC)
 			}
 
 			if elC.Binds != nil {
-				if elC.renderedBinds == nil {
-					elC.renderedBinds = map[string]string{}
+				if elC.RenderedBinds == nil {
+					elC.RenderedBinds = map[string]string{}
 				}
 
 				for bindKey, bindValue := range elC.Binds { // render binds
-					elC.renderedBinds[bindKey] = bindValue(elC)
+					elC.RenderedBinds[bindKey] = bindValue(elC)
 				}
 			}
 
-			elC.RChildes = renderTree(elC)
+			elC.RChildes = w.RenderTree(elC)
 
 			el = elC
 		}
@@ -401,7 +347,30 @@ func renderTree(c *Component) []interface{} {
 	return childes
 }
 
-func (c *Component) setShow(_el *dom.Element) {
+func (w BackEnd) ReCreate(c *core.Component) error {
+	_updatedC, err := w.CreateComponent(c)
+	if err != nil {
+		return err
+	}
+
+	c.ParentC.GetElement().(*dom.Element).ReplaceChild(_updatedC, c.GetElement().(*dom.Element))
+
+	return nil
+}
+
+
+// GetElement get dom.Element by component
+func (w BackEnd) GetElement(c *core.Component) interface{} {
+	return dom.Doc.QuerySelector(fmt.Sprintf("[data-i='%s']", c.UUID)) // select element by data-i attribute
+}
+
+// GetElement get dom.Element by component
+func (w BackEnd) GetGasEl(g *core.Gas) interface{} {
+	return dom.Doc.GetElementById(g.StartPoint)
+}
+
+
+func setShow(c *core.Component, _el *dom.Element) {
 	if c.Directives.Show != nil {
 		if !c.Directives.Show(c) {
 			doElHidden(_el)

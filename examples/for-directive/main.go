@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Sinicablyat/dom"
 	"github.com/Sinicablyat/gas"
+	"github.com/Sinicablyat/gas/core"
 )
 
 // Example application #4
@@ -11,11 +12,11 @@ import (
 // 'if-directive' shows how you can use component.Directive.For
 func main() {
 	app, err :=
-		gas.New(
+		gas.NewWasm(
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
+			func(p *core.Component) interface{} {
+				return core.NewComponent(
+					&core.Component{
 						ParentC: p,
 						Data: map[string]interface{}{
 							"arr": []interface{}{"click", "here", "if you want to see some magic"},
@@ -25,24 +26,24 @@ func main() {
 							"id": "list",
 						},
 					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
+					func(this *core.Component) interface{} {
+						return core.NewComponent(
+							&core.Component{
 								ParentC: this,
-								Directives: gas.Directives{
-									For: gas.ForDirective{
+								Directives: core.Directives{
+									For: core.ForDirective{
 										Data: "arr",
-										Render: func(i int, el interface{}, this *gas.Component) []gas.GetComponent {
+										Render: func(i int, el interface{}, this *core.Component) []core.GetComponent {
 											return gas.ToGetComponentList(
-												func(this2 *gas.Component) interface{} {
+												func(this2 *core.Component) interface{} {
 													return fmt.Sprintf("%d: %s", i+1, el)
 												},)
 										},
 										Component: this,
 									},
 								},
-								Handlers: map[string]gas.Handler {
-									"click": func(c *gas.Component, e dom.Event) {
+								Handlers: map[string]core.Handler {
+									"click": func(c *core.Component, e dom.Event) {
 										arr := this.GetData("arr").([]interface{})
 										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
 										gas.WarnError(this.SetData("arr", arr))
@@ -51,13 +52,13 @@ func main() {
 								Tag: "li",
 							}) // In components with FOR Directive childes are ignored
 					},
-					func(this *gas.Component) interface{} {
+					func(this *core.Component) interface{} {
 						return "end of list"
 					})
 			},)
 	must(err)
 
-	err = app.Init()
+	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()
 }

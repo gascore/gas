@@ -1,6 +1,6 @@
 # Examples
 
-*all examples here uses [wasm](https://github.com/Sinicablyat/wasm) backend*
+*all examples here uses [wasm](https://github.com/Sinicablyat/gas-wasm) backend*
 
 For running test you need [wasmgo](https://github.com/dave/wasmgo).
 You can install it by `go get -u github.com/dave/wasmgo`

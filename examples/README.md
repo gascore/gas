@@ -1,6 +1,7 @@
 # Examples
 
-*all examples here uses [wasm](https://github.com/Sinicablyat/gas-wasm) backend*
+*all examples here uses [wasm](https://github.com/Sinicablyat/gas-web) backend.
+If you need gopherjs see [gojs.md](https://github.com/Sinicablyat/gas/blob/master/examples/gojs.md)*
 
 For running test you need [wasmgo](https://github.com/dave/wasmgo).
 You can install it by `go get -u github.com/dave/wasmgo`

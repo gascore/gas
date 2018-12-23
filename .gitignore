@@ -1,3 +1,6 @@
+# ignore app.js files
+*app.js*
+
 .idea/
 # Created by https://www.gitignore.io/api/go,code,webstorm
 # Edit at https://www.gitignore.io/?templates=go,code,webstorm

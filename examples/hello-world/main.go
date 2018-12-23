@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas-gojs"
+	"github.com/Sinicablyat/gas-web"
+	"github.com/Sinicablyat/gas-web/wasm"
 )
 
 // Example application #1
@@ -11,7 +12,7 @@ import (
 func main() {
 	app, err :=
 		gas.New(
-			gas_gojs.GetBackEnd(),
+			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
 			func(p *gas.Component) interface{} {
 			return gas.NewComponent(

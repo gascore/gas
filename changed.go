@@ -25,7 +25,7 @@ func Changed(new, old interface{}) (bool, error) {
 		return !isComponentsEquals(newC, oldC), nil // thank you god for the go-cmp
 	}
 
-	return false, fmt.Errorf("Changed: invalid `new` or `old`. types: %T, %T", new, old)
+	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
 }
 
 func isComponentsEquals(new, old *Component) bool {
@@ -40,7 +40,7 @@ func isComponentsEquals(new, old *Component) bool {
 	bE := compareBinds(new.RenderedBinds, old.RenderedBinds)
 
 	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
-	diFE  := cmp.Equal(new.Directives.For, old.Directives.For)
+	diFE  := compareForDirectives(new, old)
 	diME  := (new.Directives.Model.Data == old.Directives.Model.Data) && (new.Directives.Model.Component == old.Directives.Model.Component)
 	diHE  := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
 	diE   := diIfE && diFE && diME && diHE // Directives
@@ -57,6 +57,22 @@ func compareHooks(new, old Hooks) bool {
 	destroyed := cmp.Equal(new.Destroyed, old.Destroyed)
 
 	return created && beforeCreate && destroyed
+}
+
+func compareForDirectives(new, old *Component) bool {
+	/*
+		It's really bad way to fix bug with not-updated i, el in components Methods.
+		We can only update methods, binds, e.t.c. and don't update 'body', but it will be in the future...
+	*/
+
+	newIsItem, newI, newVal := new.ForItemInfo()
+	oldIsItem, oldI, oldVal := old.ForItemInfo()
+
+	if newIsItem != oldIsItem {
+		return false
+	} else {
+		return newI == oldI && newVal == oldVal
+	}
 }
 
 func compareBinds(new, old map[string]string) bool {

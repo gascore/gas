@@ -67,6 +67,10 @@ type ForDirective struct {
 	Data string
 	Component *Component
 	Render func(int, interface{}, *Component) []GetComponent
+
+	isItem bool
+	itemValueI int
+	itemValueVal interface{}
 }
 
 // HTMLDirective struct for HTML Directive - storing render function and pre rendered render
@@ -138,11 +142,14 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 					}
 
 					clearedDirective := childC.Directives
-					clearedDirective.For = ForDirective{}
+					clearedDirective.For = ForDirective{isItem: true}
 
 					renderer := childC.Directives.For.Render
 					for i, el := range dataForList {
 						// recreate this component with childes from FOR, without FOR directive
+
+						clearedDirective.For.itemValueI = i
+						clearedDirective.For.itemValueVal = el
 
 						c := &Component{
 							ParentC: childC.ParentC,
@@ -175,6 +182,14 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 	component.UUID = uuid4.New().String()
 
 	return component
+}
+
+func (c *Component) ForItemInfo() (bool, int, interface{}) {
+	if !c.Directives.For.isItem {
+		return false, 0, nil
+	}
+
+	return true, c.Directives.For.itemValueI, c.Directives.For.itemValueVal
 }
 
 // GetElement return *dom.Element by component structure

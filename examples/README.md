@@ -24,6 +24,6 @@ Hosting in [jsgo.io](https://jsgo.io) examples:
 8. [watchers](https://jsgo.io/5d5c31031119d6fe644cfeb97844e5a7c986deb7)
 9. [hooks](https://jsgo.io/fefbe168d29655e42b71460212723b2c04536164)
 10. [binds](https://jsgo.io/327e3e50677329e8963ccc55051832d7c0609c28)
-11. [TODO](https://jsgo.io/ab51626d57e6da333a0abb9c921fcfb1420adc2f)
+11. [TODO](https://jsgo.io/27d3eec6f8a6debfb30ebac2434b36ec66dd71d6)
 
 Examples may be old, because recreate examples after every commits is really disrespectful to [jsgo.io](https://jsgo.io)

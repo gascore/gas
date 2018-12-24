@@ -52,8 +52,8 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 }
 
 
-// getOldValues return `old` values for component update
-func (c *Component) getOldValues() ([]interface{}, string) {
+// getState return values for component update
+func (c *Component) getState() ([]interface{}, string) {
 	oldTree := be.RenderTree(c)
 
 	var oldHtmlDirective string
@@ -66,7 +66,7 @@ func (c *Component) getOldValues() ([]interface{}, string) {
 
 // DoWithUpdate runs your event and trying to Update component after it
 func (c *Component) DoWithUpdate(event func()error) error {
-	oldTree, oldHtmlDirective := c.getOldValues()
+	oldTree, oldHtmlDirective := c.getState()
 
 	err := event() // your event
 	if err != nil {
@@ -78,12 +78,7 @@ func (c *Component) DoWithUpdate(event func()error) error {
 
 // Update update component
 func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error {
-	newTree := be.RenderTree(c)
-
-	var newHtmlDirective string
-	if c.Directives.HTML.Render != nil {
-		newHtmlDirective = c.Directives.HTML.Render(c)
-	}
+	newTree, newHtmlDirective := c.getState()
 
 	if oldHtmlDirective != newHtmlDirective {
 		err := be.ReCreate(c)
@@ -110,7 +105,7 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 		return errors.New("invalid data field type")
 	}
 
-	oldTree, oldHtmlDirective := c.getOldValues()
+	oldTree, oldHtmlDirective := c.getState()
 
 	err := c.SetDataFree(query, Remove(list, index))
 	if err != nil {
@@ -149,7 +144,7 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 		return errors.New("invalid current list")
 	}
 
-	oldTree, oldHtmlDirective := c.getOldValues()
+	oldTree, oldHtmlDirective := c.getState()
 
 
 	list[index] = value

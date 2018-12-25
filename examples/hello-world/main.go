@@ -12,6 +12,7 @@ import (
 func main() {
 	app, err :=
 		gas.New(
+			//gas_web.GetBackEnd(gojs.GetDomBackEnd()),
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
 			func(p *gas.Component) interface{} {

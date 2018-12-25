@@ -44,7 +44,7 @@ func main() {
 									},
 								},
 								Handlers: map[string]gas.Handler {
-									"click": func(c *gas.Component, e interface{}) {
+									"click": func(c *gas.Component, e gas.HandlerEvent) {
 										arr := this.GetData("arr").([]interface{})
 										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
 										gas.WarnError(this.SetData("arr", arr))

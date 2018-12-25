@@ -10,7 +10,7 @@ import (
 
 // Example application #11
 //
-// 'todo' shows how you how to build basic TODO example
+// 'to do' shows how you how to build basic to-do-mvc example
 func main() {
 	app, err :=
 		gas.New(
@@ -177,7 +177,7 @@ func main() {
 										},
 										Tag: "input",
 										Handlers: map[string]gas.Handler{
-											"keyup.enter": func(p *gas.Component, e interface{}) {
+											"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
 												currentText := this.GetData("currentText").(string)
 												if len(currentText) == 0 {
 													return
@@ -333,7 +333,7 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 										Handlers: map[string]gas.Handler{
-											"click": func(this5 *gas.Component, e interface{}) {
+											"click": func(this5 *gas.Component, e gas.HandlerEvent) {
 												gas.WarnError(this.Method("markAsDone", i))
 											},
 										},
@@ -355,7 +355,7 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 										Handlers: map[string]gas.Handler{
-											"dblclick": func(p *gas.Component, e interface{}) {
+											"dblclick": func(p *gas.Component, e gas.HandlerEvent) {
 												if listType != 0 {
 													return
 												}
@@ -386,7 +386,7 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 										Handlers: map[string]gas.Handler{
-											"keyup.enter": func(p *gas.Component, e interface{}) {
+											"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
 												newValue := this2.GetData("newValue")
 
 												gas.WarnError(this2.SetData("isEditing", false))
@@ -409,7 +409,7 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 											},
 										},
 										Handlers: map[string]gas.Handler{
-											"click": func(this5 *gas.Component, e interface{}) {
+											"click": func(this5 *gas.Component, e gas.HandlerEvent) {
 												gas.WarnError(this.Method("delete", i, true))
 											},
 										},
@@ -540,7 +540,8 @@ func getNavEl(this *gas.Component, index, name string) interface{} {
 			ParentC: this,
 			Tag: "button",
 			Handlers: map[string]gas.Handler{
-				"click": func(p *gas.Component, e interface{}) {
+				"click": func(p *gas.Component, e gas.HandlerEvent) {
+					gas.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
 					gas.WarnError(this.SetData("currentList", index))
 				},
 			},

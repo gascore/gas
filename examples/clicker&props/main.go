@@ -38,23 +38,23 @@ func main() {
 							&gas.Component{
 								ParentC: this,
 								Handlers: map[string]gas.Handler {
-									"click.left": func(this2 *gas.Component, e interface{}) {
+									"click.left": func(this2 *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.Method("addClick"))
 									},
 									// you need to click button once (for target it)
-									"keyup.control": func(this2 *gas.Component, e interface{}) {
+									"keyup.control": func(this2 *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.a": func(this2 *gas.Component, e interface{}) {
+									"keyup.a": func(this2 *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.s": func(this2 *gas.Component, e interface{}) {
+									"keyup.s": func(this2 *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.d": func(this2 *gas.Component, e interface{}) {
+									"keyup.d": func(this2 *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.Method("addClick"))
 									},
-									"keyup.f": func(this2 *gas.Component, e interface{}) {
+									"keyup.f": func(this2 *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.Method("addClick"))
 									},
 								},

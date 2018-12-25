@@ -40,7 +40,7 @@ func main() {
 							&gas.Component{
 								ParentC: this,
 								Handlers: map[string]gas.Handler {
-									"click": func(c *gas.Component, e interface{}) {
+									"click": func(c *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 									},
 								},

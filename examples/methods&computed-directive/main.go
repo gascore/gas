@@ -81,7 +81,7 @@ func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Componen
 		&gas.Component{
 			ParentC: this,
 			Handlers: map[string]gas.Handler {
-				"click": func(c *gas.Component, e interface{}) {
+				"click": func(c *gas.Component, e gas.HandlerEvent) {
 					// Of course we can use method for `this`.
 					// But if we want to pass method to child not from `this` we need to pass a pocket method/computed.
 					gas.WarnError(toggleMethod())

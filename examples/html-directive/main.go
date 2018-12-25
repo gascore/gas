@@ -50,7 +50,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 							&gas.Component{
 								ParentC: this,
 								Handlers: map[string]gas.Handler{
-									"click": func(this2 *gas.Component, e interface{}) {
+									"click": func(this2 *gas.Component, e gas.HandlerEvent) {
 										currentIsArticleActive := this.GetData("isArticleActive").(bool)
 										gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
 									},

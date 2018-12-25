@@ -81,7 +81,17 @@ type HTMLDirective struct {
 }
 
 // Handler -- handler exec function when event trigger
-type Handler func(*Component, interface{})
+type Handler func(*Component, HandlerEvent)
+
+// HandlerEvent 'united' dom.Event
+type HandlerEvent interface {
+	Get(string) interface{}
+	GetString(string) string
+	GetBool(string) bool
+	GetInt(string) int
+
+	Raw() interface{}
+}
 
 // Watcher -- function triggering after component data changed
 type Watcher func(*Component, interface{}, interface{})error // (this, new, old)

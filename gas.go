@@ -1,6 +1,7 @@
 package gas
 
 import (
+	"fmt"
 	"github.com/frankenbeanies/uuid4"
 )
 
@@ -51,7 +52,7 @@ func WarnError(err error) {
 		return
 	}
 
-	//dom.ConsoleError(err.Error())
+	be.ConsoleError(err.Error())
 }
 
 // WarnIfNot console error if !ok
@@ -60,8 +61,11 @@ func WarnIfNot(ok bool) {
 		return
 	}
 
-	//dom.ConsoleError(fmt.Sprintf("invalid data type"))
+	be.ConsoleError(fmt.Sprintf("invalid data type"))
 }
+
+func ConsoleLog(a ...interface{})   { be.ConsoleLog(a...) }
+func ConsoleError(a ...interface{}) { be.ConsoleError(a...) }
 
 var signal = make(chan int)
 

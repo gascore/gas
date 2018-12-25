@@ -21,4 +21,7 @@ type BackEnd interface {
 
 	GetElement(*Component) interface{}
 	GetGasEl(*Gas) interface{}
+
+	ConsoleLog(...interface{})
+	ConsoleError(...interface{})
 }

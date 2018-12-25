@@ -44,9 +44,6 @@ type GetChildes func(*Component) []interface{}
 // Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
 type Bind func(*Component) string
 
-// Catcher catching sub component $emit and doing his business  (analogue for vue `v-on:`). 
-type Catcher func(*Component)
-
 // Directives struct storing component if-directive
 type Directives struct {
 	If func(*Component) bool
@@ -106,11 +103,8 @@ type Component struct {
 	Computeds    map[string]Computed
 
 	Hooks    Hooks // lifecycle hooks
-	Catchers map[string]Catcher // catch child components $emit
-
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds      	  map[string]Bind    // dynamic attributes
-	RenderedBinds map[string]string // store binds for changed func
 
 	Directives 	 Directives
 

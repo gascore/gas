@@ -8,7 +8,5 @@ Examples: [example directory on github](https://github.com/Sinicablyat/gas/blob/
 
 Related packages:
 
-1. [Sinicablyat/dom](https://github.com/Sinicablyat/dom) (fork from [dennwc/dom](https://github.com/dennwc/dom)) - bindings for syscall/js
-2. [Sinicablyat/gas-gojs](https://github.com/Sinicablyat/gas-gojs) - gojs backend
-3. [Sinicablyat/gas-wasm](https://github.com/Sinicablyat/gas-wasm) - wasm backend
-4. [dave/wasmgo](https://github.com/dave/wasmgo) - cli for running golang wasm applications
+1. [Sinicablyat/gas-web](https://github.com/Sinicablyat/gas-web) - wasm/gojs backend
+2. [Sinicablyat/gas-gasx](https://github.com/Sinicablyat/gas-gasx) - vue-like template parser

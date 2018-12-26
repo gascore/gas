@@ -2,13 +2,12 @@ package gas
 
 import (
 	"fmt"
-	"github.com/frankenbeanies/uuid4"
 )
 
 var be BackEnd
 
 // New create new gas application with custom backend
-func New(backEnd BackEnd, startPoint string, components ...GetComponent) (Gas, error) {
+func New(backEnd BackEnd, startPoint string, component *Component, childes ...GetComponent) (Gas, error) {
 	be = backEnd
 
 	tagName, err := be.New(startPoint)
@@ -16,15 +15,13 @@ func New(backEnd BackEnd, startPoint string, components ...GetComponent) (Gas, e
 		return Gas{}, err
 	}
 
-	mainComponent := NewComponent(
-		&Component{
-			Tag: tagName,
-			Attrs: map[string]string{
-				"id": startPoint,
-				"data-main": "true",
-			},
-			UUID: uuid4.New().String(),
-		}, components...)
+	component.Tag = tagName
+
+	if component.Attrs == nil { component.Attrs = make(map[string]string) }
+	component.Attrs["id"] = startPoint
+	component.Attrs["data-main"] = "true"
+
+	mainComponent := NewComponent(component, childes...)
 
 	gas := Gas{App: *mainComponent, StartPoint: startPoint}
 

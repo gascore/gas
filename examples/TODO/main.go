@@ -17,256 +17,248 @@ func main() {
 			//gas_web.GetBackEnd(gojs.GetDomBackEnd()),
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			func(p *gas.Component) interface{} {
+			&gas.Component{
+				Data: map[string]interface{}{
+					"currentList": "0",
+					"currentText": "",
+
+					"current": []interface{}{},
+					"done":    []interface{}{},
+					"deleted": []interface{}{},
+				},
+				Methods: map[string]gas.Method{
+					"delete": func(this *gas.Component, values ...interface{}) error {
+						i, ok := values[0].(int)
+						if !ok {
+							return errors.New("invalid index")
+						}
+
+						appendToDeleted, ok := values[1].(bool)
+						if !ok {
+							return errors.New("invalid appendToDeleted")
+						}
+
+						list, ok := this.GetData("current").([]interface{})
+						if !ok {
+							return errors.New("invalid current list")
+						}
+						removedItem := list[i]
+
+						err := this.DataDeleteFromArray("current", i)
+						if err != nil {
+							return err
+						}
+
+						err = this.SetData("currentText", "")
+						if err != nil {
+							return err
+						}
+
+						if appendToDeleted {
+							err = this.Method("append", "deleted", removedItem)
+							if err != nil {
+								return err
+							}
+						}
+
+						return nil
+					},
+					"append": func(this *gas.Component, values ...interface{}) error {
+						listTypeS, ok := values[0].(string)
+						if !ok {
+							return errors.New("invalid list type")
+						}
+
+						newTask, ok := values[1].(string)
+						if !ok {
+							return errors.New("invalid task")
+						}
+
+						err := this.DataAddToArray(listTypeS, newTask)
+						if err != nil {
+							return err
+						}
+
+						if listTypeS == "current" {
+							gas.WarnError(this.SetData("currentText", ""))
+						}
+
+						return nil
+					},
+					"markAsDone": func(this *gas.Component, values ...interface{}) error {
+						i, ok := values[0].(int)
+						if !ok {
+							return errors.New("invalid index")
+						}
+
+						list := this.GetData("current").([]interface{})
+
+						item := list[i]
+
+						err := this.Method("append", "done", item)
+						if err != nil {
+							return err
+						}
+
+						err = this.Method("delete", i, false)
+						if err != nil {
+							return err
+						}
+
+						return nil
+					},
+					"edit": func(this *gas.Component, values ...interface{}) error {
+						i, ok := values[0].(int)
+						if !ok {
+							return errors.New("invalid index")
+						}
+
+						newValue, ok := values[1].(string)
+						if !ok {
+							return errors.New("invalid new value")
+						}
+
+						err := this.DataEditArray("current", i, newValue)
+						if err != nil {
+							return err
+						}
+
+						return nil
+					},
+				},
+			},
+			func(this *gas.Component) interface{} {
+				return getStyleEl(this)
+			},
+			func (this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: p,
-						Data: map[string]interface{}{
-							"currentList": "0",
-							"currentText": "",
-
-							"current": []interface{}{},
-							"done":    []interface{}{},
-							"deleted": []interface{}{},
-						},
-						Methods: map[string]gas.Method{
-							"delete": func(this *gas.Component, values ...interface{}) error {
-								i, ok := values[0].(int)
-								if !ok {
-									return errors.New("invalid index")
-								}
-
-								appendToDeleted, ok := values[1].(bool)
-								if !ok {
-									return errors.New("invalid appendToDeleted")
-								}
-
-								list, ok := this.GetData("current").([]interface{})
-								if !ok {
-									return errors.New("invalid current list")
-								}
-								removedItem := list[i]
-
-								err := this.DataDeleteFromArray("current", i)
-								if err != nil {
-									return err
-								}
-
-								err = this.SetData("currentText", "")
-								if err != nil {
-									return err
-								}
-
-								if appendToDeleted {
-									err = this.Method("append", "deleted", removedItem)
-									if err != nil {
-										return err
-									}
-								}
-
-								return nil
-							},
-							"append": func(this *gas.Component, values ...interface{}) error {
-								listTypeS, ok := values[0].(string)
-								if !ok {
-									return errors.New("invalid list type")
-								}
-
-								newTask, ok := values[1].(string)
-								if !ok {
-									return errors.New("invalid task")
-								}
-
-								err := this.DataAddToArray(listTypeS, newTask)
-								if err != nil {
-									return err
-								}
-
-								if listTypeS == "current" {
-									gas.WarnError(this.SetData("currentText", ""))
-								}
-
-								return nil
-							},
-							"markAsDone": func(this *gas.Component, values ...interface{}) error {
-								i, ok := values[0].(int)
-								if !ok {
-									return errors.New("invalid index")
-								}
-
-								list := this.GetData("current").([]interface{})
-
-								item := list[i]
-
-								err := this.Method("append", "done", item)
-								if err != nil {
-									return err
-								}
-
-								err = this.Method("delete", i, false)
-								if err != nil {
-									return err
-								}
-
-								return nil
-							},
-							"edit": func(this *gas.Component, values ...interface{}) error {
-								i, ok := values[0].(int)
-								if !ok {
-									return errors.New("invalid index")
-								}
-
-								newValue, ok := values[1].(string)
-								if !ok {
-									return errors.New("invalid new value")
-								}
-
-								err := this.DataEditArray("current", i, newValue)
-								if err != nil {
-									return err
-								}
-
-								return nil
-							},
-						},
+						ParentC:this,
 						Tag: "div",
 						Attrs: map[string]string{
-							"id": "todo",
+							"id": "main",
 						},
 					},
-					func(this *gas.Component) interface{} {
-						return getStyleEl(this)
-					},
-					func (this *gas.Component) interface{} {
+					func (p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC:this,
-								Tag: "div",
-								Attrs: map[string]string{
-									"id": "main",
-								},
+								ParentC: p,
+								Tag: "nav",
 							},
-							func (p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										ParentC: p,
-										Tag: "nav",
-									},
-									func(p *gas.Component) interface{} {
-										return getNavEl(this, "0", "Current")
-									},
-									func(p *gas.Component) interface{} {
-										return getNavEl(this, "1", "Completed")
-									},
-									func(p *gas.Component) interface{} {
-										return getNavEl(this, "2", "Deleted")
-									},)
+							func(p *gas.Component) interface{} {
+								return getNavEl(this, "0", "Current")
 							},
-							func (p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										ParentC: p,
-										Directives: gas.Directives{
-											If: func(p *gas.Component) bool {
-												return this.GetData("currentList").(string) == "0"
-											},
-											Model: gas.ModelDirective{
-												Data: "currentText",
-												Component: this,
-											},
-										},
-										Tag: "input",
-										Handlers: map[string]gas.Handler{
-											"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
-												currentText := this.GetData("currentText").(string)
-												if len(currentText) == 0 {
-													return
-												}
-
-												gas.WarnError(this.Method("append", "current", currentText))
-											},
-										},
-										Attrs: map[string]string{
-											"id": "new",
-											"placeholder": "New task",
-										},
-									})
+							func(p *gas.Component) interface{} {
+								return getNavEl(this, "1", "Completed")
 							},
-							func (p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										ParentC: p,
-									},
-									// Because i don't need wrap `this` and ul `this` i can overwrite this variable
-									func(p *gas.Component) interface{} {
-										return getList(p, this, 0)
-									},
-									func(p *gas.Component) interface{} {
-										return getList(p, this, 1)
-									},
-									func(p *gas.Component) interface{} {
-										return getList(p, this, 2)
-									},)
+							func(p *gas.Component) interface{} {
+								return getNavEl(this, "2", "Deleted")
 							},)
 					},
-					func (this *gas.Component) interface{} {
+					func (p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC:this,
-								Tag:"footer",
+								ParentC: p,
+								Directives: gas.Directives{
+									If: func(p *gas.Component) bool {
+										return this.GetData("currentList").(string) == "0"
+									},
+									Model: gas.ModelDirective{
+										Data: "currentText",
+										Component: this,
+									},
+								},
+								Tag: "input",
+								Handlers: map[string]gas.Handler{
+									"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
+										currentText := this.GetData("currentText").(string)
+										if len(currentText) == 0 {
+											return
+										}
+
+										gas.WarnError(this.Method("append", "current", currentText))
+									},
+								},
+								Attrs: map[string]string{
+									"id": "new",
+									"placeholder": "New task",
+								},
+							})
+					},
+					func (p *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
+								ParentC: p,
+							},
+							// Because i don't need wrap `this` and ul `this` i can overwrite this variable
+							func(p *gas.Component) interface{} {
+								return getList(p, this, 0)
+							},
+							func(p *gas.Component) interface{} {
+								return getList(p, this, 1)
+							},
+							func(p *gas.Component) interface{} {
+								return getList(p, this, 2)
+							},)
+					},)
+			},
+			func (this *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
+						ParentC:this,
+						Tag:"footer",
+					},
+					func(p *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
+								ParentC:p,
+								Tag:"div",
+							},
+							func(p *gas.Component) interface{} {
+								return "Double-click to edit a task"
+							})
+					},
+					func(p *gas.Component) interface{} {
+						return gas.NewComponent(
+							&gas.Component{
+								ParentC:p,
+								Tag:"div",
+							},
+							func(p *gas.Component) interface{} {
+								return "Created by"
 							},
 							func(p *gas.Component) interface{} {
 								return gas.NewComponent(
 									&gas.Component{
-										ParentC:p,
-										Tag:"div",
+										Tag: "a",
+										Attrs: map[string]string{
+											"href": "https://sinicablyat.github.io/",
+											"target": "_blank",
+										},
 									},
 									func(p *gas.Component) interface{} {
-										return "Double-click to edit a task"
+										return "Noskov Artem"
 									})
 							},
 							func(p *gas.Component) interface{} {
+								return "with"
+							},
+							func(p *gas.Component) interface{} {
 								return gas.NewComponent(
 									&gas.Component{
-										ParentC:p,
-										Tag:"div",
+										Tag: "a",
+										Attrs: map[string]string{
+											"href": "https://sinicablyat.github.io/gas",
+											"target": "_blank",
+										},
 									},
 									func(p *gas.Component) interface{} {
-										return "Created by"
-									},
-									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												Tag: "a",
-												Attrs: map[string]string{
-													"href": "https://sinicablyat.github.io/",
-													"target": "_blank",
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return "Noskov Artem"
-											})
-									},
-									func(p *gas.Component) interface{} {
-										return "with"
-									},
-									func(p *gas.Component) interface{} {
-										return gas.NewComponent(
-											&gas.Component{
-												Tag: "a",
-												Attrs: map[string]string{
-													"href": "https://sinicablyat.github.io/gas",
-													"target": "_blank",
-												},
-											},
-											func(p *gas.Component) interface{} {
-												return "GAS"
-											})
-									},
-									func(p *gas.Component) interface{} {
-										return "and love"
-									},)
-							})
+										return "GAS"
+									})
+							},
+							func(p *gas.Component) interface{} {
+								return "and love"
+							},)
 					})
 			},
 		)
@@ -437,7 +429,7 @@ func getStyleEl(p *gas.Component) interface{} {
 			HTML: gas.HTMLDirective{
 				Render: func(this2 *gas.Component) string {
 					return `
-#todo {
+#app {
 	width: 50%;
 	margin: 0 auto;
 }

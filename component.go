@@ -105,6 +105,7 @@ type Component struct {
 	Hooks    Hooks // lifecycle hooks
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds      	  map[string]Bind    // dynamic attributes
+	RenderedBinds map[string]string // store binds for changed func
 
 	Directives 	 Directives
 

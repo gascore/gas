@@ -34,7 +34,6 @@ func isComponentsEquals(new, old *Component) bool {
 	wE  := cmp.Equal(new.Watchers, old.Watchers)
 	mE  := true // cmp.Equal(new.Methods, old.Methods)
 	coE := true // cmp.Equal(new.Computeds, old.Computeds)
-	caE := cmp.Equal(new.Catchers, old.Catchers)
 
 	hE := compareHooks(new.Hooks, old.Hooks)
 	bE := compareBinds(new.RenderedBinds, old.RenderedBinds)
@@ -48,7 +47,7 @@ func isComponentsEquals(new, old *Component) bool {
 	tE := new.Tag == old.Tag
 	aE := cmp.Equal(new.Attrs, old.Attrs)
 
-	return daE && wE && mE && coE && caE && hE && bE && diE && tE && aE
+	return daE && wE && mE && coE && hE && bE && diE && tE && aE
 }
 
 func compareHooks(new, old Hooks) bool {

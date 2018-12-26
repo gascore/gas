@@ -15,22 +15,25 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			func(p *gas.Component) interface{} {
+			&gas.Component{
+				Data: map[string]interface{}{
+					"arr": []interface{}{"click", "here", "if you want to see some magic"},
+				},
+				Tag: "ul",
+				Attrs: map[string]string{
+					"id": "list",
+				},
+			},
+			func (this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: p,
-						Data: map[string]interface{}{
-							"arr": []interface{}{"click", "here", "if you want to see some magic"},
-						},
+						ParentC: this,
 						Tag: "ul",
-						Attrs: map[string]string{
-							"id": "list",
-						},
 					},
-					func(this *gas.Component) interface{} {
+					func(p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: this,
+								ParentC: p,
 								Directives: gas.Directives{
 									For: gas.ForDirective{
 										Data: "arr",
@@ -53,10 +56,10 @@ func main() {
 								Tag: "li",
 							}) // In components with FOR Directive childes are ignored
 					},
-					func(this *gas.Component) interface{} {
+					func(p *gas.Component) interface{} {
 						return "end of list"
 					})
-			},)
+			})
 	must(err)
 
 	err = gas.Init(app)

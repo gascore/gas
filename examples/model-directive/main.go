@@ -15,6 +15,7 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
+			&gas.Component{},
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{

@@ -16,26 +16,22 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						ParentC: p,
-						Data: map[string]interface{}{
-							"show":    true,
-							"counter": 0,
-						},
-						Hooks: gas.Hooks{
-							BeforeCreate: func(this *gas.Component) error {
-								dom.ConsoleLog("Component is being created!")
-								return nil
-							},
-						},
-						Tag: "h1",
-						Attrs: map[string]string{
-							"id": "hooks",
-						},
+			&gas.Component{
+				Data: map[string]interface{}{
+					"show":    true,
+					"counter": 0,
+				},
+				Hooks: gas.Hooks{
+					BeforeCreate: func(this *gas.Component) error {
+						dom.ConsoleLog("Component is being created!")
+						return nil
 					},
-					func(this *gas.Component) interface{} {
+				},
+				Attrs: map[string]string{
+					"id": "hooks",
+				},
+			},
+			func(this *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
 								ParentC: this,
@@ -56,35 +52,34 @@ func main() {
 									return "Hide text"
 								}
 							})
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								ParentC: this,
-								Directives:
-									gas.Directives{
-										If: func(c *gas.Component) bool {
-											return !this.GetData("show").(bool)
-										},
+				},
+			func(this *gas.Component) interface{} {
+					return gas.NewComponent(
+						&gas.Component{
+							ParentC: this,
+							Directives:
+								gas.Directives{
+									If: func(c *gas.Component) bool {
+										return !this.GetData("show").(bool)
 									},
-								Hooks:
-									gas.Hooks{
-										Created: func(this2 *gas.Component) error {
-											dom.ConsoleLog("Hidden text is created!")
-											return this.SetData("counter", this.GetData("counter").(int)+1)
-										},
-										Destroyed: func(this2 *gas.Component) error {
-											dom.ConsoleLog("Hidden text was destroyed!")
-											return nil
-										},
+								},
+							Hooks:
+								gas.Hooks{
+									Created: func(this2 *gas.Component) error {
+										dom.ConsoleLog("Hidden text is created!")
+										return this.SetData("counter", this.GetData("counter").(int)+1)
 									},
-								Tag: "i",
-							},
-							func(this2 *gas.Component) interface{} {
-								return "Hidden text " + fmt.Sprintf("(you show hidden text %d times)", this.GetData("counter"))
-							},)
-					})
-			},)
+									Destroyed: func(this2 *gas.Component) error {
+										dom.ConsoleLog("Hidden text was destroyed!")
+										return nil
+									},
+								},
+							Tag: "i",
+						},
+						func(this2 *gas.Component) interface{} {
+							return "Hidden text " + fmt.Sprintf("(you show hidden text %d times)", this.GetData("counter"))
+						},)
+				})
 	must(err)
 
 	err = gas.Init(app)

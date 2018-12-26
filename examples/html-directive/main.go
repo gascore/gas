@@ -14,13 +14,10 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						ParentC: p,
-						Data: map[string]interface{}{
-							"articleText":
-							`
+			&gas.Component{
+				Data: map[string]interface{}{
+					"articleText":
+					`
 <h1>
 	Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 </h1>
@@ -40,60 +37,58 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 <h3>
 	Nulla facilisi. Donec mattis auctor finibus.
 </h3>`,
-							"helloText": `<h1>To see article click button!</h1>`,
-							"isArticleActive": false,
-						},
-						Tag: "main",
-					},
-					func(this *gas.Component) interface{} { // don't use childes if you have v-html
-						return gas.NewComponent(
-							&gas.Component{
-								ParentC: this,
-								Handlers: map[string]gas.Handler{
-									"click": func(this2 *gas.Component, e gas.HandlerEvent) {
-										currentIsArticleActive := this.GetData("isArticleActive").(bool)
-										gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
-									},
-								},
-								Tag: "button",
+					"helloText": `<h1>To see article click button!</h1>`,
+					"isArticleActive": false,
+				},
+			},
+			func(this *gas.Component) interface{} { // don't use childes if you have v-html
+				return gas.NewComponent(
+					&gas.Component{
+						ParentC: this,
+						Handlers: map[string]gas.Handler{
+							"click": func(this2 *gas.Component, e gas.HandlerEvent) {
+								currentIsArticleActive := this.GetData("isArticleActive").(bool)
+								gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
 							},
-							func(this2 *gas.Component) interface{} {
+						},
+						Tag: "button",
+					},
+					func(this2 *gas.Component) interface{} {
+						isArticleActive, ok := this.GetData("isArticleActive").(bool)
+						gas.WarnIfNot(ok)
+
+						if isArticleActive {
+							return "Hide article"
+						} else {
+							return "Show article"
+						}
+					})
+			},
+			func(this *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
+						ParentC: this,
+						Directives: gas.Directives{
+							HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
 								isArticleActive, ok := this.GetData("isArticleActive").(bool)
+
+								var html string
+								if isArticleActive {
+									html, ok = this.GetData("articleText").(string)
+								} else {
+									html, ok = this.GetData("helloText").(string)
+								}
 								gas.WarnIfNot(ok)
 
-								if isArticleActive {
-									return "Hide article"
-								} else {
-									return "Show article"
-								}
-							})
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								ParentC: this,
-								Directives: gas.Directives{
-									HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
-										isArticleActive, ok := this.GetData("isArticleActive").(bool)
-
-										var html string
-										if isArticleActive {
-											html, ok = this.GetData("articleText").(string)
-										} else {
-											html, ok = this.GetData("helloText").(string)
-										}
-										gas.WarnIfNot(ok)
-
-										return html
-									},},
-								},
-								Tag: "article",
-								Attrs: map[string]string{
-									"id": "article",
-									"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
-								},
-							})},
-				)})
+								return html
+							},},
+						},
+						Tag: "article",
+						Attrs: map[string]string{
+							"id": "article",
+							"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
+						},
+					})},)
 	must(err)
 
 	err = gas.Init(app)

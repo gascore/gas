@@ -16,59 +16,54 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						ParentC: p,
-						Data: map[string]interface{}{
-							"show": true,
-							"number": 1,
-						},
-						// What the difference between Methods and Computed?
-						// Methods will do business things.
-						// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
-						Methods: map[string]gas.Method{
-							"toggle": func(this *gas.Component, values ...interface{}) error {
-								_ = this.SetData("show", !this.GetData("show").(bool))
+			&gas.Component{
+				Data: map[string]interface{}{
+					"show": true,
+					"number": 1,
+				},
+				// What the difference between Methods and Computed?
+				// Methods will do business things.
+				// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
+				Methods: map[string]gas.Method{
+					"toggle": func(this *gas.Component, values ...interface{}) error {
+						_ = this.SetData("show", !this.GetData("show").(bool))
 
-								if this.GetData("show").(bool) {
-									_ = this.SetData("number", this.GetData("number").(int)+1)
-								}
+						if this.GetData("show").(bool) {
+							_ = this.SetData("number", this.GetData("number").(int)+1)
+						}
 
-								return nil
-							},
-						},
-						// Computeds can be cached
-						Computeds: map[string]gas.Computed{
-							"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
-								dom.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
-
-								currentNumber, ok := this.GetData("number").(int)
-								gas.WarnIfNot(ok) // it's good practise to your data for valid type
-								explanation := fmt.Sprintf("You showed hidden text: %d times", currentNumber)
-								return explanation, nil
-							},
-						},
-						Tag: "h1",
-						Attrs: map[string]string{
-							"id": "M&C",
-						},
+						return nil
 					},
-					func(this *gas.Component) interface{} {
-						// For pass method or computed to sub component you need to get a *pocket* version.
-						// Pocket method/computed can be executed in sub component, in sub sub component, in e.t.c.
-						pocketToggle, err := this.GetPocketMethod("toggle")
-						gas.WarnError(err)
+				},
+				// Computeds can be cached
+				Computeds: map[string]gas.Computed{
+					"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
+						dom.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
 
-						return getButton(this, pocketToggle)
+						currentNumber, ok := this.GetData("number").(int)
+						gas.WarnIfNot(ok) // it's good practise to your data for valid type
+						explanation := fmt.Sprintf("You showed hidden text: %d times", currentNumber)
+						return explanation, nil
 					},
-					func(this *gas.Component) interface{} {
+				},
+				Attrs: map[string]string{
+					"id": "M&C",
+				},
+			},
+			func(this *gas.Component) interface{} {
+				// For pass method or computed to sub component you need to get a *pocket* version.
+				// Pocket method/computed can be executed in sub component, in sub sub component, in e.t.c.
+				pocketToggle, err := this.GetPocketMethod("toggle")
+				gas.WarnError(err)
+
+				return getButton(this, pocketToggle)
+			},
+			func(this *gas.Component) interface{} {
 						pocketNumber, err := this.GetPocketComputed("number")
 						gas.WarnError(err)
 
 						return getHiddenText(this, this.GetData("show").(bool), pocketNumber)
 					})
-			},)
 	must(err)
 
 	err = gas.Init(app)

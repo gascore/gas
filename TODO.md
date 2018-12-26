@@ -1,16 +1,16 @@
 # TODO list
 
-## A class tasks
+#### A class tasks
 
+* vue-like templates parser
 * TextNode (say no to `<span>`)
 
-## B class tasks
-
-* jsx-like parser
-* redux-like
-* router
-
-## C class tasks
+#### B class tasks
 
 * Create normal site
+* router
+* redux-like
+
+#### C class tasks
+
 * Initial D - Deja Vu

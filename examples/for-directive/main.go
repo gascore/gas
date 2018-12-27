@@ -30,31 +30,24 @@ func main() {
 						ParentC: this,
 						Tag: "ul",
 					},
-					func(p *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								ParentC: p,
-								Directives: gas.Directives{
-									For: gas.ForDirective{
-										Data: "arr",
-										Render: func(i int, el interface{}, this *gas.Component) []gas.GetComponent {
-											return gas.ToGetComponentList(
-												func(this2 *gas.Component) interface{} {
-													return fmt.Sprintf("%d: %s", i+1, el)
-												},)
+					func (p *gas.Component) interface{} {
+						return gas.NewFor("arr", this, func(i int, el interface{}) interface {} {
+							return gas.NewComponent(
+								&gas.Component{
+									ParentC: p,
+									Handlers: map[string]gas.Handler {
+										"click": func(c *gas.Component, e gas.HandlerEvent) {
+											arr := this.GetData("arr").([]interface{})
+											arr = append(arr, "Hello!") // hello, Annoy-o-Tron
+											gas.WarnError(this.SetData("arr", arr))
 										},
-										Component: this,
 									},
+									Tag: "li",
 								},
-								Handlers: map[string]gas.Handler {
-									"click": func(c *gas.Component, e gas.HandlerEvent) {
-										arr := this.GetData("arr").([]interface{})
-										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
-										gas.WarnError(this.SetData("arr", arr))
-									},
-								},
-								Tag: "li",
-							}) // In components with FOR Directive childes are ignored
+								func(p *gas.Component) interface{} {
+									return fmt.Sprintf("%d: %s", i+1, el)
+								})
+						})
 					},
 					func(p *gas.Component) interface{} {
 						return "end of list"

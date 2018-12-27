@@ -301,122 +301,115 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 		listTypeS = "deleted"
 	}
 
-	return gas.NewComponent(
-		&gas.Component{
-			ParentC: p,
-			Tag: "li",
-			Data: map[string]interface{}{
-				"isEditing": false,
-				"newValue": "no",
-			},
-			Directives:gas.Directives{
-				For:gas.ForDirective{
-					Data: listTypeS,
-					Component: this,
-					Render: func(i int, value interface{}, p *gas.Component) []gas.GetComponent {
-						return gas.ToGetComponentList(
-							func(p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										Tag: "button",
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
-												return listType == 0
-											},
-										},
-										Handlers: map[string]gas.Handler{
-											"click": func(this5 *gas.Component, e gas.HandlerEvent) {
-												gas.WarnError(this.Method("markAsDone", i))
-											},
-										},
-										Attrs: map[string]string{
-											"id": "submit",
-										},
-									},
-									func(this3 *gas.Component) interface{} {
-										return gas.NewComponent(&gas.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-check"}})
-									})
-							},
-							func(this2 *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										Tag: "i",
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
-												return !this2.GetData("isEditing").(bool)
-											},
-										},
-										Handlers: map[string]gas.Handler{
-											"dblclick": func(p *gas.Component, e gas.HandlerEvent) {
-												if listType != 0 {
-													return
-												}
-
-												gas.WarnError(this2.SetData("newValue", value))
-												gas.WarnError(this2.SetData("isEditing", true))
-											},
-										},
-									},
-									func(p *gas.Component) interface{} {
-										return fmt.Sprintf("%s", value)
-									})
-							},
-							func(this2 *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										Tag: "input",
-										Attrs: map[string]string{
-											"style": "margin-right: 8px",
-										},
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
-												return this2.GetData("isEditing").(bool)
-											},
-											Model:gas.ModelDirective{
-												Component: this2,
-												Data: "newValue",
-											},
-										},
-										Handlers: map[string]gas.Handler{
-											"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
-												newValue := this2.GetData("newValue")
-
-												gas.WarnError(this2.SetData("isEditing", false))
-												gas.WarnError(this.Method("edit", i, newValue))
-												value = newValue
-											},
-										},
-									},
-									func(p *gas.Component) interface{} {
-										return fmt.Sprintf("%s", value)
-									})
-							},
-							func(p *gas.Component) interface{} {
-								return gas.NewComponent(
-									&gas.Component{
-										Tag: "button",
-										Directives:gas.Directives{
-											If: func(p *gas.Component) bool {
-												return listType == 0
-											},
-										},
-										Handlers: map[string]gas.Handler{
-											"click": func(this5 *gas.Component, e gas.HandlerEvent) {
-												gas.WarnError(this.Method("delete", i, true))
-											},
-										},
-										Attrs: map[string]string{
-											"id": "delete",
-										},
-									},
-									func(this3 *gas.Component) interface{} {
-										return gas.NewComponent(&gas.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-trash-alt "}})
-									})
-							},)
-					},
+	return gas.NewFor(listTypeS, this, func(i int, el interface{}) interface{} {
+		return gas.NewComponent(
+			&gas.Component{
+				ParentC: p,
+				Tag: "li",
+				Data: map[string]interface{}{
+					"isEditing": false,
+					"newValue": "no",
 				},
 			},
-		})
+			func(p *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
+						Tag: "button",
+						Directives:gas.Directives{
+							If: func(p *gas.Component) bool {
+								return listType == 0
+							},
+						},
+						Handlers: map[string]gas.Handler{
+							"click": func(this5 *gas.Component, e gas.HandlerEvent) {
+								gas.WarnError(this.Method("markAsDone", i))
+							},
+						},
+						Attrs: map[string]string{
+							"id": "submit",
+						},
+					},
+					func(this3 *gas.Component) interface{} {
+						return gas.NewComponent(&gas.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-check"}})
+					})
+			},
+			func(this2 *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
+						Tag: "i",
+						Directives:gas.Directives{
+							If: func(p *gas.Component) bool {
+								return !this2.GetData("isEditing").(bool)
+							},
+						},
+						Handlers: map[string]gas.Handler{
+							"dblclick": func(p *gas.Component, e gas.HandlerEvent) {
+								if listType != 0 {
+									return
+								}
+
+								gas.WarnError(this2.SetData("newValue", el))
+								gas.WarnError(this2.SetData("isEditing", true))
+							},
+						},
+					},
+					func(p *gas.Component) interface{} {
+						return fmt.Sprintf("%s", el)
+					})
+			},
+			func(this2 *gas.Component) interface{} {
+				return gas.NewComponent(
+					&gas.Component{
+						Tag: "input",
+						Attrs: map[string]string{
+							"style": "margin-right: 8px",
+						},
+						Directives:gas.Directives{
+							If: func(p *gas.Component) bool {
+								return this2.GetData("isEditing").(bool)
+							},
+							Model:gas.ModelDirective{
+								Component: this2,
+								Data: "newValue",
+							},
+						},
+						Handlers: map[string]gas.Handler{
+							"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
+								newValue := this2.GetData("newValue")
+
+								gas.WarnError(this2.SetData("isEditing", false))
+								gas.WarnError(this.Method("edit", i, newValue))
+								el = newValue
+							},
+						},
+					},
+					func(p *gas.Component) interface{} {
+						return fmt.Sprintf("%s", el)
+					})
+			},
+			func(p *gas.Component) interface{} {
+			return gas.NewComponent(
+				&gas.Component{
+					Tag: "button",
+					Directives:gas.Directives{
+						If: func(p *gas.Component) bool {
+							return listType == 0
+						},
+					},
+					Handlers: map[string]gas.Handler{
+						"click": func(this5 *gas.Component, e gas.HandlerEvent) {
+							gas.WarnError(this.Method("delete", i, true))
+						},
+					},
+					Attrs: map[string]string{
+						"id": "delete",
+					},
+				},
+				func(this3 *gas.Component) interface{} {
+					return gas.NewComponent(&gas.Component{Tag: "i", Attrs: map[string]string{"class": "fas fa-trash-alt "}})
+				})
+		},)
+	})
 }
 
 func getStyleEl(p *gas.Component) interface{} {

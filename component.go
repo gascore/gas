@@ -1,6 +1,7 @@
 package gas
 
 import (
+	"fmt"
 	"github.com/frankenbeanies/uuid4"
 	"strings"
 )
@@ -61,10 +62,6 @@ type ModelDirective struct {
 
 // ForDirective struct for For Directive (needful because `for` want name and render function)
 type ForDirective struct {
-	Data string
-	Component *Component
-	Render func(int, interface{}, *Component) []GetComponent
-
 	isItem bool
 	itemValueI int
 	itemValueVal interface{}
@@ -137,45 +134,9 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 				if childC.Directives.If != nil && !childC.Directives.If(childC) {
 					continue
 				}
-
-				// if for.Data doesn't exist, but render exist - it's a user problem
-				if len(childC.Directives.For.Data) != 0 {
-					dataForList, ok := childC.Directives.For.Component.Data[childC.Directives.For.Data].([]interface{})
-					if !ok {
-						//dom.ConsoleError(fmt.Sprintf("invalid FOR directive in component %s", childC.UUID))
-						continue
-					}
-
-					clearedDirective := childC.Directives
-					clearedDirective.For = ForDirective{isItem: true}
-
-					renderer := childC.Directives.For.Render
-					for i, el := range dataForList {
-						// recreate this component with childes from FOR, without FOR directive
-
-						clearedDirective.For.itemValueI = i
-						clearedDirective.For.itemValueVal = el
-
-						c := &Component{
-							ParentC: childC.ParentC,
-							Data: childC.Data,
-							Watchers: childC.Watchers,
-							Methods: childC.Methods,
-							Computeds: childC.Computeds,
-							Directives: clearedDirective,
-							Binds: childC.Binds,
-							Hooks: childC.Hooks,
-							Handlers: childC.Handlers,
-							Tag: childC.Tag,
-							Attrs: childC.Attrs,
-						}
-
-						oneOfComponents := NewComponent(c, renderer(i, el, this)...)
-						compiled = append(compiled, oneOfComponents)
-					}
-
-					continue
-				}
+			} else if IsChildesArr(child) {
+				compiled = append(compiled, child.([]interface{})...)
+				continue
 			}
 
 			compiled = append(compiled, child)
@@ -187,6 +148,28 @@ func NewComponent(component *Component, childes ...GetComponent) *Component {
 	component.UUID = uuid4.New().String()
 
 	return component
+}
+
+func NewFor(data string, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
+	dataForList, ok := this.Data[data].([]interface{})
+	if !ok {
+		WarnError(fmt.Errorf("invalid FOR directive in component %s", this.UUID))
+		return nil
+	}
+
+	var items []interface{}
+	for i, el := range dataForList {
+		item := renderer(i, el)
+
+		if IsComponent(item) {
+			itemC := I2C(item)
+			itemC.Directives.For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
+		}
+
+		items = append(items, item)
+	}
+
+	return items
 }
 
 func (c *Component) ForItemInfo() (bool, int, interface{}) {
@@ -210,6 +193,10 @@ func I2C(a interface{}) *Component {
 
 func IsComponent(c interface{}) bool {
 	_, ok := c.(*Component)
+	return ok
+}
+func IsChildesArr(c interface{}) bool {
+	_, ok := c.([]interface{})
 	return ok
 }
 func IsString(c interface{}) bool {

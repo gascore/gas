@@ -39,18 +39,20 @@ func (c *Component) GetPocketMethod(name string) (PocketMethod, error)  {
 }
 
 // Computed runs a component computed and returns values from it
-func (c *Component) Computed(name string, values ...interface{}) (interface{}, error) {
+func (c *Component) Computed(name string, values ...interface{}) interface{} {
 	computed, err := c.GetPocketComputed(name)
 	if err != nil {
-		return nil, err
+		WarnError(err)
+		return nil
 	}
 
 	value, err := computed(values...)
 	if err != nil {
-		return nil, err
+		WarnError(err)
+		return nil
 	}
 
-	return value, nil
+	return value
 }
 
 // GetPocketComputed return function returns executing computed with binding component

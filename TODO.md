@@ -2,15 +2,13 @@
 
 #### A class tasks
 
-* vue-like templates parser
+* Remove `func(p \*gas.Component) interface{} {...}`
+* Add beforeDestroy hook
+* Create normal doc (docsify.js.org) 
+* Create normal site (with Initial D - Deja Vu)
 * TextNode (say no to `<span>`)
 
 #### B class tasks
 
-* Create normal site
 * router
 * redux-like
-
-#### C class tasks
-
-* Initial D - Deja Vu

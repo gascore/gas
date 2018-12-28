@@ -128,7 +128,7 @@ func main() {
 				},
 			},
 			func(this *gas.Component) interface{} {
-				return getStyleEl(this)
+				return getStyleEl()
 			},
 			func (this *gas.Component) interface{} {
 				return gas.NewComponent(
@@ -276,11 +276,11 @@ func getList(p *gas.Component, this *gas.Component, index int) interface{} {
 			},
 		},
 		func(p *gas.Component) interface{} {
-			return getLi(p, this, index)
+			return getLi(this, index)
 		})
 }
 
-func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
+func getLi(this *gas.Component, listType int) interface{} {
 	// listType: 0 - current, 1 - done, 2 - deleted tasks
 	var listTypeS string
 	switch listType {
@@ -402,7 +402,7 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 	})
 }
 
-func getStyleEl(p *gas.Component) interface{} {
+func getStyleEl() interface{} {
 	return gas.NewComponent(
 	&gas.Component{
 		Tag:"style",

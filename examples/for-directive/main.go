@@ -27,14 +27,12 @@ func main() {
 			func (this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Tag: "ul",
 					},
 					func (p *gas.Component) interface{} {
 						return gas.NewFor("arr", this, func(i int, el interface{}) interface {} {
 							return gas.NewComponent(
 								&gas.Component{
-									ParentC: p,
 									Handlers: map[string]gas.Handler {
 										"click": func(c *gas.Component, e gas.HandlerEvent) {
 											arr := this.GetData("arr").([]interface{})

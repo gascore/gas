@@ -133,7 +133,6 @@ func main() {
 			func (this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC:this,
 						Tag: "div",
 						Attrs: map[string]string{
 							"id": "main",
@@ -142,7 +141,6 @@ func main() {
 					func (p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: p,
 								Tag: "nav",
 							},
 							func(p *gas.Component) interface{} {
@@ -158,7 +156,6 @@ func main() {
 					func (p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: p,
 								Directives: gas.Directives{
 									If: func(p *gas.Component) bool {
 										return this.GetData("currentList").(string) == "0"
@@ -187,9 +184,7 @@ func main() {
 					},
 					func (p *gas.Component) interface{} {
 						return gas.NewComponent(
-							&gas.Component{
-								ParentC: p,
-							},
+							&gas.Component{},
 							// Because i don't need wrap `this` and ul `this` i can overwrite this variable
 							func(p *gas.Component) interface{} {
 								return getList(p, this, 0)
@@ -205,13 +200,11 @@ func main() {
 			func (this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC:this,
 						Tag:"footer",
 					},
 					func(p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC:p,
 								Tag:"div",
 							},
 							func(p *gas.Component) interface{} {
@@ -221,7 +214,6 @@ func main() {
 					func(p *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC:p,
 								Tag:"div",
 							},
 							func(p *gas.Component) interface{} {
@@ -272,7 +264,6 @@ func main() {
 func getList(p *gas.Component, this *gas.Component, index int) interface{} {
 	return gas.NewComponent(
 		&gas.Component{
-			ParentC: p,
 			Directives:gas.Directives{
 				Show: func(p *gas.Component) bool {
 					return this.GetData("currentList") == fmt.Sprintf("%d", index)
@@ -304,7 +295,6 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 	return gas.NewFor(listTypeS, this, func(i int, el interface{}) interface{} {
 		return gas.NewComponent(
 			&gas.Component{
-				ParentC: p,
 				Tag: "li",
 				Data: map[string]interface{}{
 					"isEditing": false,
@@ -415,7 +405,6 @@ func getLi(p *gas.Component, this *gas.Component, listType int) interface{} {
 func getStyleEl(p *gas.Component) interface{} {
 	return gas.NewComponent(
 	&gas.Component{
-		ParentC:p,
 		Tag:"style",
 		Attrs: map[string]string{"type": "text/css"},
 		Directives: gas.Directives{
@@ -522,7 +511,6 @@ footer a {
 func getNavEl(this *gas.Component, index, name string) interface{} {
 	return gas.NewComponent(
 		&gas.Component{
-			ParentC: this,
 			Tag: "button",
 			Handlers: map[string]gas.Handler{
 				"click": func(p *gas.Component, e gas.HandlerEvent) {

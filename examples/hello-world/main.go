@@ -23,7 +23,6 @@ func main() {
 			func(this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Tag: "h1",
 						Attrs: map[string]string{
 							"id":    "hello-world",
@@ -37,7 +36,6 @@ func main() {
 			func(this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Tag: "i",
 						Attrs: map[string]string{
 							"id":    "italiano",

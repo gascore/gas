@@ -32,7 +32,6 @@ func main() {
 			func(this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Handlers: map[string]gas.Handler {
 							"click.left": func(this2 *gas.Component, e gas.HandlerEvent) {
 								gas.WarnError(this.Method("addClick"))
@@ -66,7 +65,6 @@ func main() {
 			func(this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Tag: "span",
 						Attrs: map[string]string{
 							"id": "needful_wrapper",

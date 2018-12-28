@@ -19,7 +19,6 @@ func main() {
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: p,
 						Data: map[string]interface{}{
 							"foo": "",
 						},
@@ -35,12 +34,11 @@ func main() {
 						return fmt.Sprintf("Your text: %s", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+						return gas.NewComponent(&gas.Component{Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: this,
 								Directives: gas.Directives{
 									Model: gas.ModelDirective{
 										Data: "foo",
@@ -54,7 +52,6 @@ func main() {
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: p,
 						Data:
 						map[string]interface{}{
 							"foo": "",
@@ -72,12 +69,11 @@ func main() {
 						return fmt.Sprintf("Your color: %s", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+						return gas.NewComponent(&gas.Component{Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: this,
 								Directives: gas.Directives{
 									Model: gas.ModelDirective{
 										Data: "foo",
@@ -94,7 +90,6 @@ func main() {
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: p,
 						Data: map[string]interface{}{
 							"foo": int(0),
 						},
@@ -110,12 +105,11 @@ func main() {
 						return fmt.Sprintf("Your range: %d", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+						return gas.NewComponent(&gas.Component{Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: this,
 								Directives: gas.Directives{
 									Model: gas.ModelDirective{
 										Data: "foo",
@@ -132,7 +126,6 @@ func main() {
 			func(p *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: p,
 						Data: map[string]interface{}{
 							"foo": false,
 						},
@@ -148,12 +141,11 @@ func main() {
 						return fmt.Sprintf("Your checkbox: %t", foo)
 					},
 					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+						return gas.NewComponent(&gas.Component{Tag: "br"})
 					},
 					func(this *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: this,
 								Directives: gas.Directives{
 									Model: gas.ModelDirective{
 										Data: "foo",

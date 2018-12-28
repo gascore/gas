@@ -74,7 +74,6 @@ func main() {
 func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Component {
 	return gas.NewComponent(
 		&gas.Component{
-			ParentC: this,
 			Handlers: map[string]gas.Handler {
 				"click": func(c *gas.Component, e gas.HandlerEvent) {
 					// Of course we can use method for `this`.
@@ -100,7 +99,6 @@ func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Componen
 func getHiddenText(this *gas.Component, isShow bool, getNumber gas.PocketComputed) *gas.Component {
 	return gas.NewComponent(
 		&gas.Component{
-			ParentC: this,
 			Directives: gas.Directives{
 				If: func(c *gas.Component) bool {
 					return !isShow

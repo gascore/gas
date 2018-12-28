@@ -11,7 +11,6 @@ import (
 func GetNumberViewer(this *gas.Component, values ...interface{}) interface{} {
 	return gas.NewComponent(
 		&gas.Component{
-			ParentC: this,
 			Tag: "i",
 			Attrs: map[string]string{
 				"id": "needful_wrapper--number-viewer",

@@ -114,28 +114,34 @@ type Component struct {
 
 	UUID string
 
-	ParentC *Component
+	Parent *Component
 }
 
 func NewComponent(component *Component, childes ...GetComponent) *Component {
 	if component.Tag == "" {
 		component.Tag = "div"
+	} else {
+		component.Tag = strings.ToLower(component.Tag)
 	}
-
-	component.Tag = strings.ToLower(component.Tag)
 
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
-		for _, el := range childes {
-			child := el(this)
+		for _, renderer := range childes {
+			child := renderer(this)
 
 			if IsComponent(child) {
 				childC := I2C(child)
 				if childC.Directives.If != nil && !childC.Directives.If(childC) {
 					continue
 				}
+
+				childC.Parent = component
 			} else if IsChildesArr(child) {
-				compiled = append(compiled, child.([]interface{})...)
+				for _, el := range child.([]interface{}) {
+					if IsComponent(el) { I2C(el).Parent = component }
+					compiled = append(compiled, el)
+				}
+
 				continue
 			}
 

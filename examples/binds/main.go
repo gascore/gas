@@ -38,7 +38,6 @@ func main() {
 					},
 					func(this2 *gas.Component) interface{} {
 						return gas.NewComponent(&gas.Component{
-							ParentC: this,
 							Binds: map[string]gas.Bind{
 								"style": func(this2 *gas.Component) string {
 									foo, ok := this.GetData("foo").(int)
@@ -69,12 +68,11 @@ func main() {
 					},)
 			},
 			func(this *gas.Component) interface{} {
-				return gas.NewComponent(&gas.Component{ParentC: this, Tag: "br"})
+				return gas.NewComponent(&gas.Component{Tag: "br"})
 			},
 			func(this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Directives: gas.Directives{
 							Model: gas.ModelDirective{
 								Data: "foo",

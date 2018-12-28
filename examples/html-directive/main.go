@@ -44,7 +44,6 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 			func(this *gas.Component) interface{} { // don't use childes if you have v-html
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Handlers: map[string]gas.Handler{
 							"click": func(this2 *gas.Component, e gas.HandlerEvent) {
 								currentIsArticleActive := this.GetData("isArticleActive").(bool)
@@ -67,7 +66,6 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 			func(this *gas.Component) interface{} {
 				return gas.NewComponent(
 					&gas.Component{
-						ParentC: this,
 						Directives: gas.Directives{
 							HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
 								isArticleActive, ok := this.GetData("isArticleActive").(bool)

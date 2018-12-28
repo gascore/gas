@@ -34,7 +34,6 @@ func main() {
 			func(this *gas.Component) interface{} {
 						return gas.NewComponent(
 							&gas.Component{
-								ParentC: this,
 								Handlers: map[string]gas.Handler {
 									"click": func(c *gas.Component, e gas.HandlerEvent) {
 										gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
@@ -56,7 +55,6 @@ func main() {
 			func(this *gas.Component) interface{} {
 					return gas.NewComponent(
 						&gas.Component{
-							ParentC: this,
 							Directives:
 								gas.Directives{
 									If: func(c *gas.Component) bool {

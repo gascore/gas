@@ -54,14 +54,14 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 
 // getState return values for component update
 func (c *Component) getState() ([]interface{}, string) {
-	oldTree := be.RenderTree(c)
+	tree := be.RenderTree(c)
 
-	var oldHtmlDirective string
+	var htmlDirective string
 	if c.Directives.HTML.Render != nil {
-		oldHtmlDirective = c.Directives.HTML.Render(c)
+		htmlDirective = c.Directives.HTML.Render(c)
 	}
 
-	return oldTree, oldHtmlDirective
+	return tree, htmlDirective
 }
 
 // DoWithUpdate runs your event and trying to Update component after it

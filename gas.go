@@ -7,7 +7,7 @@ import (
 var be BackEnd
 
 // New create new gas application with custom backend
-func New(backEnd BackEnd, startPoint string, component *Component, childes ...GetComponent) (Gas, error) {
+func New(backEnd BackEnd, startPoint string, component *Component, getChildes GetComponentChildes) (Gas, error) {
 	be = backEnd
 
 	tagName, err := be.New(startPoint)
@@ -21,7 +21,7 @@ func New(backEnd BackEnd, startPoint string, component *Component, childes ...Ge
 	component.Attrs["id"] = startPoint
 	component.Attrs["data-main"] = "true"
 
-	mainComponent := NewComponent(component, childes...)
+	mainComponent := NewComponent(component, getChildes)
 
 	gas := Gas{App: *mainComponent, StartPoint: startPoint}
 
@@ -39,7 +39,7 @@ func Init(gas Gas) error {
 }
 
 // ToGetComponentList return array by many parameters, because it's pretty
-func ToGetComponentList(childes ...GetComponent) []GetComponent {
+func ToGetComponentList(childes ...interface{}) []interface{} {
 	return childes
 }
 

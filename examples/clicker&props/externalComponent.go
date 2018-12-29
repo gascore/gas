@@ -8,7 +8,7 @@ import (
 // GetNumberViewer return very cool number viewer.
 // It can be in another directory too.
 // For reference from not parent component you can use `values` (they will reload).
-func GetNumberViewer(this *gas.Component, values ...interface{}) interface{} {
+func GetNumberViewer(click int) interface{} {
 	return gas.NewComponent(
 		&gas.Component{
 			Tag: "i",
@@ -16,7 +16,8 @@ func GetNumberViewer(this *gas.Component, values ...interface{}) interface{} {
 				"id": "needful_wrapper--number-viewer",
 			},
 		},
-		func(this3 *gas.Component) interface{} {
-			return fmt.Sprintf("%d times", values[0])
-		})
+		func(this *gas.Component) []interface{} {
+			return gas.ToGetComponentList(
+				fmt.Sprintf("%d times", click))
+		},)
 }

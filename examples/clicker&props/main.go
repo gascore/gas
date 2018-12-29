@@ -21,7 +21,12 @@ func main() {
 				Methods: map[string]gas.Method{
 					"addClick": func(this *gas.Component, i ...interface{}) error {
 						currentClick := this.GetData("click").(int)
-						gas.WarnError(this.SetData("click", currentClick+1))
+
+						err := this.SetData("click", currentClick+1)
+						if err != nil {
+							return err
+						}
+
 						return nil
 					},
 				},
@@ -29,57 +34,48 @@ func main() {
 					"id": "clicker&props",
 				},
 			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Handlers: map[string]gas.Handler {
-							"click.left": func(this2 *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.Method("addClick"))
+			func(this *gas.Component) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NewBasicComponent(
+						&gas.Component{
+							Handlers: map[string]gas.Handler {
+								"click.left": func(this2 *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.Method("addClick"))
+								},
+								// you need to click button once (for target it)
+								"keyup.control": func(this2 *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.Method("addClick"))
+								},
+								"keyup.a": func(this2 *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.Method("addClick"))
+								},
+								"keyup.s": func(this2 *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.Method("addClick"))
+								},
+								"keyup.d": func(this2 *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.Method("addClick"))
+								},
+								"keyup.f": func(this2 *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.Method("addClick"))
+								},
 							},
-							// you need to click button once (for target it)
-							"keyup.control": func(this2 *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.Method("addClick"))
-							},
-							"keyup.a": func(this2 *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.Method("addClick"))
-							},
-							"keyup.s": func(this2 *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.Method("addClick"))
-							},
-							"keyup.d": func(this2 *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.Method("addClick"))
-							},
-							"keyup.f": func(this2 *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.Method("addClick"))
+							Tag: "button",
+							Attrs: map[string]string{
+								"id": "clicker__button", // I love BEM
 							},
 						},
-						Tag: "button",
-						Attrs: map[string]string{
-							"id": "clicker__button", // I love BEM
+						"Click me!",),
+					gas.NewBasicComponent(
+						&gas.Component{
+							Tag: "i",
+							Attrs: map[string]string{
+								"id": "needful_wrapper",
+							},
 						},
-					},
-					func(this2 *gas.Component) interface{} {
-						return "Click me!"
-					})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Tag: "span",
-						Attrs: map[string]string{
-							"id": "needful_wrapper",
-						},
-					},
-					func(this2 *gas.Component) interface{} {
-						return "You clicked button: "
-					},
-					func(this2 *gas.Component) interface{} {
-						// It's EXTERNAL component!
-						return GetNumberViewer(this, this.GetData("click").(int))
-					})
-			})
+						"You clicked button: ",
+						GetNumberViewer(this.GetData("click").(int))))
+			},)
 	must(err)
-
 	err = gas.Init(app)
 	must(err)
 	gas.KeepAlive()

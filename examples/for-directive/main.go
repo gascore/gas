@@ -24,32 +24,27 @@ func main() {
 					"id": "list",
 				},
 			},
-			func (this *gas.Component) interface{} {
-				return gas.NewComponent(
+			func (this *gas.Component) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NewBasicComponent(
 					&gas.Component{
 						Tag: "ul",
 					},
-					func (p *gas.Component) interface{} {
-						return gas.NewFor("arr", this, func(i int, el interface{}) interface {} {
-							return gas.NewComponent(
-								&gas.Component{
-									Handlers: map[string]gas.Handler {
-										"click": func(c *gas.Component, e gas.HandlerEvent) {
-											arr := this.GetData("arr").([]interface{})
-											arr = append(arr, "Hello!") // hello, Annoy-o-Tron
-											gas.WarnError(this.SetData("arr", arr))
-										},
+					gas.NewFor("arr", this, func(i int, el interface{}) interface {} {
+						return gas.NewBasicComponent(
+							&gas.Component{
+								Handlers: map[string]gas.Handler {
+									"click": func(c *gas.Component, e gas.HandlerEvent) {
+										arr := this.GetData("arr").([]interface{})
+										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
+										gas.WarnError(this.SetData("arr", arr))
 									},
-									Tag: "li",
 								},
-								func(p *gas.Component) interface{} {
-									return fmt.Sprintf("%d: %s", i+1, el)
-								})
-						})
-					},
-					func(p *gas.Component) interface{} {
-						return "end of list"
-					})
+								Tag: "li",
+							},
+							fmt.Sprintf("%d: %s", i+1, el))
+					}),
+					"end of list"))
 			})
 	must(err)
 

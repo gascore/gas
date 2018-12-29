@@ -20,32 +20,27 @@ func main() {
 					"hello": "Hello world!",
 				},
 			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Tag: "h1",
-						Attrs: map[string]string{
-							"id":    "hello-world",
-							"class": "greeting h1",
+			func(this *gas.Component) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NewBasicComponent(
+						&gas.Component{
+							Tag: "h1",
+							Attrs: map[string]string{
+								"id":    "hello-world",
+								"class": "greeting h1",
+							},
 						},
-					},
-					func(p *gas.Component) interface{} {
-						return this.GetData("hello")
-					})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Tag: "i",
-						Attrs: map[string]string{
-							"id":    "italiano",
-							"class": "greeting",
-							"style": "margin-right: 12px;",
+						this.GetData("hello")),
+					gas.NewBasicComponent(
+						&gas.Component{
+							Tag: "i",
+							Attrs: map[string]string{
+								"id":    "italiano",
+								"class": "greeting",
+								"style": "margin-right: 12px;",
+							},
 						},
-					},
-					func(p *gas.Component) interface{} {
-						return "Ciao mondo!" // I'm not italian, but i love films about mafia
-					})
+						"Ciao mondo!"))
 			},)
 	must(err)
 

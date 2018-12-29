@@ -38,60 +38,71 @@ func main() {
 					"id": "if",
 				},
 			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Handlers: map[string]gas.Handler {
-							"click": func(c *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+			func(this *gas.Component) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NE(
+						&gas.Component{
+							Handlers: map[string]gas.Handler {
+								"click": func(c *gas.Component, e gas.HandlerEvent) {
+									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+								},
+							},
+							Tag: "button",
+							Attrs: map[string]string{
+								"id": "if__button",
 							},
 						},
-						Tag: "button",
-						Attrs: map[string]string{
-							"id": "if__button",
+						gas.NE(
+							&gas.C{
+								Directives: gas.Directives{
+									Show: func(c *gas.C) bool {
+										return this.GetData("show").(bool)
+									},
+								},
+								Tag: "i",
+							},
+							"Show text",),
+						gas.NE(
+							&gas.C{
+								Directives: gas.Directives{
+									Show: func(c *gas.C) bool {
+										return !this.GetData("show").(bool)
+									},
+								},
+								Tag: "i",
+							},
+							"Hidden text",
+						),
+					),
+					gas.NE(
+						&gas.Component{
+							Directives: gas.Directives{
+								If: func(c *gas.Component) bool {
+									return !this.GetData("show").(bool)
+								},
+							},
+							Tag: "i",
 						},
-					},
-					func(this2 *gas.Component) interface{} {
-						if this.GetData("show").(bool) {
-							return "Show text"
-						} else {
-							return "Hide text"
-						}
-					})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Directives: gas.Directives{
-							If: func(c *gas.Component) bool {
-								return !this.GetData("show").(bool)
+						"Hidden text",
+					),
+					gas.NE(
+						&gas.Component{
+							Directives: gas.Directives{
+								If: func(this2 *gas.Component) bool {
+									watcherIsTriggered, ok := this.GetData("watcherIsTriggered").(bool)
+									gas.WarnIfNot(ok)
+									return watcherIsTriggered
+								},
+							},
+							Tag: "strong",
+							Attrs: map[string]string{
+								"style": "color: red;",
 							},
 						},
-						Tag: "i",
-					},
-					func(this2 *gas.Component) interface{} {
-						return "Hidden text"
-					})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Directives: gas.Directives{
-							If: func(this2 *gas.Component) bool {
-								watcherIsTriggered, ok := this.GetData("watcherIsTriggered").(bool)
-								gas.WarnIfNot(ok)
-								return watcherIsTriggered
-							},
-						},
-						Tag: "strong",
-						Attrs: map[string]string{
-							"style": "color: red;",
-						},
-					},
-					func(this2 *gas.Component) interface{} {
-						return "Watcher is triggered!"
-					})
-			})
+						"Watcher is triggered!",
+					),
+				)
+			},)
 	must(err)
 
 	err = gas.Init(app)

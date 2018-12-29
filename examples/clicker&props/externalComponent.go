@@ -9,7 +9,7 @@ import (
 // It can be in another directory too.
 // For reference from not parent component you can use `values` (they will reload).
 func GetNumberViewer(click int) interface{} {
-	return gas.NewComponent(
+	return gas.NC(
 		&gas.Component{
 			Tag: "i",
 			Attrs: map[string]string{

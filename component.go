@@ -119,6 +119,12 @@ type Component struct {
 	Parent *Component
 }
 
+// Aliases
+type C = Component
+type G = Gas
+var NC = NewComponent
+var NE = NewBasicComponent
+
 // NewComponent create new component with `this` context
 func NewComponent(component *Component, getChildes GetComponentChildes) *Component {
 	if component.Tag == "" {

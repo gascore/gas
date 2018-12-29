@@ -50,20 +50,11 @@ func main() {
 					"id": "M&C",
 				},
 			},
-			func(this *gas.Component) interface{} {
-				// For pass method or computed to sub component you need to get a *pocket* version.
-				// Pocket method/computed can be executed in sub component, in sub sub component, in e.t.c.
-				pocketToggle, err := this.GetPocketMethod("toggle")
-				gas.WarnError(err)
-
-				return getButton(this, pocketToggle)
-			},
-			func(this *gas.Component) interface{} {
-						pocketNumber, err := this.GetPocketComputed("number")
-						gas.WarnError(err)
-
-						return getHiddenText(this, this.GetData("show").(bool), pocketNumber)
-					})
+			func(this *gas.Component) []interface{} {
+				return gas.ToGetComponentList(
+					getButton(this.GetData("show").(bool), this.GetPocketMethod("toggle")),
+					getHiddenText(this.GetData("show").(bool), this.GetPocketComputed("number")),)
+			},)
 	must(err)
 
 	err = gas.Init(app)
@@ -71,8 +62,8 @@ func main() {
 	gas.KeepAlive()
 }
 
-func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Component {
-	return gas.NewComponent(
+func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
+	return gas.NE(
 		&gas.Component{
 			Handlers: map[string]gas.Handler {
 				"click": func(c *gas.Component, e gas.HandlerEvent) {
@@ -87,33 +78,38 @@ func getButton(this *gas.Component, toggleMethod gas.PocketMethod) *gas.Componen
 					"id": "M&C__button",
 				},
 		},
-		func(this2 *gas.Component) interface{} {
-			if this.GetData("show").(bool) {
-				return "Show text"
-			} else {
-				return "Hide text"
-			}
-		})
+		gas.NE(
+			&gas.C{
+				Directives:gas.Directives{
+					If: func(p *gas.C) bool {
+						return show
+					},
+				},
+			},
+			"Show text"),
+		gas.NE(
+			&gas.C{
+				Directives:gas.Directives{
+					If: func(p *gas.C) bool {
+						return !show
+					},
+				},
+			},
+			"Hide text"))
 }
 
-func getHiddenText(this *gas.Component, isShow bool, getNumber gas.PocketComputed) *gas.Component {
-	return gas.NewComponent(
+func getHiddenText(show bool, getNumber gas.PocketComputed) *gas.Component {
+	return gas.NE(
 		&gas.Component{
 			Directives: gas.Directives{
 				If: func(c *gas.Component) bool {
-					return !isShow
+					return !show
 				},
 			},
 			Tag: "i",
 		},
-		func(this2 *gas.Component) interface{} {
-			return "Hidden text"
-		},
-		func (this2 *gas.Component) interface{} {
-			value, err := getNumber("something for computed")
-			gas.WarnError(err) // always check for error
-			return fmt.Sprintf("  (%s)", value)
-		})
+		"Hidden text",
+		fmt.Sprintf("  (%s)", getNumber("something for computed")))
 }
 
 func must(err error) {

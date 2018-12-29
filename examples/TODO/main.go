@@ -17,7 +17,7 @@ func main() {
 			//gas_web.GetBackEnd(gojs.GetDomBackEnd()),
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"currentList": "0",
 					"currentText": "",
@@ -27,7 +27,7 @@ func main() {
 					"deleted": []interface{}{},
 				},
 				Methods: map[string]gas.Method{
-					"delete": func(this *gas.Component, values ...interface{}) error {
+					"delete": func(this *gas.C, values ...interface{}) error {
 						i, ok := values[0].(int)
 						if !ok {
 							return errors.New("invalid index")
@@ -63,7 +63,7 @@ func main() {
 
 						return nil
 					},
-					"append": func(this *gas.Component, values ...interface{}) error {
+					"append": func(this *gas.C, values ...interface{}) error {
 						listTypeS, ok := values[0].(string)
 						if !ok {
 							return errors.New("invalid list type")
@@ -85,7 +85,7 @@ func main() {
 
 						return nil
 					},
-					"markAsDone": func(this *gas.Component, values ...interface{}) error {
+					"markAsDone": func(this *gas.C, values ...interface{}) error {
 						i, ok := values[0].(int)
 						if !ok {
 							return errors.New("invalid index")
@@ -107,7 +107,7 @@ func main() {
 
 						return nil
 					},
-					"edit": func(this *gas.Component, values ...interface{}) error {
+					"edit": func(this *gas.C, values ...interface{}) error {
 						i, ok := values[0].(int)
 						if !ok {
 							return errors.New("invalid index")
@@ -127,26 +127,26 @@ func main() {
 					},
 				},
 			},
-			func(this *gas.Component) []interface{} {
+			func(this *gas.C) []interface{} {
 				return gas.ToGetComponentList(
 					getStyleEl(),
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "div",
 							Attrs: map[string]string{
 								"id": "main",
 							},
 						},
-						gas.NewBasicComponent(
-							&gas.Component{
+						gas.NE(
+							&gas.C {
 								Tag: "nav",
 							},
 							getNavEl(this, "0", "Current"),
 							getNavEl(this, "1", "Completed"),
 							getNavEl(this, "2", "Deleted"),),
-						gas.NewBasicComponent(&gas.Component{
+						gas.NE(&gas.C{
 							Directives: gas.Directives{
-								If: func(p *gas.Component) bool {
+								If: func(p *gas.C) bool {
 									return this.GetData("currentList").(string) == "0"
 								},
 								Model: gas.ModelDirective{
@@ -156,7 +156,7 @@ func main() {
 							},
 							Tag: "input",
 							Handlers: map[string]gas.Handler{
-								"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
+								"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
 									currentText := this.GetData("currentText").(string)
 									if len(currentText) == 0 {
 										return
@@ -170,28 +170,27 @@ func main() {
 								"placeholder": "New task",
 							},
 						}),
-						gas.NewBasicComponent(
-							&gas.Component{},
-							// Because i don't need wrap `this` and ul `this` i can overwrite this variable
+						gas.NE(
+							&gas.C{},
 							getList(this, 0),
 							getList(this, 1),
 							getList(this, 2),), ),
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag:"footer",
 						},
-						gas.NewBasicComponent(
-							&gas.Component{
+						gas.NE(
+							&gas.C{
 								Tag:"div",
 							},
 							"Double-click to edit a task"),
-						gas.NewBasicComponent(
-							&gas.Component{
+						gas.NE(
+							&gas.C{
 								Tag:"div",
 							},
 							"Created by",
-							gas.NewBasicComponent(
-								&gas.Component{
+							gas.NE(
+								&gas.C{
 									Tag: "a",
 									Attrs: map[string]string{
 										"href": "https://sinicablyat.github.io/",
@@ -200,8 +199,8 @@ func main() {
 								},
 								"Noskov Artem"),
 							"with",
-							gas.NewBasicComponent(
-								&gas.Component{
+							gas.NE(
+								&gas.C{
 									Tag: "a",
 									Attrs: map[string]string{
 										"href": "https://sinicablyat.github.io/gas",
@@ -219,11 +218,11 @@ func main() {
 	gas.KeepAlive()
 }
 
-func getList(pThis *gas.Component, index int) interface{} {
-	return gas.NewBasicComponent(
-		&gas.Component{
+func getList(pThis *gas.C, index int) interface{} {
+	return gas.NE(
+		&gas.C{
 			Directives:gas.Directives{
-				Show: func(p *gas.Component) bool {
+				Show: func(p *gas.C) bool {
 					return pThis.GetData("currentList") == fmt.Sprintf("%d", index)
 				},
 			},
@@ -236,7 +235,7 @@ func getList(pThis *gas.Component, index int) interface{} {
 		gas.ToGetComponentList(getLi(pThis, index)...))
 }
 
-func getLi(pThis *gas.Component, listType int) []interface{} {
+func getLi(pThis *gas.C, listType int) []interface{} {
 	// listType: 0 - current, 1 - done, 2 - deleted tasks
 	var listTypeS string
 	switch listType {
@@ -249,26 +248,26 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 	}
 
 	return gas.NewFor(listTypeS, pThis, func(i int, el interface{}) interface{} {
-		return gas.NewComponent(
-			&gas.Component{
+		return gas.NC(
+			&gas.C{
 				Tag: "li",
 				Data: map[string]interface{}{
 					"isEditing": false,
 					"newValue": "no",
 				},
 			},
-			func(this *gas.Component) []interface{} {
+			func(this *gas.C) []interface{} {
 				return gas.ToGetComponentList(
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "button",
 							Directives:gas.Directives{
-								If: func(p *gas.Component) bool {
+								If: func(p *gas.C) bool {
 									return listType == 0
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"click": func(this5 *gas.Component, e gas.HandlerEvent) {
+								"click": func(this5 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(pThis.Method("markAsDone", i))
 								},
 							},
@@ -276,23 +275,23 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 								"id": "submit",
 							},
 						},
-						gas.NewBasicComponent(
-							&gas.Component{
+						gas.NE(
+							&gas.C{
 								Tag: "i",
 								Attrs: map[string]string{
 									"class": "fas fa-check",
 								},
 							},)),
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "i",
 							Directives:gas.Directives{
-								If: func(p *gas.Component) bool {
+								If: func(p *gas.C) bool {
 									return !this.GetData("isEditing").(bool)
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"dblclick": func(p *gas.Component, e gas.HandlerEvent) {
+								"dblclick": func(p *gas.C, e gas.HandlerEvent) {
 									if listType != 0 {
 										return
 									}
@@ -303,14 +302,14 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 							},
 						},
 						fmt.Sprintf("%s", el)),
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "input",
 							Attrs: map[string]string{
 								"style": "margin-right: 8px",
 							},
 							Directives:gas.Directives{
-								If: func(p *gas.Component) bool {
+								If: func(p *gas.C) bool {
 									return this.GetData("isEditing").(bool)
 								},
 								Model:gas.ModelDirective{
@@ -319,7 +318,7 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"keyup.enter": func(p *gas.Component, e gas.HandlerEvent) {
+								"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
 									newValue := this.GetData("newValue")
 
 									gas.WarnError(this.SetData("isEditing", false))
@@ -329,16 +328,16 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 							},
 						},
 						fmt.Sprintf("%s", el),),
-					 gas.NewBasicComponent(
-						&gas.Component{
+					 gas.NE(
+						&gas.C{
 							Tag: "button",
 							Directives:gas.Directives{
-								If: func(p *gas.Component) bool {
+								If: func(p *gas.C) bool {
 									return listType == 0
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"click": func(this5 *gas.Component, e gas.HandlerEvent) {
+								"click": func(this5 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(pThis.Method("delete", i, true))
 								},
 							},
@@ -346,8 +345,8 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 								"id": "delete",
 							},
 						},
-						gas.NewBasicComponent(
-							&gas.Component{
+						gas.NE(
+							&gas.C{
 								Tag: "i",
 								Attrs: map[string]string{
 									"class": "fas fa-trash-alt",
@@ -358,13 +357,13 @@ func getLi(pThis *gas.Component, listType int) []interface{} {
 }
 
 func getStyleEl() interface{} {
-	return gas.NewBasicComponent(
-		&gas.Component{
+	return gas.NE(
+		&gas.C{
 			Tag:"style",
 			Attrs: map[string]string{"type": "text/css"},
 			Directives: gas.Directives{
 				HTML: gas.HTMLDirective{
-					Render: func(this2 *gas.Component) string {
+					Render: func(this2 *gas.C) string {
 						return `
 #app {
 	width: 50%;
@@ -463,18 +462,18 @@ footer a {
 		})
 }
 
-func getNavEl(this *gas.Component, index, name string) interface{} {
-	return gas.NewBasicComponent(
-		&gas.Component{
+func getNavEl(this *gas.C, index, name string) interface{} {
+	return gas.NE(
+		&gas.C{
 			Tag: "button",
 			Handlers: map[string]gas.Handler{
-				"click": func(p *gas.Component, e gas.HandlerEvent) {
+				"click": func(p *gas.C, e gas.HandlerEvent) {
 					gas.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
 					gas.WarnError(this.SetData("currentList", index))
 				},
 			},
 			Binds: map[string]gas.Bind{
-				"class": func(p *gas.Component) string {
+				"class": func(p *gas.C) string {
 					if this.GetData("currentList").(string) == index {
 						return "active"
 					}

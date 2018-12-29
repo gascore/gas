@@ -14,12 +14,12 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"click": 0,
 				},
 				Methods: map[string]gas.Method{
-					"addClick": func(this *gas.Component, i ...interface{}) error {
+					"addClick": func(this *gas.C, i ...interface{}) error {
 						currentClick := this.GetData("click").(int)
 
 						err := this.SetData("click", currentClick+1)
@@ -34,28 +34,28 @@ func main() {
 					"id": "clicker&props",
 				},
 			},
-			func(this *gas.Component) []interface{} {
+			func(this *gas.C) []interface{} {
 				return gas.ToGetComponentList(
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Handlers: map[string]gas.Handler {
-								"click.left": func(this2 *gas.Component, e gas.HandlerEvent) {
+								"click.left": func(this2 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(this.Method("addClick"))
 								},
 								// you need to click button once (for target it)
-								"keyup.control": func(this2 *gas.Component, e gas.HandlerEvent) {
+								"keyup.control": func(this2 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(this.Method("addClick"))
 								},
-								"keyup.a": func(this2 *gas.Component, e gas.HandlerEvent) {
+								"keyup.a": func(this2 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(this.Method("addClick"))
 								},
-								"keyup.s": func(this2 *gas.Component, e gas.HandlerEvent) {
+								"keyup.s": func(this2 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(this.Method("addClick"))
 								},
-								"keyup.d": func(this2 *gas.Component, e gas.HandlerEvent) {
+								"keyup.d": func(this2 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(this.Method("addClick"))
 								},
-								"keyup.f": func(this2 *gas.Component, e gas.HandlerEvent) {
+								"keyup.f": func(this2 *gas.C, e gas.HandlerEvent) {
 									gas.WarnError(this.Method("addClick"))
 								},
 							},
@@ -65,8 +65,8 @@ func main() {
 							},
 						},
 						"Click me!",),
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "i",
 							Attrs: map[string]string{
 								"id": "needful_wrapper",

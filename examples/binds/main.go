@@ -15,7 +15,7 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"foo": int(0),
 				},
@@ -23,70 +23,60 @@ func main() {
 					"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 				},
 			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Tag: "div",
-						Attrs: map[string]string{
-							"style": "display: flex;",
-						},
-					},
-					func(this2 *gas.Component) interface{} {
-						foo, ok := this.GetData("foo").(int)
-						gas.WarnIfNot(ok)
-						return fmt.Sprintf("Your range: %d", foo)
-					},
-					func(this2 *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{
-							Binds: map[string]gas.Bind{
-								"style": func(this2 *gas.Component) string {
-									foo, ok := this.GetData("foo").(int)
-									gas.WarnIfNot(ok)
-
-									// REMEMBER!
-									// Bind attributes appends over normal attributes, you will lose your normal attribute value
-									return fmt.Sprintf("%s; background-color: rgb(%d, %d, %d)", this2.Attrs["style"], foo, 255-foo, foo)
-								},
-							},
-							Attrs: map[string]string{
-								"style": "width: 48px; height: 36px; margin: 0 18px; border-radius: 4px;",
-							},
+			func(this *gas.C) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NE(
+						&gas.C{
 							Tag: "div",
-						},)
-					},
-					func(this2 *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								Attrs: map[string]string{
-									"style": "color: darkgray;",
+							Attrs: map[string]string{
+								"style": "display: flex;",
+							},
+						},
+						fmt.Sprintf("Your range: %d", this.GetData("foo").(int)),
+						gas.NE(
+							&gas.C{
+								Binds: map[string]gas.Bind{
+									"style": func(this2 *gas.C) string {
+										foo, ok := this.GetData("foo").(int)
+										gas.WarnIfNot(ok)
+
+										// REMEMBER!
+										// Bind attributes appends over normal attributes, you will lose your normal attribute value
+										return fmt.Sprintf("%s; background-color: rgb(%d, %d, %d)", this2.Attrs["style"], foo, 255-foo, foo)
+									},
 								},
-								Tag: "i",
+								Attrs: map[string]string{
+									"style": "width: 48px; height: 36px; margin: 0 18px; border-radius: 4px;",
+								},
+								Tag: "div",
+							},),
+							gas.NE(
+								&gas.C{
+									Attrs: map[string]string{
+										"style": "color: darkgray;",
+									},
+									Tag: "i",
+								},
+								"// color: rgb(x, 255-x, x)",
+							),
+						),
+					gas.NE(&gas.C{Tag: "br"}),
+					gas.NE(
+						&gas.C{
+							Directives: gas.Directives{
+								Model: gas.ModelDirective{
+									Data: "foo",
+									Component: this,
+								},
 							},
-							func(this3 *gas.Component) interface{} {
-								return "// color: rgb(x, 255-x, x)"
-							})
-					},)
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(&gas.Component{Tag: "br"})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Directives: gas.Directives{
-							Model: gas.ModelDirective{
-								Data: "foo",
-								Component: this,
+							Tag: "input",
+							Attrs: map[string]string{
+								"type": "range",
+								"min": "0",
+								"max": "255",
 							},
-						},
-						Tag: "input",
-						Attrs: map[string]string{
-							"type": "range",
-							"min": "0",
-							"max": "255",
-						},
-					})
-			}, )
+						}),
+					)})
 	must(err)
 
 	err = gas.Init(app)

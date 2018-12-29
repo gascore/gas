@@ -15,7 +15,7 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"arr": []interface{}{"click", "here", "if you want to see some magic"},
 				},
@@ -24,17 +24,17 @@ func main() {
 					"id": "list",
 				},
 			},
-			func (this *gas.Component) []interface{} {
+			func (this *gas.C) []interface{} {
 				return gas.ToGetComponentList(
-					gas.NewBasicComponent(
-					&gas.Component{
+					gas.NE(
+					&gas.C{
 						Tag: "ul",
 					},
 					gas.NewFor("arr", this, func(i int, el interface{}) interface {} {
-						return gas.NewBasicComponent(
-							&gas.Component{
+						return gas.NE(
+							&gas.C{
 								Handlers: map[string]gas.Handler {
-									"click": func(c *gas.Component, e gas.HandlerEvent) {
+									"click": func(c *gas.C, e gas.HandlerEvent) {
 										arr := this.GetData("arr").([]interface{})
 										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
 										gas.WarnError(this.SetData("arr", arr))

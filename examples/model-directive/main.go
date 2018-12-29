@@ -16,150 +16,137 @@ func main() {
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
 			&gas.Component{},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Data: map[string]interface{}{
-							"foo": "",
+			func(main *gas.Component) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NC(
+						&gas.Component{
+							Data: map[string]interface{}{
+								"foo": "",
+							},
+							Tag: "div",
+							Attrs: map[string]string{
+								"id": "model__text",
+								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+							},
 						},
-						Tag: "div",
-						Attrs: map[string]string{
-							"id": "model__text",
-							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
-						},
-					},
-					func(this *gas.Component) interface{} {
-						foo, ok := this.GetData("foo").(string)
-						gas.WarnIfNot(ok)
-						return fmt.Sprintf("Your text: %s", foo)
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{Tag: "br"})
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
-										Data: "foo",
-										Component: this,
+						func (this *gas.Component) []interface{} {
+							return gas.ToGetComponentList(
+								fmt.Sprintf("Your text: %s", this.GetData("foo").(string)),
+								gas.NE(&gas.Component{Tag: "br"}),
+								gas.NE(
+									&gas.Component{
+									Directives: gas.Directives{
+										Model: gas.ModelDirective{
+											Data: "foo",
+											Component: this,
+										},
 									},
+									Tag: "input",
 								},
-								Tag: "input",
-							})
-					},)
-			},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Data:
-						map[string]interface{}{
-							"foo": "",
+								),
+							)
 						},
-						Tag: "div",
-						Attrs:
-						map[string]string{
-							"id": "model__color",
-							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					),
+					gas.NC(
+						&gas.Component{
+							Data:
+							map[string]interface{}{
+								"foo": "",
+							},
+							Tag: "div",
+							Attrs:
+							map[string]string{
+								"id": "model__color",
+								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+							},
 						},
-					},
-					func(this *gas.Component) interface{} {
-						foo, ok := this.GetData("foo").(string)
-						gas.WarnIfNot(ok)
-						return fmt.Sprintf("Your color: %s", foo)
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{Tag: "br"})
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
-										Data: "foo",
-										Component: this,
+						func (this *gas.Component) []interface{} {
+							return gas.ToGetComponentList(
+								fmt.Sprintf("Your color: %s", this.GetData("foo").(string)),
+								gas.NE(&gas.Component{Tag: "br"}),
+								gas.NE(
+									&gas.Component{
+										Directives: gas.Directives{
+											Model: gas.ModelDirective{
+												Data:      "foo",
+												Component: this,
+											},
+										},
+										Tag: "input",
+										Attrs: map[string]string{
+											"type": "color",
+										},
 									},
-								},
-								Tag: "input",
-								Attrs: map[string]string{
-									"type": "color",
-								},
-							})
-					},)
-			},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Data: map[string]interface{}{
-							"foo": int(0),
+								),
+							)
 						},
-						Tag: "div",
-						Attrs: map[string]string{
-							"id": "model__range",
-							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					),
+					gas.NC(
+						&gas.Component{
+							Data: map[string]interface{}{
+								"foo": int(0),
+							},
+							Tag: "div",
+							Attrs: map[string]string{
+								"id": "model__range",
+								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+							},
 						},
-					},
-					func(this *gas.Component) interface{} {
-						foo, ok := this.GetData("foo").(int)
-						gas.WarnIfNot(ok)
-						return fmt.Sprintf("Your range: %d", foo)
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{Tag: "br"})
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
-										Data: "foo",
-										Component: this,
+						func (this *gas.Component) []interface{} {
+							return gas.ToGetComponentList(
+								fmt.Sprintf("Your range: %d", this.GetData("foo").(int)),
+								gas.NE(&gas.Component{Tag: "br"}),
+								gas.NE(
+									&gas.Component{
+										Directives: gas.Directives{
+											Model: gas.ModelDirective{
+												Data:      "foo",
+												Component: this,
+											},
+										},
+										Tag: "input",
+										Attrs: map[string]string{
+											"type": "range",
+										},
 									},
-								},
-								Tag: "input",
-								Attrs: map[string]string{
-									"type": "range",
-								},
-							})
-					},)
-			},
-			func(p *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Data: map[string]interface{}{
-							"foo": false,
+								),
+							)
 						},
-						Tag: "div",
-						Attrs: map[string]string{
-							"id": "model__date",
-							"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+					),
+					gas.NC(
+						&gas.Component{
+							Data: map[string]interface{}{
+								"foo": false,
+							},
+							Tag: "div",
+							Attrs: map[string]string{
+								"id": "model__date",
+								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
+							},
 						},
-					},
-					func(this *gas.Component) interface{} {
-						foo, ok := this.GetData("foo").(bool)
-						gas.WarnIfNot(ok)
-						return fmt.Sprintf("Your checkbox: %t", foo)
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(&gas.Component{Tag: "br"})
-					},
-					func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								Directives: gas.Directives{
-									Model: gas.ModelDirective{
-										Data: "foo",
-										Component: this,
+						func (this *gas.Component) []interface{} {
+							return gas.ToGetComponentList(
+								fmt.Sprintf("Your checkbox: %t", this.GetData("foo").(bool)),
+								gas.NE(&gas.Component{Tag: "br"}),
+								gas.NE(
+									&gas.Component{
+										Directives: gas.Directives{
+											Model: gas.ModelDirective{
+												Data:      "foo",
+												Component: this,
+											},
+										},
+										Tag: "input",
+										Attrs: map[string]string{
+											"type": "checkbox",
+										},
 									},
-								},
-								Tag: "input",
-								Attrs: map[string]string{
-									"type": "checkbox",
-								},
-							})
-					},)
-			},
-			)
+								),
+							)
+						},
+					),
+				)
+			},)
 	must(err)
 
 	err = gas.Init(app)

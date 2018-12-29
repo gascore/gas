@@ -7,16 +7,13 @@ import (
 
 type PocketMethod func(...interface{}) error
 
-type PocketComputed func(...interface{})(interface{}, error)
+type PocketComputed func(...interface{})interface{}
 
 // Method runs a component method and updates component after
 func (c *Component) Method(name string, values ...interface{}) error {
-	method, err := c.GetPocketMethod(name)
-	if err != nil {
-		return errors.New(fmt.Sprintf("invalid method name: %s", name))
-	}
+	method := c.GetPocketMethod(name)
 
-	err = method(values...) // run method
+	err := method(values...) // run method
 	if err != nil {
 		return err
 	}
@@ -25,46 +22,46 @@ func (c *Component) Method(name string, values ...interface{}) error {
 }
 
 // GetPocketMethod return function returns executing method with binding component
-func (c *Component) GetPocketMethod(name string) (PocketMethod, error)  {
+func (c *Component) GetPocketMethod(name string) PocketMethod  {
 	method := c.Methods[name]
 	if method == nil {
-		return nil, errors.New(fmt.Sprintf("invalid method name: %s", name))
+		WarnError(errors.New(fmt.Sprintf("invalid method name: %s", name)))
+		return nil
 	}
 
 	bindingMethod := func(values ...interface{}) error {
 		return method(c, values...)
 	}
 
-	return bindingMethod, nil
+	return bindingMethod
 }
 
 // Computed runs a component computed and returns values from it
 func (c *Component) Computed(name string, values ...interface{}) interface{} {
-	computed, err := c.GetPocketComputed(name)
-	if err != nil {
-		WarnError(err)
-		return nil
-	}
+	computed := c.GetPocketComputed(name)
 
-	value, err := computed(values...)
-	if err != nil {
-		WarnError(err)
-		return nil
-	}
+	value := computed(values...)
 
 	return value
 }
 
 // GetPocketComputed return function returns executing computed with binding component
-func (c *Component) GetPocketComputed(name string) (PocketComputed, error)  {
+func (c *Component) GetPocketComputed(name string) PocketComputed  {
 	computed := c.Computeds[name]
 	if computed == nil {
-		return nil, errors.New(fmt.Sprintf("invalid computed name: %s", name))
+		WarnError(errors.New(fmt.Sprintf("invalid computed name: %s", name)))
+		return nil
 	}
 
-	bindingComputed := func(values ...interface{}) (interface{}, error) {
-		return computed(c, values...)
+	bindingComputed := func(values ...interface{}) interface{} {
+		val, err := computed(c, values...)
+		if err != nil {
+			WarnError(err)
+			return nil
+		}
+
+		return val
 	}
 
-	return bindingComputed, nil
+	return bindingComputed
 }

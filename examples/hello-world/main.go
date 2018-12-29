@@ -15,15 +15,15 @@ func main() {
 			//gas_web.GetBackEnd(gojs.GetDomBackEnd()),
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"hello": "Hello world!",
 				},
 			},
-			func(this *gas.Component) []interface{} {
+			func(this *gas.C) []interface{} {
 				return gas.ToGetComponentList(
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "h1",
 							Attrs: map[string]string{
 								"id":    "hello-world",
@@ -31,8 +31,8 @@ func main() {
 							},
 						},
 						this.GetData("hello")),
-					gas.NewBasicComponent(
-						&gas.Component{
+					gas.NE(
+						&gas.C{
 							Tag: "i",
 							Attrs: map[string]string{
 								"id":    "italiano",

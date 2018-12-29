@@ -14,7 +14,7 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"articleText":
 					`
@@ -41,52 +41,61 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 					"isArticleActive": false,
 				},
 			},
-			func(this *gas.Component) interface{} { // don't use childes if you have v-html
-				return gas.NewComponent(
-					&gas.Component{
-						Handlers: map[string]gas.Handler{
-							"click": func(this2 *gas.Component, e gas.HandlerEvent) {
-								currentIsArticleActive := this.GetData("isArticleActive").(bool)
-								gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
+			func(this *gas.C) []interface{} { // don't use childes if you have v-html
+				return gas.ToGetComponentList(
+					gas.NE(
+						&gas.C{
+							Handlers: map[string]gas.Handler{
+								"click": func(this2 *gas.C, e gas.HandlerEvent) {
+									currentIsArticleActive := this.GetData("isArticleActive").(bool)
+									gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
+								},
 							},
+							Tag: "button",
 						},
-						Tag: "button",
-					},
-					func(this2 *gas.Component) interface{} {
-						isArticleActive, ok := this.GetData("isArticleActive").(bool)
-						gas.WarnIfNot(ok)
+						gas.NE(
+							&gas.C{
+								Directives:gas.Directives{
+									If: func(p *gas.C) bool {
+										return this.GetData("isArticleActive").(bool)
+									},
+								},
+							},
+							"Hide article"),
+						gas.NE(
+							&gas.C{
+								Directives:gas.Directives{
+									If: func(p *gas.C) bool {
+										return !this.GetData("isArticleActive").(bool)
+									},
+								},
+							},
+							"Show article"),
+					),
+					gas.NE(
+						&gas.C{
+							Directives: gas.Directives{
+								HTML: gas.HTMLDirective{Render: func(this2 *gas.C) string {
+									isArticleActive, ok := this.GetData("isArticleActive").(bool)
 
-						if isArticleActive {
-							return "Hide article"
-						} else {
-							return "Show article"
-						}
-					})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Directives: gas.Directives{
-							HTML: gas.HTMLDirective{Render: func(this2 *gas.Component) string {
-								isArticleActive, ok := this.GetData("isArticleActive").(bool)
+									var html string
+									if isArticleActive {
+										html, ok = this.GetData("articleText").(string)
+									} else {
+										html, ok = this.GetData("helloText").(string)
+									}
+									gas.WarnIfNot(ok)
 
-								var html string
-								if isArticleActive {
-									html, ok = this.GetData("articleText").(string)
-								} else {
-									html, ok = this.GetData("helloText").(string)
-								}
-								gas.WarnIfNot(ok)
-
-								return html
-							},},
-						},
-						Tag: "article",
-						Attrs: map[string]string{
-							"id": "article",
-							"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
-						},
-					})},)
+									return html
+								},},
+							},
+							Tag: "article",
+							Attrs: map[string]string{
+								"id": "article",
+								"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
+							},
+						}))
+			},)
 	must(err)
 
 	err = gas.Init(app)

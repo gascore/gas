@@ -14,7 +14,7 @@ func main() {
 		gas.New(
 			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
 			"app",
-			&gas.Component{
+			&gas.C{
 				Data: map[string]interface{}{
 					"show": true,
 				},
@@ -22,56 +22,60 @@ func main() {
 					"id": "if",
 				},
 			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Handlers: map[string]gas.Handler {
-							"click": func(c *gas.Component, e gas.HandlerEvent) {
-								gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+			func(this *gas.C) []interface{} {
+				return gas.ToGetComponentList(
+					gas.NE(
+						&gas.C{
+							Handlers: map[string]gas.Handler {
+								"click": func(c *gas.C, e gas.HandlerEvent) {
+									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+								},
+							},
+							Tag: "button",
+							Attrs: map[string]string{
+								"id": "if__button",
 							},
 						},
-						Tag: "button",
-						Attrs: map[string]string{
-							"id": "if__button",
-						},
-					},
-					func(this2 *gas.Component) interface{} {
-						if this.GetData("show").(bool) {
-							return "Show text"
-						} else {
-							return "Hide text"
-						}
-					})
-			},
-			func(this *gas.Component) interface{} {
-				return gas.NewComponent(
-					&gas.Component{
-						Directives: gas.Directives{
-							// If `Directives.Show == false` set `display: none` to element styles
-							Show: func(c *gas.Component) bool {
-								return !this.GetData("show").(bool)
-							},
-						},
-						Tag: "i",
-					},
-					func(this2 *gas.Component) interface{} {
-						return "Hidden text"
-					})
-			},
-			func(this *gas.Component) interface{} {
-						return gas.NewComponent(
-							&gas.Component{
-								Directives: gas.Directives{
-									If: func(c *gas.Component) bool {
+						gas.NE(
+							&gas.C{
+								Directives:gas.Directives{
+									If: func(p *gas.C) bool {
 										return this.GetData("show").(bool)
 									},
 								},
-								Tag: "b",
 							},
-							func(this2 *gas.Component) interface{} {
-								return "Public text"
-							})
-					})
+							"Show text"),
+						gas.NE(
+							&gas.C{
+								Directives:gas.Directives{
+									If: func(p *gas.C) bool {
+										return !this.GetData("show").(bool)
+									},
+								},
+							},
+							"Hide text"),),
+					gas.NE(
+						&gas.C{
+							Directives: gas.Directives{
+								// If `Directives.Show == false` set `display: none` to element styles
+								Show: func(c *gas.C) bool {
+									return !this.GetData("show").(bool)
+								},
+							},
+							Tag: "i",
+						},
+						"Hidden text",),
+					gas.NE(
+						&gas.C{
+							Directives: gas.Directives{
+								If: func(c *gas.C) bool {
+									return this.GetData("show").(bool)
+								},
+							},
+							Tag: "b",
+						},
+						"Public text",),)
+			},)
 	must(err)
 
 	err = gas.Init(app)

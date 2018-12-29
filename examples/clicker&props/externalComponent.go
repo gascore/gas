@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/gas"
+	"github.com/gascore/gas"
 )
 
 // GetNumberViewer return very cool number viewer.

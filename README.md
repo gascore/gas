@@ -1,12 +1,12 @@
 # Gas - golang frontend framework
 
-![Gas logo](https://raw.githubusercontent.com/Sinicablyat/gas/master/logo.png)
+![Gas logo](https://raw.githubusercontent.com/gascore/gas/master/logo.png)
 
-Documentation: [godoc.org](https://godoc.org/github.com/Sinicablyat/gas)
+Documentation: [godoc.org](https://godoc.org/github.com/gascore/gas)
 
-Examples: [example directory on github](https://github.com/Sinicablyat/gas/blob/master/examples)
+Examples: [example directory on github](https://github.com/gascore/gas/blob/master/examples)
 
 Related packages:
 
-1. [Sinicablyat/gas-web](https://github.com/Sinicablyat/gas-web) - wasm/gojs backend
-2. [Sinicablyat/gas-gasx](https://github.com/Sinicablyat/gas-gasx) - vue-like template parser
+1. [gascore/gas-web](https://github.com/gascore/gas-web) - wasm/gojs backend
+2. [gascore/gas-gasx](https://github.com/gascore/gas-gasx) - vue-like template parser

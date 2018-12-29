@@ -3,9 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas-web"
-	"github.com/Sinicablyat/gas-web/wasm"
+	"github.com/gascore/gas"
+	"github.com/gascore/gas-web"
+	"github.com/gascore/gas-web/wasm"
 )
 
 // Example application #11
@@ -203,7 +203,7 @@ func main() {
 								&gas.C{
 									Tag: "a",
 									Attrs: map[string]string{
-										"href": "https://sinicablyat.github.io/gas",
+										"href": "https://gascore.github.io/gas",
 										"target": "_blank",
 									},
 								},

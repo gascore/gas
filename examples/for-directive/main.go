@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/gas"
-	"github.com/Sinicablyat/gas-web"
-	"github.com/Sinicablyat/gas-web/wasm"
+	"github.com/gascore/gas"
+	"github.com/gascore/gas-web"
+	"github.com/gascore/gas-web/wasm"
 )
 
 // Example application #4

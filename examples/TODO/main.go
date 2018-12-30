@@ -144,32 +144,34 @@ func main() {
 							getNavEl(this, "0", "Current"),
 							getNavEl(this, "1", "Completed"),
 							getNavEl(this, "2", "Deleted"),),
-						gas.NE(&gas.C{
-							Directives: gas.Directives{
-								If: func(p *gas.C) bool {
-									return this.GetData("currentList").(string) == "0"
+						gas.NE(
+							&gas.C{
+								Directives: gas.Directives{
+									If: func(p *gas.C) bool {
+										return this.GetData("currentList").(string) == "0"
+									},
+									Model: gas.ModelDirective{
+										Data: "currentText",
+										Component: this,
+									},
 								},
-								Model: gas.ModelDirective{
-									Data: "currentText",
-									Component: this,
-								},
-							},
-							Tag: "input",
-							Handlers: map[string]gas.Handler{
-								"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
-									currentText := this.GetData("currentText").(string)
-									if len(currentText) == 0 {
-										return
-									}
+								Tag: "input",
+								Handlers: map[string]gas.Handler{
+									"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
+										currentText := this.GetData("currentText").(string)
+										if len(currentText) == 0 {
+											return
+										}
 
-									gas.WarnError(this.Method("append", "current", currentText))
+										gas.WarnError(this.Method("append", "current", currentText))
+									},
+								},
+								Attrs: map[string]string{
+									"id": "new",
+									"placeholder": "New task",
 								},
 							},
-							Attrs: map[string]string{
-								"id": "new",
-								"placeholder": "New task",
-							},
-						}),
+						),
 						gas.NE(
 							&gas.C{},
 							getList(this, 0),

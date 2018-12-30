@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
+	"github.com/gascore/gas-web/gojs"
 	"github.com/gascore/gas-web/wasm"
 )
 
@@ -62,7 +63,18 @@ func main() {
 						},
 						func (this *gas.Component) []interface{} {
 							return gas.ToGetComponentList(
-								fmt.Sprintf("Your color: %s", this.GetData("foo").(string)),
+								"Your color: ",
+								gas.NE(
+									&gas.Component{
+										Tag: "span",
+										Binds: map[string]gas.Bind{
+											"style": func(this2 *gas.C) string {
+												return fmt.Sprintf("color: %s", this.GetData("foo"))
+											},
+										},
+									},
+									this.GetData("foo").(string),
+								),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{

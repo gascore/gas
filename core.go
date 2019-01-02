@@ -16,6 +16,7 @@ type BackEnd interface {
 	New(string) (string, error)
 	Init(Gas) error
 	UpdateComponentChildes(*Component, []interface{}, []interface{}) error
+	ReloadComponent(*Component, []interface{}) error
 	RenderTree(*Component) []interface{}
 	ReCreate(*Component) error
 

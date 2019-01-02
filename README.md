@@ -10,3 +10,4 @@ Related packages:
 
 1. [gascore/gas-web](https://github.com/gascore/gas-web) - wasm/gojs backend
 2. [gascore/gas-gasx](https://github.com/gascore/gas-gasx) - vue-like template parser
+3. [gascore/gas-router](https://github.com/gascore/gas-router) - web router

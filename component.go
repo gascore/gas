@@ -23,7 +23,6 @@ type GetComponentChildes func(*Component) []interface{}
 // Hooks component lifecycle hooks
 type Hooks struct {
 	Created 	  Hook
-	Mounted		  Hook
 	BeforeDestroy Hook
 	Destroyed 	  Hook
 	BeforeUpdate  Hook

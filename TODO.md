@@ -1,12 +1,9 @@
 # TODO list
 
 #### A class tasks
- 
-* fix hooks
-* g-ref
-* Create normal site (with Initial D - Deja Vu)
-* Create normal doc (gitbook.com)
+
 * router
+* g-ref
 
 #### B class tasks
 

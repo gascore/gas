@@ -99,8 +99,7 @@ func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error
 
 // ForceUpdate force update your component
 func (c *Component) Reload() error {
-	childes, _ := c.getState()
-	return be.ReloadComponent(c, childes)
+	return be.ReloadComponent(c)
 }
 
 // DataDeleteFromArray Remove element from data field

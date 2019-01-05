@@ -57,7 +57,7 @@ func (c *Component) GetPocketComputed(name string) PocketComputed  {
 		val, err := computed(c, values...)
 		if err != nil {
 			WarnError(err)
-			return nil
+			return val
 		}
 
 		return val

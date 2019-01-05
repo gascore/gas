@@ -2,7 +2,9 @@
 
 #### A class tasks
 
-* router
+* HashRoute, MemoryRouter
+* Fix 'low' names in `gasx`
+* Styles support
 * g-ref
 
 #### B class tasks

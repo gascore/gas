@@ -86,6 +86,9 @@ type HandlerEvent interface {
 	GetBool(string) bool
 	GetInt(string) int
 
+	Call(string, ...interface{})
+	PreventDefault()
+
 	Raw() interface{}
 }
 

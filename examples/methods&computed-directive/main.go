@@ -41,7 +41,7 @@ func main() {
 						dom.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
 
 						currentNumber, ok := this.GetData("number").(int)
-						gas.WarnIfNot(ok) // it's good practise to your data for valid type
+						this.WarnIfNot(ok) // it's good practise to your data for valid type
 						explanation := fmt.Sprintf("You showed hidden text: %d times", currentNumber)
 						return explanation, nil
 					},
@@ -51,7 +51,7 @@ func main() {
 				},
 			},
 			func(this *gas.Component) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					getButton(this.GetData("show").(bool), this.GetPocketMethod("toggle")),
 					getHiddenText(this.GetData("show").(bool), this.GetPocketComputed("number")),)
 			},)

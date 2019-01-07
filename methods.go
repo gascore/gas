@@ -25,7 +25,7 @@ func (c *Component) Method(name string, values ...interface{}) error {
 func (c *Component) GetPocketMethod(name string) PocketMethod  {
 	method := c.Methods[name]
 	if method == nil {
-		WarnError(errors.New(fmt.Sprintf("invalid method name: %s", name)))
+		c.WarnError(errors.New(fmt.Sprintf("invalid method name: %s", name)))
 		return nil
 	}
 
@@ -49,14 +49,14 @@ func (c *Component) Computed(name string, values ...interface{}) interface{} {
 func (c *Component) GetPocketComputed(name string) PocketComputed  {
 	computed := c.Computeds[name]
 	if computed == nil {
-		WarnError(errors.New(fmt.Sprintf("invalid computed name: %s", name)))
+		c.WarnError(errors.New(fmt.Sprintf("invalid computed name: %s", name)))
 		return nil
 	}
 
 	bindingComputed := func(values ...interface{}) interface{} {
 		val, err := computed(c, values...)
 		if err != nil {
-			WarnError(err)
+			c.WarnError(err)
 			return val
 		}
 

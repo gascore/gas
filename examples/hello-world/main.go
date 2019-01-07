@@ -21,7 +21,7 @@ func main() {
 				},
 			},
 			func(this *gas.C) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					gas.NE(
 						&gas.C{
 							Tag: "h1",

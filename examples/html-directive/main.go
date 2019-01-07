@@ -42,13 +42,13 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 				},
 			},
 			func(this *gas.C) []interface{} { // don't use childes if you have v-html
-				return gas.ToGetComponentList(
+				return gas.CL(
 					gas.NE(
 						&gas.C{
 							Handlers: map[string]gas.Handler{
 								"click": func(this2 *gas.C, e gas.HandlerEvent) {
 									currentIsArticleActive := this.GetData("isArticleActive").(bool)
-									gas.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
+									this.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
 								},
 							},
 							Tag: "button",
@@ -84,7 +84,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 									} else {
 										html, ok = this.GetData("helloText").(string)
 									}
-									gas.WarnIfNot(ok)
+									this.WarnIfNot(ok)
 
 									return html
 								},},

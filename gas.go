@@ -4,24 +4,22 @@ import (
 	"fmt"
 )
 
-var be BackEnd
-
 // New create new gas application with custom backend
-func New(backEnd BackEnd, startPoint string, component *Component, getChildes GetComponentChildes) (Gas, error) {
-	be = backEnd
+func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChildes) (Gas, error) {
+	c.be = be
 
-	tagName, err := be.New(startPoint)
+	tagName, err := c.be.New(startPoint)
 	if err != nil {
 		return Gas{}, err
 	}
 
-	component.Tag = tagName
+	c.Tag = tagName
 
-	if component.Attrs == nil { component.Attrs = make(map[string]string) }
-	component.Attrs["id"] = startPoint
-	component.Attrs["data-main"] = "true"
+	if c.Attrs == nil { c.Attrs = make(map[string]string) }
+	c.Attrs["id"] = startPoint
+	c.Attrs["data-main"] = "true"
 
-	mainComponent := NewComponent(component, getChildes)
+	mainComponent := NewComponent(c, getChildes)
 
 	gas := Gas{App: *mainComponent, StartPoint: startPoint}
 
@@ -30,7 +28,7 @@ func New(backEnd BackEnd, startPoint string, component *Component, getChildes Ge
 
 // Init initialize gas application
 func Init(gas Gas) error {
-	err := be.Init(gas)
+	err := gas.App.be.Init(gas)
 	if err != nil {
 		return err
 	}
@@ -42,27 +40,28 @@ func Init(gas Gas) error {
 func ToGetComponentList(childes ...interface{}) []interface{} {
 	return childes
 }
+var CL = ToGetComponentList
 
 // WarnError log error
-func WarnError(err error) {
+func (c *Component) WarnError(err error) {
 	if err == nil {
 		return
 	}
 
-	be.ConsoleError(err.Error())
+	c.be.ConsoleError(err.Error())
 }
 
 // WarnIfNot console error if !ok
-func WarnIfNot(ok bool) {
+func (c *Component) WarnIfNot(ok bool) {
 	if ok {
 		return
 	}
 
-	be.ConsoleError(fmt.Sprintf("invalid data type"))
+	c.be.ConsoleError(fmt.Sprintf("invalid data type"))
 }
 
-func ConsoleLog(a ...interface{})   { be.ConsoleLog(a...) }
-func ConsoleError(a ...interface{}) { be.ConsoleError(a...) }
+func (c *Component) ConsoleLog(a ...interface{})   { c.be.ConsoleLog(a...) }
+func (c *Component) ConsoleError(a ...interface{}) { c.be.ConsoleError(a...) }
 
 var signal = make(chan int)
 

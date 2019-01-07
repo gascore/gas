@@ -9,7 +9,7 @@ type Gas struct {
 }
 
 func (g *Gas) GetElement() interface{} {
-	return be.GetGasEl(g)
+	return g.App.be.GetGasEl(g)
 }
 
 type BackEnd interface {

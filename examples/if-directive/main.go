@@ -23,12 +23,12 @@ func main() {
 				},
 			},
 			func(this *gas.C) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					gas.NE(
 						&gas.C{
 							Handlers: map[string]gas.Handler {
 								"click": func(c *gas.C, e gas.HandlerEvent) {
-									gas.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
 							},
 							Tag: "button",

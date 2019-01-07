@@ -117,6 +117,8 @@ type Component struct {
 	UUID string
 
 	Parent *Component
+
+	be BackEnd
 }
 
 // Aliases
@@ -136,6 +138,10 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
 		for _, child := range getChildes(component) {
+			if IsComponent(child) {
+				I2C(child).be = component.be
+			}
+
 			compiled = renderChild(this, compiled, child)
 		}
 
@@ -158,6 +164,10 @@ func NewBasicComponent(component *Component, childes ...interface{}) *Component 
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
 		for _, child := range childes {
+			if IsComponent(child) {
+				I2C(child).be = component.be
+			}
+
 			compiled = renderChild(this, compiled, child)
 		}
 
@@ -193,7 +203,7 @@ func renderChild(component *Component, arr []interface{}, child interface{}) []i
 func NewFor(data string, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
 	dataForList, ok := this.Data[data].([]interface{})
 	if !ok {
-		WarnError(fmt.Errorf("invalid FOR directive in component %s", this.UUID))
+		this.WarnError(fmt.Errorf("invalid FOR directive in component %s", this.UUID))
 		return nil
 	}
 
@@ -222,7 +232,7 @@ func (c *Component) ForItemInfo() (bool, int, interface{}) {
 
 // GetElement return *dom.Element by component structure
 func (c *Component) GetElement() interface{} {
-	return be.GetElement(c)
+	return c.be.GetElement(c)
 }
 
 // I2C - convert interface{} to *Component

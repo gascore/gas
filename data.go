@@ -54,7 +54,7 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 
 // getState return values for component update
 func (c *Component) getState() ([]interface{}, string) {
-	tree := be.RenderTree(c)
+	tree := c.be.RenderTree(c)
 
 	var htmlDirective string
 	if c.Directives.HTML.Render != nil {
@@ -81,7 +81,7 @@ func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error
 	newTree, newHtmlDirective := c.getState()
 
 	if oldHtmlDirective != newHtmlDirective {
-		err := be.ReCreate(c)
+		err := c.be.ReCreate(c)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error
 		return nil
 	}
 
-	err := be.UpdateComponentChildes(c, newTree, oldTree)
+	err := c.be.UpdateComponentChildes(c, newTree, oldTree)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error
 
 // ForceUpdate force update your component
 func (c *Component) Reload() error {
-	return be.ReloadComponent(c)
+	return c.be.ReloadComponent(c)
 }
 
 // DataDeleteFromArray Remove element from data field

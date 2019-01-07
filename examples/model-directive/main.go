@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/gascore/gas-web/gojs"
 	"github.com/gascore/gas-web/wasm"
 )
 
@@ -18,7 +17,7 @@ func main() {
 			"app",
 			&gas.Component{},
 			func(main *gas.Component) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					gas.NC(
 						&gas.Component{
 							Data: map[string]interface{}{
@@ -31,7 +30,7 @@ func main() {
 							},
 						},
 						func (this *gas.Component) []interface{} {
-							return gas.ToGetComponentList(
+							return gas.CL(
 								fmt.Sprintf("Your text: %s", this.GetData("foo").(string)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
@@ -62,7 +61,7 @@ func main() {
 							},
 						},
 						func (this *gas.Component) []interface{} {
-							return gas.ToGetComponentList(
+							return gas.CL(
 								"Your color: ",
 								gas.NE(
 									&gas.Component{
@@ -105,7 +104,7 @@ func main() {
 							},
 						},
 						func (this *gas.Component) []interface{} {
-							return gas.ToGetComponentList(
+							return gas.CL(
 								fmt.Sprintf("Your range: %d", this.GetData("foo").(int)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
@@ -137,7 +136,7 @@ func main() {
 							},
 						},
 						func (this *gas.Component) []interface{} {
-							return gas.ToGetComponentList(
+							return gas.CL(
 								fmt.Sprintf("Your checkbox: %t", this.GetData("foo").(bool)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(

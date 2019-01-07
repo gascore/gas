@@ -2,6 +2,7 @@
 
 #### A class tasks
 
+* Remove global variables
 * HashRoute, MemoryRouter
 * Fix 'low' names in `gasx`
 * Styles support

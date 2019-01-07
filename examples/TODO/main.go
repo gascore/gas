@@ -80,7 +80,7 @@ func main() {
 						}
 
 						if listTypeS == "current" {
-							gas.WarnError(this.SetData("currentText", ""))
+							this.WarnError(this.SetData("currentText", ""))
 						}
 
 						return nil
@@ -128,7 +128,7 @@ func main() {
 				},
 			},
 			func(this *gas.C) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					getStyleEl(),
 					gas.NE(
 						&gas.C{
@@ -163,7 +163,7 @@ func main() {
 											return
 										}
 
-										gas.WarnError(this.Method("append", "current", currentText))
+										this.WarnError(this.Method("append", "current", currentText))
 									},
 								},
 								Attrs: map[string]string{
@@ -234,7 +234,7 @@ func getList(pThis *gas.C, index int) interface{} {
 				"class": "list",
 			},
 		},
-		gas.ToGetComponentList(getLi(pThis, index)...))
+		gas.CL(getLi(pThis, index)...))
 }
 
 func getLi(pThis *gas.C, listType int) []interface{} {
@@ -259,7 +259,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 				},
 			},
 			func(this *gas.C) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					gas.NE(
 						&gas.C{
 							Tag: "button",
@@ -270,7 +270,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							},
 							Handlers: map[string]gas.Handler{
 								"click": func(this5 *gas.C, e gas.HandlerEvent) {
-									gas.WarnError(pThis.Method("markAsDone", i))
+									this.WarnError(pThis.Method("markAsDone", i))
 								},
 							},
 							Attrs: map[string]string{
@@ -298,8 +298,8 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 										return
 									}
 
-									gas.WarnError(this.SetData("newValue", el))
-									gas.WarnError(this.SetData("isEditing", true))
+									this.WarnError(this.SetData("newValue", el))
+									this.WarnError(this.SetData("isEditing", true))
 								},
 							},
 						},
@@ -323,8 +323,8 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
 									newValue := this.GetData("newValue")
 
-									gas.WarnError(this.SetData("isEditing", false))
-									gas.WarnError(pThis.Method("edit", i, newValue))
+									this.WarnError(this.SetData("isEditing", false))
+									this.WarnError(pThis.Method("edit", i, newValue))
 									el = newValue
 								},
 							},
@@ -340,7 +340,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							},
 							Handlers: map[string]gas.Handler{
 								"click": func(this5 *gas.C, e gas.HandlerEvent) {
-									gas.WarnError(pThis.Method("delete", i, true))
+									this.WarnError(pThis.Method("delete", i, true))
 								},
 							},
 							Attrs: map[string]string{
@@ -470,8 +470,8 @@ func getNavEl(this *gas.C, index, name string) interface{} {
 			Tag: "button",
 			Handlers: map[string]gas.Handler{
 				"click": func(p *gas.C, e gas.HandlerEvent) {
-					gas.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
-					gas.WarnError(this.SetData("currentList", index))
+					this.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
+					this.WarnError(this.SetData("currentList", index))
 				},
 			},
 			Binds: map[string]gas.Bind{

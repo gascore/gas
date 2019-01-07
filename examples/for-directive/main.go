@@ -25,7 +25,7 @@ func main() {
 				},
 			},
 			func (this *gas.C) []interface{} {
-				return gas.ToGetComponentList(
+				return gas.CL(
 					gas.NE(
 					&gas.C{
 						Tag: "ul",
@@ -37,7 +37,7 @@ func main() {
 									"click": func(c *gas.C, e gas.HandlerEvent) {
 										arr := this.GetData("arr").([]interface{})
 										arr = append(arr, "Hello!") // hello, Annoy-o-Tron
-										gas.WarnError(this.SetData("arr", arr))
+										this.WarnError(this.SetData("arr", arr))
 									},
 								},
 								Tag: "li",

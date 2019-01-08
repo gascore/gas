@@ -1,8 +1,8 @@
 package gas
 
 import (
+	"errors"
 	"fmt"
-	"github.com/pkg/errors"
 )
 
 // GetData return data field by query string
@@ -102,7 +102,8 @@ func (c *Component) Reload() error {
 	return c.be.ReloadComponent(c)
 }
 
-// DataDeleteFromArray Remove element from data field
+
+// DataDeleteFromArray remove element from data field
 func (c *Component) DataDeleteFromArray(query string, index int) error {
 	list, ok := c.GetData(query).([]interface{})
 	if !ok {
@@ -111,7 +112,7 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 
 	oldTree, oldHtmlDirective := c.getState()
 
-	err := c.SetDataFree(query, Remove(list, index))
+	err := c.SetDataFree(query, remove(list, index))
 	if err != nil {
 		return err
 	}
@@ -150,9 +151,7 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 
 	oldTree, oldHtmlDirective := c.getState()
 
-
 	list[index] = value
-
 
 	err := c.Update(oldTree, oldHtmlDirective)
 	if err != nil {
@@ -162,9 +161,10 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 	return nil
 }
 
+// TODO: Add methods for work with map[string]interface{}
 
-// Remove remove item from element
-func Remove(a []interface{}, i int) []interface{} {
+// remove remove item from element
+func remove(a []interface{}, i int) []interface{} {
 	copy(a[i:], a[i+1:]) // Shift a[i+1:] left one index
 	a[len(a)-1] = ""     // Erase last element (write zero value)
 	a = a[:len(a)-1]     // Truncate slice

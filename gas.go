@@ -60,7 +60,7 @@ func (c *Component) WarnIfNot(ok bool) {
 	c.be.ConsoleError(fmt.Sprintf("invalid data type"))
 }
 
-func (c *Component) ConsoleLog(a ...interface{})   { c.be.ConsoleLog(a...) }
+func (c *Component) ConsoleLog  (a ...interface{}) { c.be.ConsoleLog  (a...) }
 func (c *Component) ConsoleError(a ...interface{}) { c.be.ConsoleError(a...) }
 
 var signal = make(chan int)

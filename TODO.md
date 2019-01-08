@@ -2,8 +2,7 @@
 
 #### A class tasks
 
-* Remove global variables
-* HashRoute, MemoryRouter
+* Add `go mod` for all repositories
 * Fix 'low' names in `gasx`
 * Styles support
 * g-ref

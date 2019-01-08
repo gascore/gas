@@ -130,7 +130,7 @@ type G = Gas
 var NC = NewComponent
 var NE = NewBasicComponent
 
-// NewComponent create new component with `this` context
+// NewComponent create new component
 func NewComponent(component *Component, getChildes GetComponentChildes) *Component {
 	if component.Tag == "" {
 		component.Tag = "div"
@@ -138,13 +138,11 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 		component.Tag = strings.ToLower(component.Tag)
 	}
 
+	component.UUID = uuid4.New().String()
+
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
 		for _, child := range getChildes(component) {
-			if IsComponent(child) {
-				I2C(child).be = component.be
-			}
-
 			compiled = renderChild(this, compiled, child)
 		}
 
@@ -156,35 +154,19 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 	return component
 }
 
-// NewBasicComponent create new component
+// NewBasicComponent create new component without *this* context
 func NewBasicComponent(component *Component, childes ...interface{}) *Component {
-	if component.Tag == "" {
-		component.Tag = "div"
-	} else {
-		component.Tag = strings.ToLower(component.Tag)
-	}
-
-	component.Childes = func(this *Component) []interface{} {
-		var compiled []interface{}
-		for _, child := range childes {
-			if IsComponent(child) {
-				I2C(child).be = component.be
-			}
-
-			compiled = renderChild(this, compiled, child)
-		}
-
-		return compiled
-	}
-
-	component.UUID = uuid4.New().String()
-
-	return component
+	return NewComponent(component, func(this *Component) []interface{} {
+		return childes
+	})
 }
 
 func renderChild(component *Component, arr []interface{}, child interface{}) []interface{} {
 	if IsComponent(child) {
 		childC := I2C(child)
+
+		childC.be = component.be
+
 		if childC.Directives.If != nil && !childC.Directives.If(childC) {
 			return arr
 		}
@@ -192,8 +174,7 @@ func renderChild(component *Component, arr []interface{}, child interface{}) []i
 		childC.Parent = component
 	} else if IsChildesArr(child) {
 		for _, el := range child.([]interface{}) {
-			if IsComponent(el) { I2C(el).Parent = component }
-			arr = append(arr, el)
+			arr = renderChild(component, arr, el)
 		}
 
 		return arr
@@ -202,7 +183,7 @@ func renderChild(component *Component, arr []interface{}, child interface{}) []i
 	return append(arr, child)
 }
 
-
+// NewFor create new FOR directive
 func NewFor(data string, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
 	dataForList, ok := this.Data[data].([]interface{})
 	if !ok {
@@ -225,6 +206,7 @@ func NewFor(data string, this *Component, renderer func(int, interface{}) interf
 	return items
 }
 
+// ForItemInfo return info about FOR directive
 func (c *Component) ForItemInfo() (bool, int, interface{}) {
 	if !c.Directives.For.isItem {
 		return false, 0, nil
@@ -244,14 +226,19 @@ func I2C(a interface{}) *Component {
 }
 
 
+// IsComponent return true if interface is *Component
 func IsComponent(c interface{}) bool {
 	_, ok := c.(*Component)
 	return ok
 }
+
+// IsComponent return true if interface is array of interfaces
 func IsChildesArr(c interface{}) bool {
 	_, ok := c.([]interface{})
 	return ok
 }
+
+// IsComponent return true if interface is string
 func IsString(c interface{}) bool {
 	_, ok := c.(string)
 	return ok

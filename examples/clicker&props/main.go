@@ -39,23 +39,23 @@ func main() {
 					gas.NE(
 						&gas.C{
 							Handlers: map[string]gas.Handler {
-								"click.left": func(this2 *gas.C, e gas.HandlerEvent) {
+								"click.left": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
 								// you need to click button once (for target it)
-								"keyup.control": func(this2 *gas.C, e gas.HandlerEvent) {
+								"keyup.control": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
-								"keyup.a": func(this2 *gas.C, e gas.HandlerEvent) {
+								"keyup.a": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
-								"keyup.s": func(this2 *gas.C, e gas.HandlerEvent) {
+								"keyup.s": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
-								"keyup.d": func(this2 *gas.C, e gas.HandlerEvent) {
+								"keyup.d": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
-								"keyup.f": func(this2 *gas.C, e gas.HandlerEvent) {
+								"keyup.f": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
 							},

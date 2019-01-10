@@ -66,7 +66,7 @@ func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
 	return gas.NE(
 		&gas.Component{
 			Handlers: map[string]gas.Handler {
-				"click": func(this *gas.Component, e gas.HandlerEvent) {
+				"click": func(this *gas.Component, e gas.Object) {
 					this.WarnError(toggleMethod())
 				},
 			},

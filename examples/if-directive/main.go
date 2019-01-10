@@ -27,7 +27,7 @@ func main() {
 					gas.NE(
 						&gas.C{
 							Handlers: map[string]gas.Handler {
-								"click": func(c *gas.C, e gas.HandlerEvent) {
+								"click": func(c *gas.C, e gas.Object) {
 									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
 							},

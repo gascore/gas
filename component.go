@@ -78,17 +78,19 @@ type HTMLDirective struct {
 }
 
 // Handler -- handler exec function when event trigger
-type Handler func(*Component, HandlerEvent)
+type Handler func(*Component, Object)
 
-// HandlerEvent 'united' dom.Event
-type HandlerEvent interface {
+// Object 'united' dom.Event
+type Object interface {
+	String() string
+	Int() int
+
 	Get(string) interface{}
 	GetString(string) string
 	GetBool(string) bool
 	GetInt(string) int
 
-	Call(string, ...interface{})
-	PreventDefault()
+	Call(string, ...interface{}) Object
 
 	Raw() interface{}
 }

@@ -157,7 +157,7 @@ func main() {
 								},
 								Tag: "input",
 								Handlers: map[string]gas.Handler{
-									"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
+									"keyup.enter": func(p *gas.C, e gas.Object) {
 										currentText := this.GetData("currentText").(string)
 										if len(currentText) == 0 {
 											return
@@ -269,7 +269,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"click": func(this5 *gas.C, e gas.HandlerEvent) {
+								"click": func(this5 *gas.C, e gas.Object) {
 									this.WarnError(pThis.Method("markAsDone", i))
 								},
 							},
@@ -293,7 +293,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"dblclick": func(p *gas.C, e gas.HandlerEvent) {
+								"dblclick": func(p *gas.C, e gas.Object) {
 									if listType != 0 {
 										return
 									}
@@ -320,7 +320,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"keyup.enter": func(p *gas.C, e gas.HandlerEvent) {
+								"keyup.enter": func(p *gas.C, e gas.Object) {
 									newValue := this.GetData("newValue")
 
 									this.WarnError(this.SetData("isEditing", false))
@@ -339,7 +339,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								},
 							},
 							Handlers: map[string]gas.Handler{
-								"click": func(this5 *gas.C, e gas.HandlerEvent) {
+								"click": func(this5 *gas.C, e gas.Object) {
 									this.WarnError(pThis.Method("delete", i, true))
 								},
 							},
@@ -469,7 +469,7 @@ func getNavEl(this *gas.C, index, name string) interface{} {
 		&gas.C{
 			Tag: "button",
 			Handlers: map[string]gas.Handler{
-				"click": func(p *gas.C, e gas.HandlerEvent) {
+				"click": func(p *gas.C, e gas.Object) {
 					this.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
 					this.WarnError(this.SetData("currentList", index))
 				},

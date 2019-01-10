@@ -46,7 +46,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 					gas.NE(
 						&gas.C{
 							Handlers: map[string]gas.Handler{
-								"click": func(this2 *gas.C, e gas.HandlerEvent) {
+								"click": func(this2 *gas.C, e gas.Object) {
 									currentIsArticleActive := this.GetData("isArticleActive").(bool)
 									this.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
 								},

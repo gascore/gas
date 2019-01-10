@@ -52,16 +52,23 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 }
 
 
+// getOldState return *old* values for component update
+func (c *Component) getOldState() ([]interface{}, string) {
+	return c.RChildes, c.renderHtmlDirective()
+}
+
 // getState return values for component update
 func (c *Component) getState() ([]interface{}, string) {
-	tree := c.be.RenderTree(c)
+	return c.be.RenderTree(c), c.renderHtmlDirective()
+}
 
+func (c *Component) renderHtmlDirective() string {
 	var htmlDirective string
 	if c.Directives.HTML.Render != nil {
 		htmlDirective = c.Directives.HTML.Render(c)
 	}
 
-	return tree, htmlDirective
+	return htmlDirective
 }
 
 // DoWithUpdate runs your event and trying to Update component after it
@@ -97,9 +104,25 @@ func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error
 	return nil
 }
 
-// ForceUpdate force update your component
+// ReCreate recreate your component
+func (c *Component) ReCreate() error {
+	return c.be.ReCreate(c)
+}
+
+// ReCreate recreate your component
 func (c *Component) Reload() error {
 	return c.be.ReloadComponent(c)
+}
+
+// ForceUpdate force update your component
+func (c *Component) ForceUpdate() error {
+	childes := c.Childes(c)
+	err := c.be.UpdateComponentChildes(c, childes, c.RChildes)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 

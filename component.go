@@ -20,19 +20,6 @@ type GetComponent func(*Component) interface{}
 
 type GetComponentChildes func(*Component) []interface{}
 
-// Hooks component lifecycle hooks
-type Hooks struct {
-	Created 	  Hook
-	Mounted       Hook
-	BeforeDestroy Hook
-	Destroyed 	  Hook
-	BeforeUpdate  Hook
-	Updated		  Hook
-}
-
-// Hook - lifecycle hook
-type Hook func(*Component) error
-
 // GetChildes -- function returning component childes
 // In function parameter sends `this` component and you can get it data from this parameter
 //
@@ -107,7 +94,7 @@ type Component struct {
 	Methods    	 map[string]Method
 	Computeds    map[string]Computed
 
-	Hooks    Hooks // lifecycle hooks
+	Hooks    	  Hooks // lifecycle hooks
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds      	  map[string]Bind    // dynamic attributes
 	RenderedBinds map[string]string // store binds for changed func

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/dom"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
 	"github.com/gascore/gas-web/wasm"
@@ -68,11 +67,11 @@ func main() {
 								Hooks:
 								gas.Hooks{
 									Created: func(this2 *gas.C) error {
-										dom.ConsoleLog("Hidden text is created!")
+										this.ConsoleLog("Hidden text is created!")
 										return this.SetData("counter", this.GetData("counter").(int)+1)
 									},
-									Destroyed: func(this2 *gas.C) error {
-										dom.ConsoleLog("Hidden text was destroyed!")
+									WillDestroy: func(this2 *gas.C) error {
+										this.ConsoleLog("Hidden text will destroy!")
 										return nil
 									},
 								},

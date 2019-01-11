@@ -52,12 +52,13 @@ func isComponentsEquals(new, old *Component) bool {
 
 func compareHooks(new, old Hooks) bool {
 	created := cmp.Equal(new.Created, old.Created)
-	beforeDestroy := cmp.Equal(new.BeforeDestroy, old.BeforeDestroy)
-	destroyed := cmp.Equal(new.Destroyed, old.Destroyed)
-	beforeUpdate := cmp.Equal(new.BeforeUpdate, old.BeforeUpdate)
-	updated := cmp.Equal(new.Updated, old.Updated)
+	mounted := cmp.Equal(new.Mounted, old.Mounted)
+	willDestroy := cmp.Equal(new.WillDestroy, old.WillDestroy)
+	//beforeUpdate := cmp.Equal(new.BeforeUpdate, old.BeforeUpdate)
+	//updated := cmp.Equal(new.Updated, old.Updated)
 
-	return created && beforeDestroy && destroyed && beforeUpdate && updated
+	//return created && mounted && beforeDestroy && destroyed && beforeUpdate && updated
+	return created && mounted && willDestroy
 }
 
 func compareForDirectives(new, old *Component) bool {

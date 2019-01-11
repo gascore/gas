@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/dom"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
 	"github.com/gascore/gas-web/wasm"
@@ -23,7 +22,7 @@ func main() {
 				},
 				Watchers: map[string]gas.Watcher{
 					"show": func(this *gas.Component, new interface{}, old interface{}) error {
-						dom.ConsoleLog(fmt.Sprintf("Watcher is triggered! New value: %t, old value: %t", new, old))
+						this.ConsoleLog(fmt.Sprintf("Watcher is triggered! New value: %t, old value: %t", new, old))
 
 						err := this.SetDataFree("watcherIsTriggered", true)
 						if err != nil {

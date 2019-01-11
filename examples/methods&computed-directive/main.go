@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/dom"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
 	"github.com/gascore/gas-web/wasm"
@@ -38,7 +37,7 @@ func main() {
 				// Computeds can be cached
 				Computeds: map[string]gas.Computed{
 					"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
-						dom.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
+						this.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
 
 						currentNumber, ok := this.GetData("number").(int)
 						this.WarnIfNot(ok) // it's good practise to your data for valid type

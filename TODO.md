@@ -2,7 +2,7 @@
 
 #### A class tasks
 
-* Add `go mod` for all repositories
+* Add Updated, BeforeUpdate hooks support
 * Styles support
 * g-ref
 

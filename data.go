@@ -101,26 +101,20 @@ func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error
 		return err
 	}
 
+	c.RChildes = newTree
+
 	return nil
-}
-
-// ReCreate recreate your component
-func (c *Component) ReCreate() error {
-	return c.be.ReCreate(c)
-}
-
-// ReCreate recreate your component
-func (c *Component) Reload() error {
-	return c.be.ReloadComponent(c)
 }
 
 // ForceUpdate force update your component
 func (c *Component) ForceUpdate() error {
-	childes := c.Childes(c)
-	err := c.be.UpdateComponentChildes(c, childes, c.RChildes)
+	newChildes := c.be.RenderTree(c)
+	err := c.be.UpdateComponentChildes(c, newChildes, c.RChildes)
 	if err != nil {
 		return err
 	}
+
+	c.RChildes = newChildes
 
 	return nil
 }
@@ -167,7 +161,7 @@ func (c *Component) DataAddToArray(query string, value interface{}) error {
 
 // DataEditArray edit element in data field
 func (c *Component) DataEditArray(query string, index int, value interface{}) error {
-	list, ok := c.GetData("current").([]interface{})
+	list, ok := c.GetData(query).([]interface{})
 	if !ok {
 		return errors.New("invalid current list")
 	}

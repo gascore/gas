@@ -64,7 +64,7 @@ func compareHooks(new, old Hooks) bool {
 func compareForDirectives(new, old *Component) bool {
 	/*
 		It's really bad way to fix bug with not-updated i, el in components Methods.
-		We can only update methods, binds, e.t.c. and don't update 'body', but it will be in the future...
+		We can only ForceUpdate methods, binds, e.t.c. and don't ForceUpdate 'body', but it will be in the future...
 	*/
 
 	newIsItem, newI, newVal := new.ForItemInfo()

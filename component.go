@@ -61,7 +61,7 @@ type ForDirective struct {
 type HTMLDirective struct {
 	Render func(*Component) string
 
-	Rendered string // here storing rendered html for Update functions
+	Rendered string // here storing rendered html for ForceUpdate functions
 }
 
 // Handler -- handler exec function when event trigger

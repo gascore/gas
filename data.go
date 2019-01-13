@@ -13,9 +13,11 @@ func (c *Component) GetData(query string) interface{} {
 	return data
 }
 
-// SetData set data field and Update component (after changes)
+// SetData set data field and ForceUpdate component (after changes)
 func (c *Component) SetData(query string, value interface{}) error {
-	err := c.DoWithUpdate(func() error {
+	oldHtmlDirective := c.htmlDirective()
+
+	err := func() error { // it doesn't work without this wrap function (idk why)
 		oldValue := c.Data[query]
 		err := c.SetDataFree(query, value)
 		if err != nil {
@@ -32,89 +34,21 @@ func (c *Component) SetData(query string, value interface{}) error {
 		}
 
 		return nil
-	})
+	}()
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return c.update(oldHtmlDirective)
 }
 
-// SetDataFree set data without Update
+// SetDataFree set data without ForceUpdate
 func (c *Component) SetDataFree(query string, value interface{}) error {
 	if value == nil {
 		return fmt.Errorf("trying to set nil value to %s field", query)
 	}
 
 	c.Data[query] = value
-
-	return nil
-}
-
-
-// getOldState return *old* values for component update
-func (c *Component) getOldState() ([]interface{}, string) {
-	return c.RChildes, c.renderHtmlDirective()
-}
-
-// getState return values for component update
-func (c *Component) getState() ([]interface{}, string) {
-	return c.be.RenderTree(c), c.renderHtmlDirective()
-}
-
-func (c *Component) renderHtmlDirective() string {
-	var htmlDirective string
-	if c.Directives.HTML.Render != nil {
-		htmlDirective = c.Directives.HTML.Render(c)
-	}
-
-	return htmlDirective
-}
-
-// DoWithUpdate runs your event and trying to Update component after it
-func (c *Component) DoWithUpdate(event func()error) error {
-	oldTree, oldHtmlDirective := c.getState()
-
-	err := event() // your event
-	if err != nil {
-		return err
-	}
-
-	return c.Update(oldTree, oldHtmlDirective)
-}
-
-// Update update component
-func (c *Component) Update(oldTree []interface{}, oldHtmlDirective string) error {
-	newTree, newHtmlDirective := c.getState()
-
-	if oldHtmlDirective != newHtmlDirective {
-		err := c.be.ReCreate(c)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	err := c.be.UpdateComponentChildes(c, newTree, oldTree)
-	if err != nil {
-		return err
-	}
-
-	c.RChildes = newTree
-
-	return nil
-}
-
-// ForceUpdate force update your component
-func (c *Component) ForceUpdate() error {
-	newChildes := c.be.RenderTree(c)
-	err := c.be.UpdateComponentChildes(c, newChildes, c.RChildes)
-	if err != nil {
-		return err
-	}
-
-	c.RChildes = newChildes
 
 	return nil
 }
@@ -127,14 +61,14 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 		return errors.New("invalid data field type")
 	}
 
-	oldTree, oldHtmlDirective := c.getState()
+	oldHtmlDirective := c.htmlDirective()
 
 	err := c.SetDataFree(query, remove(list, index))
 	if err != nil {
 		return err
 	}
 
-	err = c.Update(oldTree, oldHtmlDirective)
+	err = c.update(oldHtmlDirective)
 	if err != nil {
 		return err
 	}
@@ -166,19 +100,17 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 		return errors.New("invalid current list")
 	}
 
-	oldTree, oldHtmlDirective := c.getState()
+	oldHtmlDirective := c.htmlDirective()
 
 	list[index] = value
 
-	err := c.Update(oldTree, oldHtmlDirective)
+	err := c.update(oldHtmlDirective)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-// TODO: Add methods for work with map[string]interface{}
 
 // remove remove item from element
 func remove(a []interface{}, i int) []interface{} {
@@ -187,4 +119,43 @@ func remove(a []interface{}, i int) []interface{} {
 	a = a[:len(a)-1]     // Truncate slice
 
 	return a
+}
+
+
+// DataDeleteFromArray remove element from data field (works only with map[string]interface{} maps)
+func (c *Component) DataDeleteFromMap(query string, key string) error {
+	m, ok := c.GetData(query).(map[string]interface{})
+	if !ok {
+		return errors.New("invalid data field type")
+	}
+
+	oldHtmlDirective := c.htmlDirective()
+
+	delete(m, key)
+
+	err := c.update(oldHtmlDirective)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DataEditMap edit element to data field (works only with map[string]interface{} maps)
+func (c *Component) DataEditMap(query string, key string, value interface{}) error {
+	m, ok := c.GetData(query).(map[string]interface{})
+	if !ok {
+		return errors.New("invalid data field type")
+	}
+
+	oldHtmlDirective := c.htmlDirective()
+
+	m[key] = value
+
+	err := c.update(oldHtmlDirective)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

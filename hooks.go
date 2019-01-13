@@ -5,8 +5,8 @@ type Hooks struct {
 	Created     Hook // When component has been created in golang only (GetElement isn't available)
 	Mounted     Hook // When component has been mounted (GetElement is available)
 	WillDestroy Hook // Before component destroy (GetElement is available)
-	//BeforeUpdate  Hook // Will add in the future
-	//Updated		Hook // Will add in the future
+	BeforeUpdate  Hook // Will add in the future
+	Updated		Hook // Will add in the future
 }
 
 // Hook - lifecycle hook
@@ -60,6 +60,42 @@ func RunWillDestroyIfCan(i interface{}) error {
 
 	if c.Hooks.WillDestroy != nil {
 		err := c.Hooks.WillDestroy(c)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func RunUpdatedIfCan(i interface{}) error {
+	if !IsComponent(i) {
+		return nil
+	}
+
+	// run Updated hook for component parent(!)
+	c := I2C(i).Parent
+
+	if c.Hooks.Updated != nil {
+		err := c.Hooks.Updated(c)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func RunBeforeUpdateIfCan(i interface{}) error {
+	if !IsComponent(i) {
+		return nil
+	}
+
+	// run BeforeUpdate hook for component parent(!)
+	c := I2C(i).Parent
+
+	if c.Hooks.BeforeUpdate != nil {
+		err := c.Hooks.BeforeUpdate(c)
 		if err != nil {
 			return err
 		}

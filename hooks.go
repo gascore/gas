@@ -2,11 +2,11 @@ package gas
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created     Hook // When component has been created in golang only (GetElement isn't available)
-	Mounted     Hook // When component has been mounted (GetElement is available)
-	WillDestroy Hook // Before component destroy (GetElement is available)
-	BeforeUpdate  Hook // Will add in the future
-	Updated		Hook // Will add in the future
+	Created       Hook // When component has been created in golang only (GetElement isn't available)
+	Mounted       Hook // When component has been mounted (GetElement is available)
+	WillDestroy   Hook // Before component destroy (GetElement is available)
+	BeforeUpdate  Hook // When component child don't updated
+	Updated		  Hook // After component child was updated
 }
 
 // Hook - lifecycle hook

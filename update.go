@@ -32,7 +32,7 @@ func (c *Component) update(oldHtmlDirective string) error {
 	return nil
 }
 
-// ForceUpdate ForceUpdate component
+// ForceUpdate force update component
 func (c *Component) ForceUpdate() error {
 	return c.update("")
 }

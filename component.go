@@ -94,14 +94,14 @@ type Component struct {
 	Methods    	 map[string]Method
 	Computeds    map[string]Computed
 
-	Hooks    	  Hooks // lifecycle hooks
+	Hooks    	  Hooks 			 // lifecycle hooks
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds      	  map[string]Bind    // dynamic attributes
-	RenderedBinds map[string]string // store binds for changed func
+	RenderedBinds map[string]string  // store binds for changed func
 
 	Directives 	 Directives
 
-	Childes GetChildes
+	Childes  GetChildes
 	RChildes []interface{} // rendered childes
 
 	Tag   string
@@ -109,7 +109,8 @@ type Component struct {
 
 	UUID string
 
-	Parent *Component
+	isElement bool // childes don't have parent context
+	Parent    *Component
 
 	be BackEnd
 }
@@ -146,6 +147,7 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 
 // NewBasicComponent create new component without *this* context
 func NewBasicComponent(component *Component, childes ...interface{}) *Component {
+	component.isElement = true
 	return NewComponent(component, func(this *Component) []interface{} {
 		return childes
 	})
@@ -194,6 +196,12 @@ func NewFor(data string, this *Component, renderer func(int, interface{}) interf
 	}
 
 	return items
+}
+
+// IsElement return Component.isElement.
+// isElement isn't public because it's useless for applications developing but helpful libraries
+func (c *Component) IsElement() bool {
+	return c.isElement
 }
 
 // ForItemInfo return info about FOR directive

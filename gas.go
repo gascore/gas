@@ -21,7 +21,7 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 
 	mainComponent := NewComponent(c, getChildes)
 
-	gas := Gas{App: *mainComponent, StartPoint: startPoint}
+	gas := Gas{App: mainComponent, StartPoint: startPoint}
 
 	return gas, nil
 }

@@ -140,8 +140,6 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 		return compiled
 	}
 
-	component.UUID = uuid4.New().String()
-
 	return component
 }
 

@@ -181,6 +181,10 @@ func NewFor(data string, this *Component, renderer func(int, interface{}) interf
 		return nil
 	}
 
+	return NewForByData(dataForList, this, renderer)
+}
+
+func NewForByData(dataForList []interface{}, this *Component, renderer func(int, interface{})interface{}) []interface{} {
 	var items []interface{}
 	for i, el := range dataForList {
 		item := renderer(i, el)

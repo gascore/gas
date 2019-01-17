@@ -2,7 +2,6 @@
 
 #### A class tasks
 
-* add RHtml
-* g-ref
-* normal cli
+* gasx/syntax.md
+* new project generator
 * atomic css support

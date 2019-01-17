@@ -28,8 +28,16 @@ func (c *Component) update(oldHtmlDirective string) error {
 	}
 
 	c.RChildes = newTree
+	c.UpdateHtmlDirective()
 
 	return nil
+}
+
+// UpdateHtmlDirective trying rerender component html directive
+func (c *Component) UpdateHtmlDirective() {
+	if c.Directives.HTML.Render != nil {
+		c.Directives.HTML.Rendered = c.Directives.HTML.Render(c)
+	}
 }
 
 // ForceUpdate force update component

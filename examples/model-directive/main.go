@@ -25,49 +25,47 @@ func main() {
 							},
 							Tag: "div",
 							Attrs: map[string]string{
-								"id": "model__text",
+								"id":    "model__text",
 								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 							},
 						},
-						func (this *gas.Component) []interface{} {
+						func(this *gas.Component) []interface{} {
 							return gas.CL(
 								fmt.Sprintf("Your text: %s", this.GetData("foo").(string)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
-									Directives: gas.Directives{
-										Model: gas.ModelDirective{
-											Data: "foo",
-											Component: this,
+										Directives: gas.Directives{
+											Model: gas.ModelDirective{
+												Data:      "foo",
+												Component: this,
+											},
 										},
+										Tag: "input",
 									},
-									Tag: "input",
-								},
 								),
 							)
 						},
 					),
 					gas.NC(
 						&gas.Component{
-							Data:
-							map[string]interface{}{
+							Data: map[string]interface{}{
 								"foo": "",
 							},
 							Tag: "div",
-							Attrs:
-							map[string]string{
-								"id": "model__color",
+							Attrs: map[string]string{
+								"id":    "model__color",
 								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 							},
 						},
-						func (this *gas.Component) []interface{} {
+						func(this *gas.Component) []interface{} {
 							return gas.CL(
 								"Your color: ",
 								gas.NE(
 									&gas.Component{
 										Tag: "span",
 										Binds: map[string]gas.Bind{
-											"style": func(this2 *gas.C) string {
+											"style": func() string {
 												return fmt.Sprintf("color: %s", this.GetData("foo"))
 											},
 										},
@@ -99,11 +97,11 @@ func main() {
 							},
 							Tag: "div",
 							Attrs: map[string]string{
-								"id": "model__range",
+								"id":    "model__range",
 								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 							},
 						},
-						func (this *gas.Component) []interface{} {
+						func(this *gas.Component) []interface{} {
 							return gas.CL(
 								fmt.Sprintf("Your range: %d", this.GetData("foo").(int)),
 								gas.NE(&gas.Component{Tag: "br"}),
@@ -131,11 +129,11 @@ func main() {
 							},
 							Tag: "div",
 							Attrs: map[string]string{
-								"id": "model__date",
+								"id":    "model__date",
 								"style": "border: 1px solid #dedede; margin-bottom: 8px; padding: 4px 16px;",
 							},
 						},
-						func (this *gas.Component) []interface{} {
+						func(this *gas.Component) []interface{} {
 							return gas.CL(
 								fmt.Sprintf("Your checkbox: %t", this.GetData("foo").(bool)),
 								gas.NE(&gas.Component{Tag: "br"}),
@@ -157,7 +155,7 @@ func main() {
 						},
 					),
 				)
-			},)
+			})
 	must(err)
 
 	err = gas.Init(app)

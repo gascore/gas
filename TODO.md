@@ -2,6 +2,6 @@
 
 #### A class tasks
 
-* gasx/syntax.md
-* new project generator
-* atomic css support
+* gasx build
+* standard components library
+* ssr

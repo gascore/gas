@@ -17,7 +17,7 @@ func main() {
 			"app",
 			&gas.Component{
 				Data: map[string]interface{}{
-					"show": true,
+					"show":   true,
 					"number": 1,
 				},
 				// What the difference between Methods and Computed?
@@ -52,8 +52,8 @@ func main() {
 			func(this *gas.Component) []interface{} {
 				return gas.CL(
 					getButton(this.GetData("show").(bool), this.GetPocketMethod("toggle")),
-					getHiddenText(this.GetData("show").(bool), this.GetPocketComputed("number")),)
-			},)
+					getHiddenText(this.GetData("show").(bool), this.GetPocketComputed("number")))
+			})
 	must(err)
 
 	err = gas.Init(app)
@@ -64,20 +64,19 @@ func main() {
 func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
 	return gas.NE(
 		&gas.Component{
-			Handlers: map[string]gas.Handler {
+			Handlers: map[string]gas.Handler{
 				"click": func(this *gas.Component, e gas.Object) {
 					this.WarnError(toggleMethod())
 				},
 			},
 			Tag: "button",
-			Attrs:
-				map[string]string{
-					"id": "M&C__button",
-				},
+			Attrs: map[string]string{
+				"id": "M&C__button",
+			},
 		},
 		gas.NE(
 			&gas.C{
-				Directives:gas.Directives{
+				Directives: gas.Directives{
 					If: func(p *gas.C) bool {
 						return show
 					},
@@ -86,7 +85,7 @@ func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
 			"Show text"),
 		gas.NE(
 			&gas.C{
-				Directives:gas.Directives{
+				Directives: gas.Directives{
 					If: func(p *gas.C) bool {
 						return !show
 					},

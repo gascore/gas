@@ -31,29 +31,27 @@ type GetComponentChildes func(*Component) []interface{}
 type GetChildes func(*Component) []interface{}
 
 // Bind - dynamic component attribute (analogue for vue `v-bind:`).
-//
-// Like: `gBind:id="c.GetDataByString("iterator") + 1024"``
-type Bind func(*Component) string
+type Bind func() string
 
 // Directives struct storing component if-directive
 type Directives struct {
-	If func(*Component) bool
-	Show func(*Component) bool
-	For ForDirective
+	If    func(*Component) bool
+	Show  func(*Component) bool
+	For   ForDirective
 	Model ModelDirective
-	HTML HTMLDirective
+	HTML  HTMLDirective
 }
 
 // ModelDirective struct for Model directive
 type ModelDirective struct {
-	Data string
+	Data      string
 	Component *Component
 }
 
 // ForDirective struct for For Directive (needful because `for` want name and render function)
 type ForDirective struct {
-	isItem bool
-	itemValueI int
+	isItem       bool
+	itemValueI   int
 	itemValueVal interface{}
 }
 
@@ -83,23 +81,22 @@ type Object interface {
 }
 
 // Watcher -- function triggering after component data changed
-type Watcher func(*Component, interface{}, interface{})error // (this, new, old)
-
+type Watcher func(*Component, interface{}, interface{}) error // (this, new, old)
 
 // Component -- basic component struct
 type Component struct {
-	Data  map[string]interface{}
+	Data     map[string]interface{}
 	Watchers map[string]Watcher
 
-	Methods    	 map[string]Method
-	Computeds    map[string]Computed
+	Methods   map[string]Method
+	Computeds map[string]Computed
 
-	Hooks    	  Hooks 			 // lifecycle hooks
+	Hooks         Hooks              // lifecycle hooks
 	Handlers      map[string]Handler // events handlers: onClick, onHover
-	Binds      	  map[string]Bind    // dynamic attributes
+	Binds         map[string]Bind    // dynamic attributes
 	RenderedBinds map[string]string  // store binds for changed func
 
-	Directives 	 Directives
+	Directives Directives
 
 	Childes  GetChildes
 	RChildes []interface{} // rendered childes
@@ -118,6 +115,7 @@ type Component struct {
 // Aliases
 type C = Component
 type G = Gas
+
 var NC = NewComponent
 var NE = NewBasicComponent
 
@@ -184,7 +182,7 @@ func NewFor(data string, this *Component, renderer func(int, interface{}) interf
 	return NewForByData(dataForList, this, renderer)
 }
 
-func NewForByData(dataForList []interface{}, this *Component, renderer func(int, interface{})interface{}) []interface{} {
+func NewForByData(dataForList []interface{}, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
 	var items []interface{}
 	for i, el := range dataForList {
 		item := renderer(i, el)
@@ -224,7 +222,6 @@ func (c *Component) GetElement() interface{} {
 func I2C(a interface{}) *Component {
 	return a.(*Component)
 }
-
 
 // IsComponent return true if interface is *Component
 func IsComponent(c interface{}) bool {

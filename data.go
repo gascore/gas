@@ -17,26 +17,17 @@ func (c *Component) GetData(query string) interface{} {
 func (c *Component) SetData(query string, value interface{}) error {
 	oldHtmlDirective := c.htmlDirective()
 
-	err := func() error { // it doesn't work without this wrap function (idk why)
-		oldValue := c.Data[query]
-		err := c.SetDataFree(query, value)
-		if err != nil {
-			return err
-		}
+	oldValue := c.Data[query]
+	err := c.SetDataFree(query, value)
+	if err != nil {
+		return err
+	}
 
-		if c.Watchers[query] == nil {
-			return nil
-		}
-
+	if c.Watchers[query] != nil {
 		err = c.Watchers[query](c, value, oldValue)
 		if err != nil {
 			return err
 		}
-
-		return nil
-	}()
-	if err != nil {
-		return err
 	}
 
 	return c.update(oldHtmlDirective)
@@ -52,7 +43,6 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 
 	return nil
 }
-
 
 // DataDeleteFromArray remove element from data field
 func (c *Component) DataDeleteFromArray(query string, index int) error {
@@ -83,7 +73,7 @@ func (c *Component) DataAddToArray(query string, value interface{}) error {
 		return errors.New("invalid data field type")
 	}
 
-	list  = append(list, value)
+	list = append(list, value)
 
 	err := c.SetData(query, list)
 	if err != nil {
@@ -120,7 +110,6 @@ func remove(a []interface{}, i int) []interface{} {
 
 	return a
 }
-
 
 // DataDeleteFromArray remove element from data field (works only with map[string]interface{} maps)
 func (c *Component) DataDeleteFromMap(query string, key string) error {

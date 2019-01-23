@@ -11,7 +11,7 @@ func (c *Component) htmlDirective() string {
 }
 
 func (c *Component) update(oldHtmlDirective string) error {
-	newTree := c.be.RenderTree(c)
+	newTree := RenderTree(c)
 
 	if oldHtmlDirective != c.htmlDirective() {
 		err := c.be.ReCreate(c)
@@ -42,5 +42,33 @@ func (c *Component) UpdateHtmlDirective() {
 
 // ForceUpdate force update component
 func (c *Component) ForceUpdate() error {
-	return c.update("")
+	return c.update(c.Directives.HTML.Rendered)
+}
+
+// RenderTree return full rendered childes tree of component
+func RenderTree(c *Component) []interface{} {
+	var childes []interface{}
+	for _, el := range c.Childes(c) {
+		if IsComponent(el) {
+			elC := I2C(el)
+
+			if elC.Binds != nil {
+				if elC.RenderedBinds == nil {
+					elC.RenderedBinds = map[string]string{}
+				}
+
+				for bindKey, bindValue := range elC.Binds { // render binds
+					elC.RenderedBinds[bindKey] = bindValue()
+				}
+			}
+
+			elC.RChildes = RenderTree(elC)
+			elC.UpdateHtmlDirective()
+
+			el = elC
+		}
+
+		childes = append(childes, el)
+	}
+	return childes
 }

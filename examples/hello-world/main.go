@@ -41,7 +41,7 @@ func main() {
 							},
 						},
 						"Ciao mondo!"))
-			},)
+			})
 	must(err)
 
 	err = gas.Init(app)

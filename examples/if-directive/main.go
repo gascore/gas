@@ -26,7 +26,7 @@ func main() {
 				return gas.CL(
 					gas.NE(
 						&gas.C{
-							Handlers: map[string]gas.Handler {
+							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.C, e gas.Object) {
 									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
@@ -38,7 +38,7 @@ func main() {
 						},
 						gas.NE(
 							&gas.C{
-								Directives:gas.Directives{
+								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
 										return this.GetData("show").(bool)
 									},
@@ -47,13 +47,13 @@ func main() {
 							"Show text"),
 						gas.NE(
 							&gas.C{
-								Directives:gas.Directives{
+								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
 										return !this.GetData("show").(bool)
 									},
 								},
 							},
-							"Hide text"),),
+							"Hide text")),
 					gas.NE(
 						&gas.C{
 							Directives: gas.Directives{
@@ -64,7 +64,7 @@ func main() {
 							},
 							Tag: "i",
 						},
-						"Hidden text",),
+						"Hidden text"),
 					gas.NE(
 						&gas.C{
 							Directives: gas.Directives{
@@ -74,8 +74,8 @@ func main() {
 							},
 							Tag: "b",
 						},
-						"Public text",),)
-			},)
+						"Public text"))
+			})
 	must(err)
 
 	err = gas.Init(app)

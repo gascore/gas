@@ -2,16 +2,15 @@ package gas
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created       Hook // When component has been created in golang only (GetElement isn't available)
-	Mounted       Hook // When component has been mounted (GetElement is available)
-	WillDestroy   Hook // Before component destroy (GetElement is available)
-	BeforeUpdate  Hook // When component child don't updated
-	Updated		  Hook // After component child was updated
+	Created      Hook // When component has been created in golang only (GetElement isn't available)
+	Mounted      Hook // When component has been mounted (GetElement is available)
+	WillDestroy  Hook // Before component destroy (GetElement is available)
+	BeforeUpdate Hook // When component child don't updated
+	Updated      Hook // After component child was updated
 }
 
 // Hook - lifecycle hook
 type Hook func(*Component) error
-
 
 func RunMountedIfCan(i interface{}) error {
 	if !IsComponent(i) {

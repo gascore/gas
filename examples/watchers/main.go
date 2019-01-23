@@ -17,7 +17,7 @@ func main() {
 			"app",
 			&gas.Component{
 				Data: map[string]interface{}{
-					"show": true,
+					"show":               true,
 					"watcherIsTriggered": false,
 				},
 				Watchers: map[string]gas.Watcher{
@@ -41,7 +41,7 @@ func main() {
 				return gas.CL(
 					gas.NE(
 						&gas.Component{
-							Handlers: map[string]gas.Handler {
+							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.Component, e gas.Object) {
 									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
@@ -60,7 +60,7 @@ func main() {
 								},
 								Tag: "i",
 							},
-							"Show text",),
+							"Show text"),
 						gas.NE(
 							&gas.C{
 								Directives: gas.Directives{
@@ -101,7 +101,7 @@ func main() {
 						"Watcher is triggered!",
 					),
 				)
-			},)
+			})
 	must(err)
 
 	err = gas.Init(app)

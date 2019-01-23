@@ -17,7 +17,6 @@ type BackEnd interface {
 	Init(Gas) error
 	UpdateComponentChildes(*Component, []interface{}, []interface{}) error
 	ReCreate(*Component) error
-	RenderTree(*Component) []interface{}
 
 	GetElement(*Component) interface{}
 	GetGasEl(*Gas) interface{}

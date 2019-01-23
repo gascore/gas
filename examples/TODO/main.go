@@ -138,12 +138,12 @@ func main() {
 							},
 						},
 						gas.NE(
-							&gas.C {
+							&gas.C{
 								Tag: "nav",
 							},
 							getNavEl(this, "0", "Current"),
 							getNavEl(this, "1", "Completed"),
-							getNavEl(this, "2", "Deleted"),),
+							getNavEl(this, "2", "Deleted")),
 						gas.NE(
 							&gas.C{
 								Directives: gas.Directives{
@@ -151,7 +151,7 @@ func main() {
 										return this.GetData("currentList").(string) == "0"
 									},
 									Model: gas.ModelDirective{
-										Data: "currentText",
+										Data:      "currentText",
 										Component: this,
 									},
 								},
@@ -167,7 +167,7 @@ func main() {
 									},
 								},
 								Attrs: map[string]string{
-									"id": "new",
+									"id":          "new",
 									"placeholder": "New task",
 								},
 							},
@@ -176,26 +176,26 @@ func main() {
 							&gas.C{},
 							getList(this, 0),
 							getList(this, 1),
-							getList(this, 2),), ),
+							getList(this, 2))),
 					gas.NE(
 						&gas.C{
-							Tag:"footer",
+							Tag: "footer",
 						},
 						gas.NE(
 							&gas.C{
-								Tag:"div",
+								Tag: "div",
 							},
 							"Double-click to edit a task"),
 						gas.NE(
 							&gas.C{
-								Tag:"div",
+								Tag: "div",
 							},
 							"Created by",
 							gas.NE(
 								&gas.C{
 									Tag: "a",
 									Attrs: map[string]string{
-										"href": "https://sinicablyat.github.io/",
+										"href":   "https://noartem.github.io/",
 										"target": "_blank",
 									},
 								},
@@ -205,12 +205,12 @@ func main() {
 								&gas.C{
 									Tag: "a",
 									Attrs: map[string]string{
-										"href": "https://gascore.github.io/gas",
+										"href":   "https://gascore.github.io/gas",
 										"target": "_blank",
 									},
 								},
 								"GAS"),
-							"and love",),))
+							"and love")))
 			},
 		)
 	must(err)
@@ -223,14 +223,14 @@ func main() {
 func getList(pThis *gas.C, index int) interface{} {
 	return gas.NE(
 		&gas.C{
-			Directives:gas.Directives{
+			Directives: gas.Directives{
 				Show: func(p *gas.C) bool {
 					return pThis.GetData("currentList") == fmt.Sprintf("%d", index)
 				},
 			},
 			Tag: "ul",
 			Attrs: map[string]string{
-				"id": "list__current",
+				"id":    "list__current",
 				"class": "list",
 			},
 		},
@@ -255,7 +255,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 				Tag: "li",
 				Data: map[string]interface{}{
 					"isEditing": false,
-					"newValue": "no",
+					"newValue":  "no",
 				},
 			},
 			func(this *gas.C) []interface{} {
@@ -263,7 +263,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 					gas.NE(
 						&gas.C{
 							Tag: "button",
-							Directives:gas.Directives{
+							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return listType == 0
 								},
@@ -283,11 +283,11 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								Attrs: map[string]string{
 									"class": "fas fa-check",
 								},
-							},)),
+							})),
 					gas.NE(
 						&gas.C{
 							Tag: "i",
-							Directives:gas.Directives{
+							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return !this.GetData("isEditing").(bool)
 								},
@@ -310,13 +310,13 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							Attrs: map[string]string{
 								"style": "margin-right: 8px",
 							},
-							Directives:gas.Directives{
+							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return this.GetData("isEditing").(bool)
 								},
-								Model:gas.ModelDirective{
+								Model: gas.ModelDirective{
 									Component: this,
-									Data: "newValue",
+									Data:      "newValue",
 								},
 							},
 							Handlers: map[string]gas.Handler{
@@ -329,11 +329,11 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								},
 							},
 						},
-						fmt.Sprintf("%s", el),),
-					 gas.NE(
+						fmt.Sprintf("%s", el)),
+					gas.NE(
 						&gas.C{
 							Tag: "button",
-							Directives:gas.Directives{
+							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return listType == 0
 								},
@@ -353,15 +353,15 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 								Attrs: map[string]string{
 									"class": "fas fa-trash-alt",
 								},
-							}, )),)
-			},)
+							})))
+			})
 	})
 }
 
 func getStyleEl() interface{} {
 	return gas.NE(
 		&gas.C{
-			Tag:"style",
+			Tag:   "style",
 			Attrs: map[string]string{"type": "text/css"},
 			Directives: gas.Directives{
 				HTML: gas.HTMLDirective{
@@ -475,7 +475,7 @@ func getNavEl(this *gas.C, index, name string) interface{} {
 				},
 			},
 			Binds: map[string]gas.Bind{
-				"class": func(p *gas.C) string {
+				"class": func() string {
 					if this.GetData("currentList").(string) == index {
 						return "active"
 					}
@@ -483,9 +483,8 @@ func getNavEl(this *gas.C, index, name string) interface{} {
 				},
 			},
 		},
-		name,)
+		name)
 }
-
 
 func must(err error) {
 	if err != nil {

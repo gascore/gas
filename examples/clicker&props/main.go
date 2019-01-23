@@ -38,7 +38,7 @@ func main() {
 				return gas.CL(
 					gas.NE(
 						&gas.C{
-							Handlers: map[string]gas.Handler {
+							Handlers: map[string]gas.Handler{
 								"click.left": func(this2 *gas.C, e gas.Object) {
 									this.WarnError(this.Method("addClick"))
 								},
@@ -64,7 +64,7 @@ func main() {
 								"id": "clicker__button", // I love BEM
 							},
 						},
-						"Click me!",),
+						"Click me!"),
 					gas.NE(
 						&gas.C{
 							Tag: "i",
@@ -74,7 +74,7 @@ func main() {
 						},
 						"You clicked button: ",
 						GetNumberViewer(this.GetData("click").(int))))
-			},)
+			})
 	must(err)
 	err = gas.Init(app)
 	must(err)

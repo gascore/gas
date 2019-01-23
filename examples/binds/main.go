@@ -36,7 +36,7 @@ func main() {
 						gas.NE(
 							&gas.C{
 								Binds: map[string]gas.Bind{
-									"style": func(this2 *gas.C) string {
+									"style": func() string {
 										foo, ok := this.GetData("foo").(int)
 										this.WarnIfNot(ok)
 
@@ -49,34 +49,35 @@ func main() {
 									"style": "width: 48px; height: 36px; margin: 0 18px; border-radius: 4px;",
 								},
 								Tag: "div",
-							},),
-							gas.NE(
-								&gas.C{
-									Attrs: map[string]string{
-										"style": "color: darkgray;",
-									},
-									Tag: "i",
+							}),
+						gas.NE(
+							&gas.C{
+								Attrs: map[string]string{
+									"style": "color: darkgray;",
 								},
-								"// color: rgb(x, 255-x, x)",
-							),
+								Tag: "i",
+							},
+							"// color: rgb(x, 255-x, x)",
 						),
+					),
 					gas.NE(&gas.C{Tag: "br"}),
 					gas.NE(
 						&gas.C{
 							Directives: gas.Directives{
 								Model: gas.ModelDirective{
-									Data: "foo",
+									Data:      "foo",
 									Component: this,
 								},
 							},
 							Tag: "input",
 							Attrs: map[string]string{
 								"type": "range",
-								"min": "0",
-								"max": "255",
+								"min":  "0",
+								"max":  "255",
 							},
 						}),
-					)})
+				)
+			})
 	must(err)
 
 	err = gas.Init(app)

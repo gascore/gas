@@ -28,7 +28,7 @@ func main() {
 				return gas.CL(
 					gas.NE(
 						&gas.C{
-							Handlers: map[string]gas.Handler {
+							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.C, e gas.Object) {
 									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
 								},
@@ -40,7 +40,7 @@ func main() {
 						},
 						gas.NE(
 							&gas.C{
-								Directives:gas.Directives{
+								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
 										return this.GetData("show").(bool)
 									},
@@ -49,38 +49,36 @@ func main() {
 							"Show text"),
 						gas.NE(
 							&gas.C{
-								Directives:gas.Directives{
+								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
 										return !this.GetData("show").(bool)
 									},
 								},
 							},
-							"Hide text"),),
-						gas.NE(
-							&gas.C{
-								Directives:
-								gas.Directives{
-									If: func(c *gas.C) bool {
-										return !this.GetData("show").(bool)
-									},
+							"Hide text")),
+					gas.NE(
+						&gas.C{
+							Directives: gas.Directives{
+								If: func(c *gas.C) bool {
+									return !this.GetData("show").(bool)
 								},
-								Hooks:
-								gas.Hooks{
-									Created: func(this2 *gas.C) error {
-										this.ConsoleLog("Hidden text is created!")
-										return this.SetData("counter", this.GetData("counter").(int)+1)
-									},
-									WillDestroy: func(this2 *gas.C) error {
-										this.ConsoleLog("Hidden text will destroy!")
-										return nil
-									},
-								},
-								Tag: "i",
 							},
-							fmt.Sprintf("Hidden text (you show hidden text %d times)", this.GetData("counter")),
-						),
-					)
-			},)
+							Hooks: gas.Hooks{
+								Created: func(this2 *gas.C) error {
+									this.ConsoleLog("Hidden text is created!")
+									return this.SetData("counter", this.GetData("counter").(int)+1)
+								},
+								WillDestroy: func(this2 *gas.C) error {
+									this.ConsoleLog("Hidden text will destroy!")
+									return nil
+								},
+							},
+							Tag: "i",
+						},
+						fmt.Sprintf("Hidden text (you show hidden text %d times)", this.GetData("counter")),
+					),
+				)
+			})
 	must(err)
 
 	err = gas.Init(app)

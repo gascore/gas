@@ -31,18 +31,18 @@ func Changed(new, old interface{}) (bool, error) {
 func isComponentsEquals(new, old *Component) bool {
 	// sometimes i'm sad that i chose strict-type pl
 	daE := true // cmp.Equal(new.Data, old.Data)
-	wE  := cmp.Equal(new.Watchers, old.Watchers)
-	mE  := true // cmp.Equal(new.Methods, old.Methods)
+	wE := cmp.Equal(new.Watchers, old.Watchers)
+	mE := true  // cmp.Equal(new.Methods, old.Methods)
 	coE := true // cmp.Equal(new.Computeds, old.Computeds)
 
 	hE := compareHooks(new.Hooks, old.Hooks)
 	bE := compareBinds(new.RenderedBinds, old.RenderedBinds)
 
 	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
-	diFE  := compareForDirectives(new, old)
-	diME  := (new.Directives.Model.Data == old.Directives.Model.Data) && (new.Directives.Model.Component == old.Directives.Model.Component)
-	diHE  := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
-	diE   := diIfE && diFE && diME && diHE // Directives
+	diFE := compareForDirectives(new, old)
+	diME := (new.Directives.Model.Data == old.Directives.Model.Data) && (new.Directives.Model.Component == old.Directives.Model.Component)
+	diHE := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
+	diE := diIfE && diFE && diME && diHE // Directives
 
 	tE := new.Tag == old.Tag
 	aE := cmp.Equal(new.Attrs, old.Attrs)

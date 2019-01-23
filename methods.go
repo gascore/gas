@@ -6,7 +6,7 @@ import (
 
 type PocketMethod func(...interface{}) error
 
-type PocketComputed func(...interface{})interface{}
+type PocketComputed func(...interface{}) interface{}
 
 // Method runs a component method and updates component after
 func (c *Component) Method(name string, values ...interface{}) error {
@@ -21,7 +21,7 @@ func (c *Component) Method(name string, values ...interface{}) error {
 }
 
 // GetPocketMethod return function returns executing method with binding component
-func (c *Component) GetPocketMethod(name string) PocketMethod  {
+func (c *Component) GetPocketMethod(name string) PocketMethod {
 	method := c.Methods[name]
 	if method == nil {
 		c.WarnError(fmt.Errorf("invalid method name: %s", name))
@@ -43,7 +43,7 @@ func (c *Component) Computed(name string, values ...interface{}) interface{} {
 }
 
 // GetPocketComputed return function returns executing computed with binding component
-func (c *Component) GetPocketComputed(name string) PocketComputed  {
+func (c *Component) GetPocketComputed(name string) PocketComputed {
 	computed := c.Computeds[name]
 	if computed == nil {
 		c.WarnError(fmt.Errorf("invalid computed name: %s", name))

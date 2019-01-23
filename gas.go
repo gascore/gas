@@ -15,7 +15,9 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 
 	c.Tag = tagName
 
-	if c.Attrs == nil { c.Attrs = make(map[string]string) }
+	if c.Attrs == nil {
+		c.Attrs = make(map[string]string)
+	}
 	c.Attrs["id"] = startPoint
 	c.Attrs["data-main"] = "true"
 
@@ -40,6 +42,7 @@ func Init(gas Gas) error {
 func ToGetComponentList(childes ...interface{}) []interface{} {
 	return childes
 }
+
 var CL = ToGetComponentList
 
 // WarnError log error
@@ -60,7 +63,7 @@ func (c *Component) WarnIfNot(ok bool) {
 	c.be.ConsoleError(fmt.Sprintf("invalid data type"))
 }
 
-func (c *Component) ConsoleLog  (a ...interface{}) { c.be.ConsoleLog  (a...) }
+func (c *Component) ConsoleLog(a ...interface{})   { c.be.ConsoleLog(a...) }
 func (c *Component) ConsoleError(a ...interface{}) { c.be.ConsoleError(a...) }
 
 var signal = make(chan int)
@@ -68,6 +71,6 @@ var signal = make(chan int)
 // KeepAlive keep alive runtime, without it application will stop (user won't be able to init events)
 func KeepAlive() {
 	for {
-		<- signal
+		<-signal
 	}
 }

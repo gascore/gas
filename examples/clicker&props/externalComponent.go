@@ -19,5 +19,5 @@ func GetNumberViewer(click int) interface{} {
 		func(this *gas.Component) []interface{} {
 			return gas.CL(
 				fmt.Sprintf("%d times", click))
-		},)
+		})
 }

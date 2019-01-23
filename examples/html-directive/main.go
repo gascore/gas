@@ -16,8 +16,7 @@ func main() {
 			"app",
 			&gas.C{
 				Data: map[string]interface{}{
-					"articleText":
-					`
+					"articleText": `
 <h1>
 	Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 </h1>
@@ -37,7 +36,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 <h3>
 	Nulla facilisi. Donec mattis auctor finibus.
 </h3>`,
-					"helloText": `<h1>To see article click button!</h1>`,
+					"helloText":       `<h1>To see article click button!</h1>`,
 					"isArticleActive": false,
 				},
 			},
@@ -55,7 +54,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						},
 						gas.NE(
 							&gas.C{
-								Directives:gas.Directives{
+								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
 										return this.GetData("isArticleActive").(bool)
 									},
@@ -64,7 +63,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 							"Hide article"),
 						gas.NE(
 							&gas.C{
-								Directives:gas.Directives{
+								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
 										return !this.GetData("isArticleActive").(bool)
 									},
@@ -87,15 +86,15 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 									this.WarnIfNot(ok)
 
 									return html
-								},},
+								}},
 							},
 							Tag: "article",
 							Attrs: map[string]string{
-								"id": "article",
+								"id":    "article",
 								"style": `border: 1px solid #dedede;padding: 2px 4px;margin-top:12px;`,
 							},
 						}))
-			},)
+			})
 	must(err)
 
 	err = gas.Init(app)

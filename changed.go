@@ -15,50 +15,56 @@ func Changed(new, old interface{}) (bool, error) {
 	if IsString(new) {
 		return new.(string) != old.(string), nil
 	} else if IsComponent(new) {
-		newC := I2C(new)
-		oldC := I2C(old)
-
-		if newC.Directives.HTML.Rendered != oldC.Directives.HTML.Rendered {
-			return true, nil
-		}
-
-		return !isComponentsEquals(newC, oldC), nil // thank you god for the go-cmp
+		return !isComponentsEquals(I2C(new), I2C(old)), nil // thank you god for the go-cmp
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
 }
 
 func isComponentsEquals(new, old *Component) bool {
-	// sometimes i'm sad that i chose strict-type pl
-	daE := true // cmp.Equal(new.Data, old.Data)
-	wE := cmp.Equal(new.Watchers, old.Watchers)
-	mE := true  // cmp.Equal(new.Methods, old.Methods)
-	coE := true // cmp.Equal(new.Computeds, old.Computeds)
+	return  new.Tag == old.Tag &&
+			new.Directives.HTML.Rendered != old.Directives.HTML.Rendered &&
 
-	hE := compareHooks(new.Hooks, old.Hooks)
-	bE := compareBinds(new.RenderedBinds, old.RenderedBinds)
+			cmp.Equal(new.Attrs, old.Attrs) &&
+			cmp.Equal(new.RenderedBinds, old.RenderedBinds) &&
 
-	diIfE := reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer()
-	diFE := compareForDirectives(new, old)
-	diME := (new.Directives.Model.Data == old.Directives.Model.Data) && (new.Directives.Model.Component == old.Directives.Model.Component)
-	diHE := reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer()
-	diE := diIfE && diFE && diME && diHE // Directives
+			compareHooks(new, old) &&
 
-	tE := new.Tag == old.Tag
-	aE := cmp.Equal(new.Attrs, old.Attrs)
+			reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer() &&
+			reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer() &&
+			compareForDirectives(new, old) &&
 
-	return daE && wE && mE && coE && hE && bE && diE && tE && aE
+			new.Directives.Model.Data == old.Directives.Model.Data &&
+			new.Directives.Model.Component == old.Directives.Model.Component
 }
 
-func compareHooks(new, old Hooks) bool {
-	created := cmp.Equal(new.Created, old.Created)
-	mounted := cmp.Equal(new.Mounted, old.Mounted)
-	willDestroy := cmp.Equal(new.WillDestroy, old.WillDestroy)
-	//beforeUpdate := cmp.Equal(new.BeforeUpdate, old.BeforeUpdate)
-	//updated := cmp.Equal(new.Updated, old.Updated)
+func compareHooks(new, old *Component) bool {
+	if !new.isElement && !old.isElement {
+		return true
+	}
+	
+	if (new.isElement && !old.isElement) || (!new.isElement && old.isElement) {
+		return false
+	}
 
-	//return created && mounted && beforeDestroy && destroyed && beforeUpdate && updated
-	return created && mounted && willDestroy
+	return compareHook(new.Hooks.Created, old.Hooks.Created) &&
+		compareHook(new.Hooks.Mounted, old.Hooks.Mounted) &&
+		compareHook(new.Hooks.WillDestroy, old.Hooks.WillDestroy) &&
+		compareHook(new.Hooks.BeforeUpdate, old.Hooks.BeforeUpdate) &&
+		compareHook(new.Hooks.Updated, old.Hooks.Updated)
+}
+
+func compareHook(new, old Hook) bool {
+	if new == nil && old == nil {
+		return true
+	}
+
+	//if (new == nil && old != nil) || (new != nil && old == nil) {
+	//	return false
+	//}
+
+	// cmp.Equal and reflect.Equal can't do it better
+	return false
 }
 
 func compareForDirectives(new, old *Component) bool {
@@ -75,18 +81,4 @@ func compareForDirectives(new, old *Component) bool {
 	} else {
 		return newI == oldI && newVal == oldVal
 	}
-}
-
-func compareBinds(new, old map[string]string) bool {
-	if len(new) != len(old) {
-		return false
-	}
-
-	for newKey, newValue := range new {
-		if newValue != old[newKey] {
-			return false
-		}
-	}
-
-	return true
 }

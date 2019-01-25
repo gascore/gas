@@ -30,7 +30,7 @@ func RunMountedIfCan(i interface{}) error {
 		}
 	}
 
-	if c.Hooks.Mounted != nil {
+	if c.Hooks.Mounted != nil  {
 		err := c.Hooks.Mounted(c)
 		if err != nil {
 			return err

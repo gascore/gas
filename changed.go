@@ -23,7 +23,7 @@ func Changed(new, old interface{}) (bool, error) {
 
 func isComponentsEquals(new, old *Component) bool {
 	return  new.Tag == old.Tag &&
-			new.Directives.HTML.Rendered != old.Directives.HTML.Rendered &&
+			new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
 
 			cmp.Equal(new.Attrs, old.Attrs) &&
 			cmp.Equal(new.RenderedBinds, old.RenderedBinds) &&
@@ -33,9 +33,7 @@ func isComponentsEquals(new, old *Component) bool {
 			reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer() &&
 			reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer() &&
 			compareForDirectives(new, old) &&
-
-			new.Directives.Model.Data == old.Directives.Model.Data &&
-			new.Directives.Model.Component == old.Directives.Model.Component
+			new.Directives.Model.Data == old.Directives.Model.Data
 }
 
 func compareHooks(new, old *Component) bool {

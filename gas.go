@@ -65,12 +65,3 @@ func (c *Component) WarnIfNot(ok bool) {
 
 func (c *Component) ConsoleLog(a ...interface{})   { c.be.ConsoleLog(a...) }
 func (c *Component) ConsoleError(a ...interface{}) { c.be.ConsoleError(a...) }
-
-var signal = make(chan int)
-
-// KeepAlive keep alive runtime, without it application will stop (user won't be able to init events)
-func KeepAlive() {
-	for {
-		<-signal
-	}
-}

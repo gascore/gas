@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/gascore/gas-web/wasm"
+	"github.com/noartem/dom"
 )
 
 // Example application #11
@@ -15,7 +15,7 @@ func main() {
 	app, err :=
 		gas.New(
 			//gas_web.GetBackEnd(gojs.GetDomBackEnd()),
-			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
+			gas_web.GetBackEnd(),
 			"app",
 			&gas.C{
 				Data: map[string]interface{}{
@@ -217,7 +217,7 @@ func main() {
 
 	err = gas.Init(app)
 	must(err)
-	gas.KeepAlive()
+	dom.KeepAlive()
 }
 
 func getList(pThis *gas.C, index int) interface{} {

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/gascore/gas-web/wasm"
 )
 
 // Example application #6
@@ -13,7 +12,7 @@ import (
 func main() {
 	app, err :=
 		gas.New(
-			gas_web.GetBackEnd(wasm.GetDomBackEnd()),
+			gas_web.GetBackEnd(),
 			"app",
 			&gas.Component{},
 			func(main *gas.Component) []interface{} {
@@ -160,7 +159,7 @@ func main() {
 
 	err = gas.Init(app)
 	must(err)
-	gas.KeepAlive()
+	dom.KeepAlive()
 }
 
 func must(err error) {

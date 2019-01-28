@@ -2,7 +2,6 @@ package gas
 
 import (
 	"fmt"
-	"github.com/google/go-cmp/cmp"
 	"reflect"
 )
 
@@ -15,7 +14,7 @@ func Changed(new, old interface{}) (bool, error) {
 	if IsString(new) {
 		return new.(string) != old.(string), nil
 	} else if IsComponent(new) {
-		return !isComponentsEquals(I2C(new), I2C(old)), nil // thank you god for the go-cmp
+		return !isComponentsEquals(I2C(new), I2C(old)), nil
 	}
 
 	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
@@ -25,8 +24,8 @@ func isComponentsEquals(new, old *Component) bool {
 	return  new.Tag == old.Tag &&
 			new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
 
-			cmp.Equal(new.Attrs, old.Attrs) &&
-			cmp.Equal(new.RenderedBinds, old.RenderedBinds) &&
+			reflect.DeepEqual(new.Attrs, old.Attrs) &&
+			reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
 
 			compareHooks(new, old) &&
 
@@ -57,12 +56,11 @@ func compareHook(new, old Hook) bool {
 		return true
 	}
 
-	//if (new == nil && old != nil) || (new != nil && old == nil) {
-	//	return false
-	//}
+	if (new == nil && old != nil) || (new != nil && old == nil) {
+		return false
+	}
 
-	// cmp.Equal and reflect.Equal can't do it better
-	return false
+	return reflect.ValueOf(new).Pointer() == reflect.ValueOf(old).Pointer()
 }
 
 func compareForDirectives(new, old *Component) bool {

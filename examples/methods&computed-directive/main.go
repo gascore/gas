@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/noartem/dom"
 )
 
 // Example application #5
@@ -58,7 +57,7 @@ func main() {
 
 	err = gas.Init(app)
 	must(err)
-	dom.KeepAlive()
+	gas_web.KeepAlive()
 }
 
 func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {

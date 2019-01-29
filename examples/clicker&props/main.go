@@ -77,7 +77,7 @@ func main() {
 	must(err)
 	err = gas.Init(app)
 	must(err)
-	dom.KeepAlive()
+	gas_web.KeepAlive()
 }
 
 func must(err error) {

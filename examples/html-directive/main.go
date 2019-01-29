@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/noartem/dom"
 )
 
 // Example application #7
@@ -99,7 +98,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 
 	err = gas.Init(app)
 	must(err)
-	dom.KeepAlive()
+	gas_web.KeepAlive()
 }
 
 func must(err error) {

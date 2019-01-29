@@ -70,7 +70,7 @@ type Object interface {
 	String() string
 	Int() int
 
-	Get(string) interface{}
+	Get(string) Object
 	GetString(string) string
 	GetBool(string) bool
 	GetInt(string) int

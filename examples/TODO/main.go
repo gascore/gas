@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/noartem/dom"
 )
 
 // Example application #11
@@ -217,7 +216,7 @@ func main() {
 
 	err = gas.Init(app)
 	must(err)
-	dom.KeepAlive()
+	gas_web.KeepAlive()
 }
 
 func getList(pThis *gas.C, index int) interface{} {

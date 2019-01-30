@@ -188,8 +188,8 @@ func NewForByData(dataForList []interface{}, this *Component, renderer func(int,
 		item := renderer(i, el)
 
 		if IsComponent(item) {
-			itemC := I2C(item)
-			itemC.Directives.For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
+			I2C(item).Directives.For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
+			I2C(item).Attrs["data-for-i"] = fmt.Sprintf("i")
 		}
 
 		items = append(items, item)

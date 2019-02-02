@@ -71,6 +71,7 @@ type Object interface {
 	Int() int
 
 	Get(string) Object
+	Set(string, interface{})
 	GetString(string) string
 	GetBool(string) bool
 	GetInt(string) int
@@ -189,7 +190,9 @@ func NewForByData(dataForList []interface{}, this *Component, renderer func(int,
 
 		if IsComponent(item) {
 			I2C(item).Directives.For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
-			I2C(item).Attrs["data-for-i"] = fmt.Sprintf("i")
+
+			if I2C(item).Attrs == nil { I2C(item).Attrs = make(map[string]string) }
+			I2C(item).Attrs["data-for-i"] = fmt.Sprintf("%d", i)
 		}
 
 		items = append(items, item)

@@ -75,6 +75,6 @@ func compareForDirectives(new, old *Component) bool {
 	if newIsItem != oldIsItem {
 		return false
 	} else {
-		return newI == oldI && newVal == oldVal
+		return newI == oldI && reflect.DeepEqual(newVal, oldVal)
 	}
 }

@@ -45,6 +45,10 @@ func (c *Component) ForceUpdate() error {
 	return c.update(c.Directives.HTML.Rendered)
 }
 
+func (c *Component) ReCreate() error {
+	return c.be.ReCreate(c)
+}
+
 // RenderTree return full rendered childes tree of component
 func RenderTree(c *Component) []interface{} {
 	var childes []interface{}

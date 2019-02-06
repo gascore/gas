@@ -155,12 +155,11 @@ func renderChild(component *Component, arr []interface{}, child interface{}) []i
 		childC := I2C(child)
 
 		childC.be = component.be
+		childC.Parent = component
 
 		if childC.Directives.If != nil && !childC.Directives.If(childC) {
 			return arr
 		}
-
-		childC.Parent = component
 	} else if IsChildesArr(child) {
 		for _, el := range child.([]interface{}) {
 			arr = renderChild(component, arr, el)

@@ -27,6 +27,10 @@ func isComponentsEquals(new, old *Component) bool {
 			reflect.DeepEqual(new.Attrs, old.Attrs) &&
 			reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
 
+			reflect.DeepEqual(new.Data, old.Data) &&
+			compareMethods(new.Methods, old.Methods) &&
+			compareComputeds(new.Computeds, old.Computeds) &&
+
 			compareHooks(new, old) &&
 
 			reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer() &&
@@ -35,12 +39,36 @@ func isComponentsEquals(new, old *Component) bool {
 			new.Directives.Model.Data == old.Directives.Model.Data
 }
 
-func compareHooks(new, old *Component) bool {
-	if !new.isElement && !old.isElement {
-		return true
+func compareMethods(new map[string]Method, old map[string]Method) bool {
+	if len(new) != len(old) {
+		return false
 	}
-	
-	if (new.isElement && !old.isElement) || (!new.isElement && old.isElement) {
+
+	for i, el := range new {
+		if reflect.ValueOf(el).Pointer() != reflect.ValueOf(old[i]).Pointer() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func compareComputeds(new map[string]Computed, old map[string]Computed) bool {
+	if len(new) != len(old) {
+		return false
+	}
+
+	for i, el := range new {
+		if reflect.ValueOf(el).Pointer() != reflect.ValueOf(old[i]).Pointer() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func compareHooks(new, old *Component) bool {
+	if  (new.isElement && !old.isElement) || (!new.isElement && old.isElement) {
 		return false
 	}
 

@@ -128,7 +128,9 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 		component.Tag = strings.ToLower(component.Tag)
 	}
 
-	component.UUID = uuid4.New().String()
+	if len(component.UUID) == 0 {
+		component.UUID = uuid4.New().String()
+	}
 
 	component.Childes = func(this *Component) []interface{} {
 		var compiled []interface{}
@@ -215,8 +217,19 @@ func (c *Component) ForItemInfo() (bool, int, interface{}) {
 	return true, c.Directives.For.itemValueI, c.Directives.For.itemValueVal
 }
 
-// GetElement return *dom.Element by component structure
+// GetElement return *dom.Element by component
 func (c *Component) GetElement() interface{} {
+	_el := c.be.GetElement(c)
+	if _el == nil {
+		c.WarnError(fmt.Errorf("GetElement for component: %s, returning nil", c.UUID))
+		return nil
+	}
+
+	return _el
+}
+
+// GetElementUnsafely return *dom.Element by component without warning
+func (c *Component) GetElementUnsafely() interface{} {
 	return c.be.GetElement(c)
 }
 

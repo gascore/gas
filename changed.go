@@ -2,6 +2,7 @@ package gas
 
 import (
 	"fmt"
+	"github.com/Sinicablyat/gas"
 	"reflect"
 )
 
@@ -11,13 +12,16 @@ func Changed(new, old interface{}) (bool, error) {
 		return true, nil
 	}
 
-	if IsString(new) {
-		return new.(string) != old.(string), nil
-	} else if IsComponent(new) {
+	switch new.(type) {
+	case *gas.Component:
 		return !isComponentsEquals(I2C(new), I2C(old)), nil
-	}
 
-	return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+	case string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return new != old, nil
+
+	default:
+		return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+	}
 }
 
 func isComponentsEquals(new, old *Component) bool {

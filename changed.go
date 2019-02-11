@@ -2,7 +2,6 @@ package gas
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/gas"
 	"reflect"
 )
 
@@ -13,7 +12,7 @@ func Changed(new, old interface{}) (bool, error) {
 	}
 
 	switch new.(type) {
-	case *gas.Component:
+	case *Component:
 		return !isComponentsEquals(I2C(new), I2C(old)), nil
 
 	case string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
@@ -25,6 +24,24 @@ func Changed(new, old interface{}) (bool, error) {
 }
 
 func isComponentsEquals(new, old *Component) bool {
+	// if one of element and second is component return false
+	if (new.isElement && !old.isElement) || (!new.isElement && old.isElement) {
+		return false
+	}
+
+	// if components are elements
+	if new.isElement && old.isElement {
+		return new.Tag == old.Tag &&
+			new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
+			reflect.DeepEqual(new.Attrs, old.Attrs) &&
+			reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
+			reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer() &&
+			reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer() &&
+			compareForDirectives(new, old) &&
+			new.Directives.Model.Data == old.Directives.Model.Data
+	}
+
+	// if components are *true* components
 	return  new.Tag == old.Tag &&
 			new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
 
@@ -35,12 +52,7 @@ func isComponentsEquals(new, old *Component) bool {
 			compareMethods(new.Methods, old.Methods) &&
 			compareComputeds(new.Computeds, old.Computeds) &&
 
-			compareHooks(new, old) &&
-
-			reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer() &&
-			reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer() &&
-			compareForDirectives(new, old) &&
-			new.Directives.Model.Data == old.Directives.Model.Data
+			compareHooks(new, old)
 }
 
 func compareMethods(new map[string]Method, old map[string]Method) bool {
@@ -72,10 +84,6 @@ func compareComputeds(new map[string]Computed, old map[string]Computed) bool {
 }
 
 func compareHooks(new, old *Component) bool {
-	if  (new.isElement && !old.isElement) || (!new.isElement && old.isElement) {
-		return false
-	}
-
 	return compareHook(new.Hooks.Created, old.Hooks.Created) &&
 		compareHook(new.Hooks.Mounted, old.Hooks.Mounted) &&
 		compareHook(new.Hooks.WillDestroy, old.Hooks.WillDestroy) &&

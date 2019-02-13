@@ -192,7 +192,9 @@ func NewForByData(dataForList []interface{}, this *Component, renderer func(int,
 		if IsComponent(item) {
 			I2C(item).Directives.For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
 
-			if I2C(item).Attrs == nil { I2C(item).Attrs = make(map[string]string) }
+			if I2C(item).Attrs == nil {
+				I2C(item).Attrs = make(map[string]string)
+			}
 			I2C(item).Attrs["data-for-i"] = fmt.Sprintf("%d", i)
 		}
 

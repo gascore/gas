@@ -42,17 +42,17 @@ func isComponentsEquals(new, old *Component) bool {
 	}
 
 	// if components are *true* components
-	return  new.Tag == old.Tag &&
-			new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
+	return new.Tag == old.Tag &&
+		new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
 
-			reflect.DeepEqual(new.Attrs, old.Attrs) &&
-			reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
+		reflect.DeepEqual(new.Attrs, old.Attrs) &&
+		reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
 
-			reflect.DeepEqual(new.Data, old.Data) &&
-			compareMethods(new.Methods, old.Methods) &&
-			compareComputeds(new.Computeds, old.Computeds) &&
+		reflect.DeepEqual(new.Data, old.Data) &&
+		compareMethods(new.Methods, old.Methods) &&
+		compareComputeds(new.Computeds, old.Computeds) &&
 
-			compareHooks(new, old)
+		compareHooks(new, old)
 }
 
 func compareMethods(new map[string]Method, old map[string]Method) bool {

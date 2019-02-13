@@ -2,7 +2,6 @@ package gas
 
 import (
 	"fmt"
-	"github.com/frankenbeanies/uuid4"
 )
 
 // New create new gas application with custom backend
@@ -62,10 +61,6 @@ func (c *Component) WarnIfNot(ok bool) {
 	}
 
 	c.be.ConsoleError(fmt.Sprintf("invalid data type"))
-}
-
-func NewID() string {
-	return uuid4.New().String()
 }
 
 func (c *Component) ConsoleLog(a ...interface{})   { c.be.ConsoleLog(a...) }

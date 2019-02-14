@@ -1,3 +1,7 @@
+# ignore cover files
+cover.html
+cover.out
+
 # ignore app.js files
 *app.js*
 

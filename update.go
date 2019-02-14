@@ -10,10 +10,10 @@ func (c *Component) htmlDirective() string {
 	return htmlDirective
 }
 
-func (c *Component) update(oldHtmlDirective string) error {
+func (c *Component) update(oldHTMLDirective string) error {
 	newTree := RenderTree(c)
 
-	if oldHtmlDirective != c.htmlDirective() {
+	if oldHTMLDirective != c.htmlDirective() {
 		err := c.be.ReCreate(c)
 		if err != nil {
 			return err
@@ -28,13 +28,13 @@ func (c *Component) update(oldHtmlDirective string) error {
 	}
 
 	c.RChildes = newTree
-	c.UpdateHtmlDirective()
+	c.UpdateHTMLDirective()
 
 	return nil
 }
 
-// UpdateHtmlDirective trying rerender component html directive
-func (c *Component) UpdateHtmlDirective() {
+// UpdateHTMLDirective trying rerender component html directive
+func (c *Component) UpdateHTMLDirective() {
 	if c.Directives.HTML.Render != nil {
 		c.Directives.HTML.Rendered = c.Directives.HTML.Render(c)
 	}
@@ -67,7 +67,7 @@ func RenderTree(c *Component) []interface{} {
 			}
 
 			elC.RChildes = RenderTree(elC)
-			elC.UpdateHtmlDirective()
+			elC.UpdateHTMLDirective()
 
 			el = elC
 		}

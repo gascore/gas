@@ -30,7 +30,7 @@ type GetComponentChildes func(*Component) []interface{}
 // 2. Another component
 type GetChildes func(*Component) []interface{}
 
-// Bind - dynamic component attribute (analogue for vue `v-bind:`).
+// Bind - dynamic component attribute (analog for vue `v-bind:`).
 type Bind func() string
 
 // Directives struct storing component if-directive
@@ -86,13 +86,13 @@ type Watcher func(*Component, interface{}, interface{}) error // (this, new, old
 
 // Component -- basic component struct
 type Component struct {
-	Data     map[string]interface{}
-	Watchers map[string]Watcher
-
+	Data      map[string]interface{}
+	Watchers  map[string]Watcher
 	Methods   map[string]Method
 	Computeds map[string]Computed
 
-	Hooks         Hooks              // lifecycle hooks
+	Hooks Hooks // lifecycle hooks
+
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds         map[string]Bind    // dynamic attributes
 	RenderedBinds map[string]string  // store binds for changed func
@@ -128,7 +128,7 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 		component.Tag = strings.ToLower(component.Tag)
 	}
 
-	if len(component.UUID) == 0 {
+	if component.UUID == "" {
 		component.UUID = uuid4.New().String()
 	}
 
@@ -205,13 +205,13 @@ func NewForByData(dataForList []interface{}, this *Component, renderer func(int,
 }
 
 // IsElement return Component.isElement.
-// isElement isn't public because it's useless for applications developing but helpful libraries
+// isElement isn't public because it's useless for applications developing but for helpful libraries
 func (c *Component) IsElement() bool {
 	return c.isElement
 }
 
 // ForItemInfo return info about FOR directive
-func (c *Component) ForItemInfo() (bool, int, interface{}) {
+func (c *Component) ForItemInfo() (isItem bool, i int, val interface{}) {
 	if !c.Directives.For.isItem {
 		return false, 0, nil
 	}
@@ -223,7 +223,7 @@ func (c *Component) ForItemInfo() (bool, int, interface{}) {
 func (c *Component) GetElement() interface{} {
 	_el := c.be.GetElement(c)
 	if _el == nil {
-		c.WarnError(fmt.Errorf("GetElement for component: %s, returning nil", c.UUID))
+		c.WarnError(fmt.Errorf("component GetElement: %s, returning nil", c.UUID))
 		return nil
 	}
 

@@ -19,7 +19,6 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 		c.Attrs = make(map[string]string)
 	}
 	c.Attrs["id"] = startPoint
-	c.Attrs["data-main"] = "true"
 
 	mainComponent := NewComponent(c, getChildes)
 

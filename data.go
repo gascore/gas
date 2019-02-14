@@ -15,7 +15,7 @@ func (c *Component) GetData(query string) interface{} {
 
 // SetData set data field and ForceUpdate component (after changes)
 func (c *Component) SetData(query string, value interface{}) error {
-	oldHtmlDirective := c.htmlDirective()
+	oldHTMLDirective := c.htmlDirective()
 
 	oldValue := c.Data[query]
 	err := c.SetDataFree(query, value)
@@ -30,7 +30,7 @@ func (c *Component) SetData(query string, value interface{}) error {
 		}
 	}
 
-	return c.update(oldHtmlDirective)
+	return c.update(oldHTMLDirective)
 }
 
 // SetDataFree set data without ForceUpdate
@@ -51,14 +51,14 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 		return errors.New("invalid data field type")
 	}
 
-	oldHtmlDirective := c.htmlDirective()
+	oldHTMLDirective := c.htmlDirective()
 
 	err := c.SetDataFree(query, remove(list, index))
 	if err != nil {
 		return err
 	}
 
-	err = c.update(oldHtmlDirective)
+	err = c.update(oldHTMLDirective)
 	if err != nil {
 		return err
 	}
@@ -90,11 +90,11 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 		return errors.New("invalid current list")
 	}
 
-	oldHtmlDirective := c.htmlDirective()
+	oldHTMLDirective := c.htmlDirective()
 
 	list[index] = value
 
-	err := c.update(oldHtmlDirective)
+	err := c.update(oldHTMLDirective)
 	if err != nil {
 		return err
 	}
@@ -112,17 +112,17 @@ func remove(a []interface{}, i int) []interface{} {
 }
 
 // DataDeleteFromArray remove element from data field (works only with map[string]interface{} maps)
-func (c *Component) DataDeleteFromMap(query string, key string) error {
+func (c *Component) DataDeleteFromMap(query, key string) error {
 	m, ok := c.GetData(query).(map[string]interface{})
 	if !ok {
 		return errors.New("invalid data field type")
 	}
 
-	oldHtmlDirective := c.htmlDirective()
+	oldHTMLDirective := c.htmlDirective()
 
 	delete(m, key)
 
-	err := c.update(oldHtmlDirective)
+	err := c.update(oldHTMLDirective)
 	if err != nil {
 		return err
 	}
@@ -131,17 +131,17 @@ func (c *Component) DataDeleteFromMap(query string, key string) error {
 }
 
 // DataEditMap edit element to data field (works only with map[string]interface{} maps)
-func (c *Component) DataEditMap(query string, key string, value interface{}) error {
+func (c *Component) DataEditMap(query, key string, value interface{}) error {
 	m, ok := c.GetData(query).(map[string]interface{})
 	if !ok {
 		return errors.New("invalid data field type")
 	}
 
-	oldHtmlDirective := c.htmlDirective()
+	oldHTMLDirective := c.htmlDirective()
 
 	m[key] = value
 
-	err := c.update(oldHtmlDirective)
+	err := c.update(oldHTMLDirective)
 	if err != nil {
 		return err
 	}

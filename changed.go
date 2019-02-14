@@ -6,62 +6,104 @@ import (
 )
 
 // Changed return true if node Changed
-func Changed(new, old interface{}) (bool, error) {
-	if fmt.Sprintf("%T", new) != fmt.Sprintf("%T", old) {
+func Changed(newEl, oldEl interface{}) (bool, error) {
+	if fmt.Sprintf("%T", newEl) != fmt.Sprintf("%T", oldEl) {
 		return true, nil
 	}
 
-	switch new.(type) {
+	switch newEl.(type) {
 	case *Component:
-		return !isComponentsEquals(I2C(new), I2C(old)), nil
+		return !isComponentsEquals(I2C(newEl), I2C(oldEl)), nil
 
 	case string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		return new != old, nil
+		return newEl != oldEl, nil
 
 	default:
-		return false, fmt.Errorf("changed: invalid `new` or `old`. types: %T, %T", new, old)
+		return false, fmt.Errorf("changed: invalid `newEl` or `oldEl`. types: %T, %T", newEl, oldEl)
 	}
 }
 
-func isComponentsEquals(new, old *Component) bool {
+func isComponentsEquals(newC, oldC *Component) bool {
 	// if one of element and second is component return false
-	if (new.isElement && !old.isElement) || (!new.isElement && old.isElement) {
+	if (newC.isElement && !oldC.isElement) || (!newC.isElement && oldC.isElement) {
 		return false
 	}
 
 	// if components are elements
-	if new.isElement && old.isElement {
-		return new.Tag == old.Tag &&
-			new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
-			reflect.DeepEqual(new.Attrs, old.Attrs) &&
-			reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
-			reflect.ValueOf(new.Directives.HTML.Render).Pointer() == reflect.ValueOf(old.Directives.HTML.Render).Pointer() &&
-			reflect.ValueOf(new.Directives.If).Pointer() == reflect.ValueOf(old.Directives.If).Pointer() &&
-			compareForDirectives(new, old) &&
-			new.Directives.Model.Data == old.Directives.Model.Data
+	if newC.isElement && oldC.isElement {
+		return newC.Tag == oldC.Tag &&
+			newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
+
+			reflect.DeepEqual(newC.Attrs, oldC.Attrs) &&
+			reflect.DeepEqual(newC.RenderedBinds, oldC.RenderedBinds) &&
+
+			reflect.ValueOf(newC.Directives.HTML.Render).Pointer() == reflect.ValueOf(oldC.Directives.HTML.Render).Pointer() &&
+			reflect.ValueOf(newC.Directives.If).Pointer() == reflect.ValueOf(oldC.Directives.If).Pointer() &&
+			compareForDirectives(newC, oldC) &&
+			newC.Directives.Model.Data == oldC.Directives.Model.Data
 	}
 
 	// if components are *true* components
-	return new.Tag == old.Tag &&
-		new.Directives.HTML.Rendered == old.Directives.HTML.Rendered &&
+	return newC.Tag == oldC.Tag &&
+		newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
 
-		reflect.DeepEqual(new.Attrs, old.Attrs) &&
-		reflect.DeepEqual(new.RenderedBinds, old.RenderedBinds) &&
+		reflect.DeepEqual(newC.Data, oldC.Data) &&
+		compareWatchers(newC.Watchers, oldC.Watchers) &&
+		compareMethods(newC.Methods, oldC.Methods) &&
+		compareComputeds(newC.Computeds, oldC.Computeds) &&
 
-		reflect.DeepEqual(new.Data, old.Data) &&
-		compareMethods(new.Methods, old.Methods) &&
-		compareComputeds(new.Computeds, old.Computeds) &&
-
-		compareHooks(new, old)
+		compareHooks(newC, oldC)
 }
 
-func compareMethods(new map[string]Method, old map[string]Method) bool {
-	if len(new) != len(old) {
+func compareWatchers(a, b map[string]Watcher) bool {
+	n := make(map[string]interface{})
+	for key, val := range a {
+		n[key] = val
+	}
+
+	o := make(map[string]interface{})
+	for key, val := range b {
+		o[key] = val
+	}
+
+	return compareMapStringFunc(n, o)
+}
+
+func compareComputeds(a, b map[string]Computed) bool {
+	n := make(map[string]interface{})
+	for key, val := range a {
+		n[key] = val
+	}
+
+	o := make(map[string]interface{})
+	for key, val := range b {
+		o[key] = val
+	}
+
+	return compareMapStringFunc(n, o)
+}
+
+func compareMethods(a, b map[string]Method) bool {
+	n := make(map[string]interface{})
+	for key, val := range a {
+		n[key] = val
+	}
+
+	o := make(map[string]interface{})
+	for key, val := range b {
+		o[key] = val
+	}
+
+	return compareMapStringFunc(n, o)
+}
+
+func compareMapStringFunc(newMap, oldMap map[string]interface{}) bool {
+	if len(newMap) != len(oldMap) {
 		return false
 	}
 
-	for i, el := range new {
-		if reflect.ValueOf(el).Pointer() != reflect.ValueOf(old[i]).Pointer() {
+	for i, el := range newMap {
+		if reflect.ValueOf(el).Pointer() != reflect.ValueOf(oldMap[i]).Pointer() {
 			return false
 		}
 	}
@@ -69,52 +111,42 @@ func compareMethods(new map[string]Method, old map[string]Method) bool {
 	return true
 }
 
-func compareComputeds(new map[string]Computed, old map[string]Computed) bool {
-	if len(new) != len(old) {
-		return false
-	}
-
-	for i, el := range new {
-		if reflect.ValueOf(el).Pointer() != reflect.ValueOf(old[i]).Pointer() {
-			return false
-		}
-	}
-
-	return true
+func compareHooks(newHooks, oldHooks *Component) bool {
+	return compareHook(newHooks.Hooks.Created, oldHooks.Hooks.Created) &&
+		compareHook(newHooks.Hooks.Mounted, oldHooks.Hooks.Mounted) &&
+		compareHook(newHooks.Hooks.WillDestroy, oldHooks.Hooks.WillDestroy) &&
+		compareHook(newHooks.Hooks.BeforeUpdate, oldHooks.Hooks.BeforeUpdate) &&
+		compareHook(newHooks.Hooks.Updated, oldHooks.Hooks.Updated)
 }
 
-func compareHooks(new, old *Component) bool {
-	return compareHook(new.Hooks.Created, old.Hooks.Created) &&
-		compareHook(new.Hooks.Mounted, old.Hooks.Mounted) &&
-		compareHook(new.Hooks.WillDestroy, old.Hooks.WillDestroy) &&
-		compareHook(new.Hooks.BeforeUpdate, old.Hooks.BeforeUpdate) &&
-		compareHook(new.Hooks.Updated, old.Hooks.Updated)
-}
-
-func compareHook(new, old Hook) bool {
-	if new == nil && old == nil {
+func compareHook(newHook, oldHook Hook) bool {
+	if newHook == nil && oldHook == nil {
 		return true
 	}
 
-	if (new == nil && old != nil) || (new != nil && old == nil) {
+	if (newHook == nil && oldHook != nil) || (newHook != nil && oldHook == nil) {
 		return false
 	}
 
-	return reflect.ValueOf(new).Pointer() == reflect.ValueOf(old).Pointer()
+	return reflect.ValueOf(newHook).Pointer() == reflect.ValueOf(oldHook).Pointer()
 }
 
-func compareForDirectives(new, old *Component) bool {
+func compareForDirectives(newC, oldC *Component) bool {
 	/*
 		It's really bad way to fix bug with not-updated i, el in components Methods.
 		We can only ForceUpdate methods, binds, e.t.c. and don't ForceUpdate 'body', but it will be in the future...
 	*/
 
-	newIsItem, newI, newVal := new.ForItemInfo()
-	oldIsItem, oldI, oldVal := old.ForItemInfo()
+	newIsItem, newI, newVal := newC.ForItemInfo()
+	oldIsItem, oldI, oldVal := oldC.ForItemInfo()
+
+	if !newIsItem && !oldIsItem {
+		return true
+	}
 
 	if newIsItem != oldIsItem {
 		return false
-	} else {
-		return newI == oldI && reflect.DeepEqual(newVal, oldVal)
 	}
+
+	return newI == oldI && reflect.DeepEqual(newVal, oldVal)
 }

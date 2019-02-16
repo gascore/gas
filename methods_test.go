@@ -53,7 +53,7 @@ func TestComponent_Method(t *testing.T) {
 	}
 
 	err = nil
-	err = c.Method("invalidMethodName", 1,2,3)
+	err = c.Method("invalidMethodName", 1, 2, 3)
 	if err == nil {
 		t.Error("no error after calling nil method")
 		return
@@ -88,8 +88,7 @@ func TestComponent_Computed(t *testing.T) {
 		return
 	}
 
-	val = nil
-	val = c.Computed("invalidMethodName", 1,2,3)
+	val = c.Computed("invalidMethodName", 1, 2, 3)
 	if val != nil {
 		t.Error("value not nil after calling nil method")
 		return

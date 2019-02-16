@@ -6,8 +6,8 @@ import (
 )
 
 func TestGetData(t *testing.T) {
-	data := []struct{
-		c *Component
+	data := []struct {
+		c     *Component
 		query string
 		isNil bool
 	}{
@@ -24,13 +24,13 @@ func TestGetData(t *testing.T) {
 		{
 			c: &C{
 				Data: map[string]interface{}{},
-				be: getEmptyBackend(),
+				be:   getEmptyBackend(),
 			},
 			query: "hello_world",
 			isNil: true,
 		},
 		{
-			c: &C{be: getEmptyBackend()}, // check will GetData throw panic with nil Data map
+			c:     &C{be: getEmptyBackend()}, // check will GetData throw panic with nil Data map
 			query: "hello_world",
 			isNil: true,
 		},
@@ -50,7 +50,7 @@ func TestSetData(t *testing.T) {
 	c1 := NC(&C{
 		Data: map[string]interface{}{
 			"hello_world": "Hello world!!",
-			"bye_world": "no",
+			"bye_world":   "no",
 		},
 		Watchers: map[string]Watcher{
 			"hello_world": func(this *Component, new interface{}, old interface{}) error {
@@ -71,8 +71,8 @@ func TestSetData(t *testing.T) {
 		Data: map[string]interface{}{
 			"type": 0,
 		},
-		Directives:Directives{
-			HTML:HTMLDirective{
+		Directives: Directives{
+			HTML: HTMLDirective{
 				Render: func(this *Component) string {
 					var val string
 					if this.GetData("type").(int) == 0 {
@@ -94,8 +94,8 @@ func TestSetData(t *testing.T) {
 		Data: map[string]interface{}{
 			"type": 0,
 		},
-		Directives:Directives{
-			HTML:HTMLDirective{
+		Directives: Directives{
+			HTML: HTMLDirective{
 				Render: func(this *Component) string {
 					return `<a href="https://gascore.github.io/" target="_blank">project site</a>`
 				},
@@ -109,7 +109,7 @@ func TestSetData(t *testing.T) {
 	c4 := NC(&C{
 		Data: map[string]interface{}{
 			"hello_world": "Hello world!!",
-			"bye_world": "no",
+			"bye_world":   "no",
 		},
 		be: getEmptyBackend(),
 	}, func(this *Component) []interface{} {
@@ -119,9 +119,8 @@ func TestSetData(t *testing.T) {
 					"color": func() string {
 						if this.GetData("bye_world").(string) == "no" {
 							return "hello"
-						} else {
-							return "bye"
 						}
+						return "bye"
 					},
 				},
 			}, "lorem ipsum"),
@@ -129,21 +128,21 @@ func TestSetData(t *testing.T) {
 	})
 	c4.be = getEmptyBackend()
 
-	data := []struct{
-		c *Component
+	data := []struct {
+		c     *Component
 		value interface{}
 		query string
 		error error
 		extra func(*C) error
 	}{
 		{
-			c: c1,
+			c:     c1,
 			query: "hello_world",
 			value: "Hello world!",
 			error: nil,
 		},
 		{
-			c: c1,
+			c:     c1,
 			query: "bye_world",
 			value: "bye",
 			error: errInByeWatcher,
@@ -157,25 +156,25 @@ func TestSetData(t *testing.T) {
 			error: ErrNilField,
 		},
 		{
-			c: &C{}, // check will GetData throw panic with nil Data map
+			c:     &C{}, // check will GetData throw panic with nil Data map
 			query: "hello_world",
 			value: "...",
 			error: ErrComponentDataIsNil,
 		},
 		{ // html directive changed
-			c: c2,
+			c:     c2,
 			query: "type",
 			value: 1,
 			error: nil,
 		},
 		{ // html directive not changed
-			c: c3,
+			c:     c3,
 			query: "type",
 			value: 1,
 			error: nil,
 		},
 		{ // RenderTree
-			c: c4,
+			c:     c4,
 			query: "hello_world",
 			value: "Hello world!",
 			error: nil,
@@ -191,7 +190,7 @@ func TestSetData(t *testing.T) {
 			},
 		},
 		{ // RenderTree
-			c: c4,
+			c:     c4,
 			query: "bye_world",
 			value: "Goodbye!",
 			error: nil,
@@ -227,8 +226,8 @@ func TestSetData(t *testing.T) {
 
 func TestRemove(t *testing.T) {
 	// test remove function
-	a := remove([]interface{}{1,2,3}, 1)
-	aRes := []interface{}{1,3}
+	a := remove([]interface{}{1, 2, 3}, 1)
+	aRes := []interface{}{1, 3}
 	if len(a) != len(aRes) || a[0] != aRes[0] || a[1] != aRes[1] {
 		t.Errorf("invalid remove function response: want: %v, got: %v", aRes, a)
 	}
@@ -238,8 +237,8 @@ func TestDataDeleteFromArray(t *testing.T) {
 	c1 := NC(
 		&C{
 			Data: map[string]interface{}{
-				"arr": []interface{}{1,2,3},
-				"arr2": []int{1,2,3},
+				"arr":  []interface{}{1, 2, 3},
+				"arr2": []int{1, 2, 3},
 			},
 		},
 		func(this *Component) []interface{} {
@@ -247,25 +246,25 @@ func TestDataDeleteFromArray(t *testing.T) {
 		})
 	c1.be = getEmptyBackend()
 
-	data := []struct{
-		c *C
+	data := []struct {
+		c     *C
 		query string
 		index int
-		len int
-		err error
+		len   int
+		err   error
 	}{
 		{
-			c: c1,
+			c:     c1,
 			query: "arr",
 			index: 1,
-			len: 2,
-			err: nil,
+			len:   2,
+			err:   nil,
 		},
 		{
-			c: c1,
+			c:     c1,
 			query: "arr2",
 			index: 1,
-			err: ErrInvalidDataFieldType,
+			err:   ErrInvalidDataFieldType,
 		},
 	}
 
@@ -287,8 +286,8 @@ func TestDataAddToArray(t *testing.T) {
 	c1 := NC(
 		&C{
 			Data: map[string]interface{}{
-				"arr": []interface{}{1,2,3},
-				"arr2": []int{1,2,3},
+				"arr":  []interface{}{1, 2, 3},
+				"arr2": []int{1, 2, 3},
 			},
 		},
 		func(this *Component) []interface{} {
@@ -296,26 +295,26 @@ func TestDataAddToArray(t *testing.T) {
 		})
 	c1.be = getEmptyBackend()
 
-	data := []struct{
-		c *C
+	data := []struct {
+		c     *C
 		query string
 		value interface{}
-		len int
-		err error
+		len   int
+		err   error
 	}{
 		{
-			c: c1,
+			c:     c1,
 			query: "arr",
 			value: 4,
-			len: 4,
-			err: nil,
+			len:   4,
+			err:   nil,
 		},
 		{
-			c: c1,
+			c:     c1,
 			query: "arr2",
 			value: 4,
-			len: 4,
-			err: ErrInvalidDataFieldType,
+			len:   4,
+			err:   ErrInvalidDataFieldType,
 		},
 	}
 
@@ -337,8 +336,8 @@ func TestDataEditArray(t *testing.T) {
 	c1 := NC(
 		&C{
 			Data: map[string]interface{}{
-				"arr": []interface{}{1,2,3},
-				"arr2": []int{1,2,3},
+				"arr":  []interface{}{1, 2, 3},
+				"arr2": []int{1, 2, 3},
 			},
 		},
 		func(this *Component) []interface{} {
@@ -346,29 +345,29 @@ func TestDataEditArray(t *testing.T) {
 		})
 	c1.be = getEmptyBackend()
 
-	data := []struct{
-		c *C
+	data := []struct {
+		c     *C
 		query string
 		index int
 		value interface{}
-		len int
-		err error
+		len   int
+		err   error
 	}{
 		{
-			c: c1,
+			c:     c1,
 			query: "arr",
 			index: 1,
 			value: 22,
-			len: 3,
-			err: nil,
+			len:   3,
+			err:   nil,
 		},
 		{
-			c: c1,
+			c:     c1,
 			query: "arr2",
 			index: 1,
 			value: 22,
-			len: 3,
-			err: ErrInvalidDataFieldType,
+			len:   3,
+			err:   ErrInvalidDataFieldType,
 		},
 	}
 
@@ -386,7 +385,6 @@ func TestDataEditArray(t *testing.T) {
 	}
 }
 
-
 func TestDataDeleteFromMap(t *testing.T) {
 	c1 := NC(
 		&C{
@@ -395,7 +393,7 @@ func TestDataDeleteFromMap(t *testing.T) {
 					"foo": 1,
 					"bar": 2,
 				},
-				"arr2": map[string]int {
+				"arr2": map[string]int{
 					"foo": 1,
 					"bar": 2,
 				},
@@ -406,26 +404,26 @@ func TestDataDeleteFromMap(t *testing.T) {
 		})
 	c1.be = getEmptyBackend()
 
-	data := []struct{
-		c *C
+	data := []struct {
+		c     *C
 		query string
-		key string
-		len int
-		err error
+		key   string
+		len   int
+		err   error
 	}{
 		{
-			c: c1,
+			c:     c1,
 			query: "arr",
-			key: "bar",
-			len: 1,
-			err: nil,
+			key:   "bar",
+			len:   1,
+			err:   nil,
 		},
 		{
-			c: c1,
+			c:     c1,
 			query: "arr2",
-			key: "bar",
-			len: 1,
-			err: ErrInvalidDataFieldType,
+			key:   "bar",
+			len:   1,
+			err:   ErrInvalidDataFieldType,
 		},
 	}
 
@@ -451,7 +449,7 @@ func TestDataEditMap(t *testing.T) {
 					"foo": 1,
 					"bar": 2,
 				},
-				"arr2": map[string]int {
+				"arr2": map[string]int{
 					"foo": 1,
 					"bar": 2,
 				},
@@ -462,29 +460,29 @@ func TestDataEditMap(t *testing.T) {
 		})
 	c1.be = getEmptyBackend()
 
-	data := []struct{
-		c *C
+	data := []struct {
+		c     *C
 		query string
-		key string
+		key   string
 		value interface{}
-		len int
-		err error
+		len   int
+		err   error
 	}{
 		{
-			c: c1,
+			c:     c1,
 			query: "arr",
-			key: "bar",
+			key:   "bar",
 			value: 22,
-			len: 2,
-			err: nil,
+			len:   2,
+			err:   nil,
 		},
 		{
-			c: c1,
+			c:     c1,
 			query: "arr2",
-			key: "bar",
+			key:   "bar",
 			value: 22,
-			len: 2,
-			err: ErrInvalidDataFieldType,
+			len:   2,
+			err:   ErrInvalidDataFieldType,
 		},
 	}
 

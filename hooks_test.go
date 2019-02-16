@@ -9,10 +9,10 @@ func TestRunMountedIfCan(t *testing.T) {
 		&C{
 			Tag: "h1",
 			Data: map[string]interface{}{
-				"counter": 0,
+				"counter":      0,
 				"childCounter": 0,
 			},
-			Hooks:Hooks{
+			Hooks: Hooks{
 				Mounted: func(this *Component) error {
 					return this.SetData("counter", 1)
 				},
@@ -22,7 +22,7 @@ func TestRunMountedIfCan(t *testing.T) {
 			return ToGetComponentList(
 				NC(
 					&C{
-						Hooks:Hooks{
+						Hooks: Hooks{
 							Mounted: func(this2 *Component) error {
 								return this.SetData("childCounter", 1)
 							},
@@ -51,8 +51,6 @@ func TestRunMountedIfCan(t *testing.T) {
 	if c.GetData("childCounter").(int) != 1 {
 		t.Errorf("mounted not called in child component")
 	}
-
-	return
 }
 
 func TestRunWillDestroyIfCan(t *testing.T) {
@@ -60,10 +58,10 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 		&C{
 			Tag: "h1",
 			Data: map[string]interface{}{
-				"counter": 0,
+				"counter":      0,
 				"childCounter": 0,
 			},
-			Hooks:Hooks{
+			Hooks: Hooks{
 				WillDestroy: func(this *Component) error {
 					return this.SetData("counter", 1)
 				},
@@ -73,7 +71,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 			return ToGetComponentList(
 				NC(
 					&C{
-						Hooks:Hooks{
+						Hooks: Hooks{
 							WillDestroy: func(this2 *Component) error {
 								return this.SetData("childCounter", 1)
 							},
@@ -102,25 +100,23 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 	if c.GetData("childCounter").(int) != 1 {
 		t.Errorf("willDestroy not called in child component")
 	}
-
-	return
 }
 
 func TestRunUpdatedIfCan(t *testing.T) {
 	c2 := NC(
-		&C{Tag:"i"},
+		&C{Tag: "i"},
 		func(this2 *Component) []interface{} {
 			return []interface{}{}
-		},)
+		})
 
 	c := NC(
 		&C{
 			Tag: "h1",
 			Data: map[string]interface{}{
-				"counter": 0,
+				"counter":      0,
 				"childCounter": 0,
 			},
-			Hooks:Hooks{
+			Hooks: Hooks{
 				Updated: func(this *Component) error {
 					return this.SetData("counter", 1)
 				},
@@ -146,19 +142,19 @@ func TestRunUpdatedIfCan(t *testing.T) {
 
 func TestRunBeforeUpdateIfCan(t *testing.T) {
 	c2 := NC(
-		&C{Tag:"i"},
+		&C{Tag: "i"},
 		func(this2 *Component) []interface{} {
 			return []interface{}{}
-		},)
+		})
 
 	c := NC(
 		&C{
 			Tag: "h1",
 			Data: map[string]interface{}{
-				"counter": 0,
+				"counter":      0,
 				"childCounter": 0,
 			},
-			Hooks:Hooks{
+			Hooks: Hooks{
 				BeforeUpdate: func(this *Component) error {
 					return this.SetData("counter", 1)
 				},

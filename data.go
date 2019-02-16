@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	ErrComponentDataIsNil = errors.New("component Data is nil")
-	ErrNilField = errors.New("trying to set value to nil field")
+	ErrComponentDataIsNil   = errors.New("component Data is nil")
+	ErrNilField             = errors.New("trying to set value to nil field")
 	ErrInvalidDataFieldType = errors.New("invalid data field type")
 )
 

@@ -6,9 +6,7 @@ func TestNew(t *testing.T) {
 	gas, err := New(
 		getEmptyBackend(),
 		"app",
-		&C{
-
-		}, func(this *Component) []interface{} {
+		&C{}, func(this *Component) []interface{} {
 			return ToGetComponentList()
 		})
 	if err != nil {

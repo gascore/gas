@@ -2,11 +2,26 @@ package gas
 
 import (
 	"errors"
-	"fmt"
+)
+
+var (
+	ErrComponentDataIsNil = errors.New("component Data is nil")
+	ErrNilField = errors.New("trying to set value to nil field")
+	ErrInvalidDataFieldType = errors.New("invalid data field type")
 )
 
 // GetData return data field by query string
 func (c *Component) GetData(query string) interface{} {
+	if c.Data == nil {
+		c.ConsoleError(ErrComponentDataIsNil.Error())
+		return nil
+	}
+
+	if _, ok := c.Data[query]; !ok {
+		c.ConsoleError(ErrNilField.Error())
+		return nil
+	}
+
 	// There will be callbacks, events, e.t.c.
 	data := c.Data[query]
 
@@ -35,8 +50,13 @@ func (c *Component) SetData(query string, value interface{}) error {
 
 // SetDataFree set data without ForceUpdate
 func (c *Component) SetDataFree(query string, value interface{}) error {
-	if value == nil {
-		return fmt.Errorf("trying to set nil value to %s field", query)
+	if c.Data == nil {
+		c.Data = make(map[string]interface{})
+		return ErrComponentDataIsNil
+	}
+
+	if _, ok := c.Data[query]; !ok {
+		return ErrNilField
 	}
 
 	c.Data[query] = value
@@ -48,9 +68,10 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 func (c *Component) DataDeleteFromArray(query string, index int) error {
 	list, ok := c.GetData(query).([]interface{})
 	if !ok {
-		return errors.New("invalid data field type")
+		return ErrInvalidDataFieldType
 	}
 
+	// TODO: check is it necessary
 	oldHTMLDirective := c.htmlDirective()
 
 	err := c.SetDataFree(query, remove(list, index))
@@ -70,7 +91,7 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 func (c *Component) DataAddToArray(query string, value interface{}) error {
 	list, ok := c.GetData(query).([]interface{})
 	if !ok {
-		return errors.New("invalid data field type")
+		return ErrInvalidDataFieldType
 	}
 
 	list = append(list, value)
@@ -87,7 +108,7 @@ func (c *Component) DataAddToArray(query string, value interface{}) error {
 func (c *Component) DataEditArray(query string, index int, value interface{}) error {
 	list, ok := c.GetData(query).([]interface{})
 	if !ok {
-		return errors.New("invalid current list")
+		return ErrInvalidDataFieldType
 	}
 
 	oldHTMLDirective := c.htmlDirective()
@@ -115,7 +136,7 @@ func remove(a []interface{}, i int) []interface{} {
 func (c *Component) DataDeleteFromMap(query, key string) error {
 	m, ok := c.GetData(query).(map[string]interface{})
 	if !ok {
-		return errors.New("invalid data field type")
+		return ErrInvalidDataFieldType
 	}
 
 	oldHTMLDirective := c.htmlDirective()
@@ -134,7 +155,7 @@ func (c *Component) DataDeleteFromMap(query, key string) error {
 func (c *Component) DataEditMap(query, key string, value interface{}) error {
 	m, ok := c.GetData(query).(map[string]interface{})
 	if !ok {
-		return errors.New("invalid data field type")
+		return ErrInvalidDataFieldType
 	}
 
 	oldHTMLDirective := c.htmlDirective()

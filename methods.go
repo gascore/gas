@@ -11,6 +11,9 @@ type PocketComputed func(...interface{}) interface{}
 // Method runs a component method and updates component after
 func (c *Component) Method(name string, values ...interface{}) error {
 	method := c.GetPocketMethod(name)
+	if method == nil {
+		return fmt.Errorf("invalid method name: %s", name)
+	}
 
 	err := method(values...) // run method
 	if err != nil {
@@ -36,6 +39,9 @@ func (c *Component) GetPocketMethod(name string) PocketMethod {
 // Computed runs a component computed and returns values from it
 func (c *Component) Computed(name string, values ...interface{}) interface{} {
 	computed := c.GetPocketComputed(name)
+	if computed == nil {
+		return nil
+	}
 
 	value := computed(values...)
 

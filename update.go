@@ -14,7 +14,7 @@ func (c *Component) update(oldHTMLDirective string) error {
 	newTree := RenderTree(c)
 
 	if oldHTMLDirective != c.htmlDirective() {
-		err := c.be.ReCreate(c)
+		err := c.BE.ReCreate(c)
 		if err != nil {
 			return err
 		}
@@ -22,7 +22,7 @@ func (c *Component) update(oldHTMLDirective string) error {
 		return nil
 	}
 
-	err := c.be.UpdateComponentChildes(c, newTree, c.RChildes)
+	err := c.BE.UpdateComponentChildes(c, newTree, c.RChildes)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (c *Component) ForceUpdate() error {
 }
 
 func (c *Component) ReCreate() error {
-	return c.be.ReCreate(c)
+	return c.BE.ReCreate(c)
 }
 
 // RenderTree return full rendered childes tree of component

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gascore/gas"
 	"github.com/gascore/gas-web"
-	"github.com/noartem/dom"
 )
 
 // Example application #10
@@ -13,7 +12,7 @@ import (
 func main() {
 	app, err :=
 		gas.New(
-			gas_web.GetBackEnd(),
+			web.GetBackEnd(),
 			"app",
 			&gas.C{
 				Data: map[string]interface{}{
@@ -82,7 +81,7 @@ func main() {
 
 	err = gas.Init(app)
 	must(err)
-	gas_web.KeepAlive()
+	web.KeepAlive()
 }
 
 func must(err error) {

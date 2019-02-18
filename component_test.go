@@ -129,7 +129,7 @@ func TestGetElement(t *testing.T) {
 	}
 
 	for _, el := range data {
-		el.c.be = getEmptyBackend()
+		el.c.BE = GetEmptyBackend()
 		_c := el.c.GetElement()
 		if _c == nil && !el.isNil {
 			t.Error("meh, I just want 100% coverage")
@@ -155,7 +155,7 @@ func TestNewFor(t *testing.T) {
 		Attrs: map[string]string{
 			"id": "list",
 		},
-		be: getEmptyBackend(),
+		BE: GetEmptyBackend(),
 	}
 
 	data := []TestNewForData{
@@ -209,10 +209,10 @@ func TestNewFor(t *testing.T) {
 		}
 
 		c := NC(this, childesRenderer)
-		c.be = getEmptyBackend()
+		c.BE = GetEmptyBackend()
 
 		elementC := I2C(c.Childes(c)[0])
-		elementC.be = getEmptyBackend()
+		elementC.BE = GetEmptyBackend()
 
 		childes := elementC.Childes(elementC)
 

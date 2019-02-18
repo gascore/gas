@@ -23,7 +23,7 @@ type GetComponentChildes func(*Component) []interface{}
 // GetChildes -- function returning component childes
 // In function parameter sends `this` component and you can get it data from this parameter
 //
-// Component childes can be:
+// Component childes can BE:
 //
 // 1. String (or tag_value)
 //
@@ -110,7 +110,7 @@ type Component struct {
 	isElement bool // childes don't have parent context
 	Parent    *Component
 
-	be BackEnd
+	BE BackEnd
 }
 
 // Aliases
@@ -156,7 +156,7 @@ func renderChild(component *Component, arr []interface{}, child interface{}) []i
 	if IsComponent(child) {
 		childC := I2C(child)
 
-		childC.be = component.be
+		childC.BE = component.BE
 		childC.Parent = component
 
 		if childC.Directives.If != nil && !childC.Directives.If(childC) {
@@ -221,7 +221,7 @@ func (c *Component) ForItemInfo() (isItem bool, i int, val interface{}) {
 
 // GetElement return *dom.Element by component
 func (c *Component) GetElement() interface{} {
-	_el := c.be.GetElement(c)
+	_el := c.BE.GetElement(c)
 	if _el == nil {
 		c.WarnError(fmt.Errorf("component GetElement: %s, returning nil", c.UUID))
 		return nil
@@ -232,7 +232,7 @@ func (c *Component) GetElement() interface{} {
 
 // GetElementUnsafely return *dom.Element by component without warning
 func (c *Component) GetElementUnsafely() interface{} {
-	return c.be.GetElement(c)
+	return c.BE.GetElement(c)
 }
 
 // I2C - convert interface{} to *Component

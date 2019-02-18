@@ -134,7 +134,7 @@ func compareHook(newHook, oldHook Hook) bool {
 func compareForDirectives(newC, oldC *Component) bool {
 	/*
 		It's really bad way to fix bug with not-updated i, el in components Methods.
-		We can only ForceUpdate methods, binds, e.t.c. and don't ForceUpdate 'body', but it will be in the future...
+		We can only ForceUpdate methods, binds, e.t.c. and don't ForceUpdate 'body', but it will BE in the future...
 	*/
 
 	newIsItem, newI, newVal := newC.ForItemInfo()

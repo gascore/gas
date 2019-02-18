@@ -4,16 +4,16 @@ import "testing"
 
 func TestNew(t *testing.T) {
 	gas, err := New(
-		getEmptyBackend(),
+		GetEmptyBackend(),
 		"app",
 		&C{}, func(this *Component) []interface{} {
 			return ToGetComponentList()
 		})
 	if err != nil {
-		t.Error("in New function error can be thrown only by backend")
+		t.Error("in New function error can BE thrown only by backend")
 	}
 
-	if gas.App.be != getEmptyBackend() {
+	if gas.App.BE != GetEmptyBackend() {
 		t.Error("invalid backend")
 		return
 	}

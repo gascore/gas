@@ -22,7 +22,7 @@ func (c *Component) GetData(query string) interface{} {
 		return nil
 	}
 
-	// There will be callbacks, events, e.t.c.
+	// There will BE callbacks, events, e.t.c.
 	data := c.Data[query]
 
 	return data

@@ -6,9 +6,9 @@ import (
 
 // New create new gas application with custom backend
 func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChildes) (Gas, error) {
-	c.be = be
+	c.BE = be
 
-	tagName, err := c.be.New(startPoint)
+	tagName, err := c.BE.New(startPoint)
 	if err != nil {
 		return Gas{}, err
 	}
@@ -29,7 +29,7 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 
 // Init initialize gas application
 func Init(gas Gas) error {
-	err := gas.App.be.Init(gas)
+	err := gas.App.BE.Init(gas)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (c *Component) WarnError(err error) {
 		return
 	}
 
-	c.be.ConsoleError(err.Error())
+	c.BE.ConsoleError(err.Error())
 }
 
 // WarnIfNot console error if !ok
@@ -59,8 +59,8 @@ func (c *Component) WarnIfNot(ok bool) {
 		return
 	}
 
-	c.be.ConsoleError(fmt.Sprintf("invalid data type"))
+	c.BE.ConsoleError(fmt.Sprintf("invalid data type"))
 }
 
-func (c *Component) ConsoleLog(a ...interface{})   { c.be.ConsoleLog(a...) }
-func (c *Component) ConsoleError(a ...interface{}) { c.be.ConsoleError(a...) }
+func (c *Component) ConsoleLog(a ...interface{})   { c.BE.ConsoleLog(a...) }
+func (c *Component) ConsoleError(a ...interface{}) { c.BE.ConsoleError(a...) }

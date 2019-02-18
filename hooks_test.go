@@ -35,7 +35,7 @@ func TestRunMountedIfCan(t *testing.T) {
 			)
 		},
 	)
-	c.be = getEmptyBackend()
+	c.BE = GetEmptyBackend()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
@@ -84,7 +84,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 			)
 		},
 	)
-	c.be = getEmptyBackend()
+	c.BE = GetEmptyBackend()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
@@ -126,7 +126,7 @@ func TestRunUpdatedIfCan(t *testing.T) {
 			return ToGetComponentList(c2)
 		},
 	)
-	c.be = getEmptyBackend()
+	c.BE = GetEmptyBackend()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
@@ -164,7 +164,7 @@ func TestRunBeforeUpdateIfCan(t *testing.T) {
 			return ToGetComponentList(c2)
 		},
 	)
-	c.be = getEmptyBackend()
+	c.BE = GetEmptyBackend()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 

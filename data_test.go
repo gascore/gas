@@ -16,7 +16,7 @@ func TestGetData(t *testing.T) {
 				Data: map[string]interface{}{
 					"hello_world": "Hello world!!",
 				},
-				be: getEmptyBackend(),
+				BE: GetEmptyBackend(),
 			},
 			query: "hello_world",
 			isNil: false,
@@ -24,13 +24,13 @@ func TestGetData(t *testing.T) {
 		{
 			c: &C{
 				Data: map[string]interface{}{},
-				be:   getEmptyBackend(),
+				BE:   GetEmptyBackend(),
 			},
 			query: "hello_world",
 			isNil: true,
 		},
 		{
-			c:     &C{be: getEmptyBackend()}, // check will GetData throw panic with nil Data map
+			c:     &C{BE: GetEmptyBackend()}, // check will GetData throw panic with nil Data map
 			query: "hello_world",
 			isNil: true,
 		},
@@ -61,11 +61,11 @@ func TestSetData(t *testing.T) {
 				return errInByeWatcher
 			},
 		},
-		be: getEmptyBackend(),
+		BE: GetEmptyBackend(),
 	}, func(this *Component) []interface{} {
 		return []interface{}{}
 	})
-	c1.be = getEmptyBackend()
+	c1.BE = GetEmptyBackend()
 
 	c2 := NC(&C{
 		Data: map[string]interface{}{
@@ -88,7 +88,7 @@ func TestSetData(t *testing.T) {
 	}, func(this *Component) []interface{} {
 		return []interface{}{}
 	})
-	c2.be = getEmptyBackend()
+	c2.BE = GetEmptyBackend()
 
 	c3 := NC(&C{
 		Data: map[string]interface{}{
@@ -104,14 +104,14 @@ func TestSetData(t *testing.T) {
 	}, func(this *Component) []interface{} {
 		return []interface{}{}
 	})
-	c3.be = getEmptyBackend()
+	c3.BE = GetEmptyBackend()
 
 	c4 := NC(&C{
 		Data: map[string]interface{}{
 			"hello_world": "Hello world!!",
 			"bye_world":   "no",
 		},
-		be: getEmptyBackend(),
+		BE: GetEmptyBackend(),
 	}, func(this *Component) []interface{} {
 		return []interface{}{
 			NE(&C{
@@ -126,7 +126,7 @@ func TestSetData(t *testing.T) {
 			}, "lorem ipsum"),
 		}
 	})
-	c4.be = getEmptyBackend()
+	c4.BE = GetEmptyBackend()
 
 	data := []struct {
 		c     *Component
@@ -244,7 +244,7 @@ func TestDataDeleteFromArray(t *testing.T) {
 		func(this *Component) []interface{} {
 			return []interface{}{len(this.GetData("arr").([]interface{}))}
 		})
-	c1.be = getEmptyBackend()
+	c1.BE = GetEmptyBackend()
 
 	data := []struct {
 		c     *C
@@ -293,7 +293,7 @@ func TestDataAddToArray(t *testing.T) {
 		func(this *Component) []interface{} {
 			return []interface{}{len(this.GetData("arr").([]interface{}))}
 		})
-	c1.be = getEmptyBackend()
+	c1.BE = GetEmptyBackend()
 
 	data := []struct {
 		c     *C
@@ -343,7 +343,7 @@ func TestDataEditArray(t *testing.T) {
 		func(this *Component) []interface{} {
 			return []interface{}{len(this.GetData("arr").([]interface{}))}
 		})
-	c1.be = getEmptyBackend()
+	c1.BE = GetEmptyBackend()
 
 	data := []struct {
 		c     *C
@@ -402,7 +402,7 @@ func TestDataDeleteFromMap(t *testing.T) {
 		func(this *Component) []interface{} {
 			return []interface{}{len(this.GetData("arr").(map[string]interface{}))}
 		})
-	c1.be = getEmptyBackend()
+	c1.BE = GetEmptyBackend()
 
 	data := []struct {
 		c     *C
@@ -458,7 +458,7 @@ func TestDataEditMap(t *testing.T) {
 		func(this *Component) []interface{} {
 			return []interface{}{len(this.GetData("arr").(map[string]interface{}))}
 		})
-	c1.be = getEmptyBackend()
+	c1.BE = GetEmptyBackend()
 
 	data := []struct {
 		c     *C

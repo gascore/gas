@@ -39,7 +39,7 @@ func TestComponent_Method(t *testing.T) {
 				"wow",
 				this.GetData("type"))
 		})
-	c.be = getEmptyBackend()
+	c.BE = GetEmptyBackend()
 
 	err := c.Method("changeType", 1)
 	if err != nil {
@@ -80,7 +80,7 @@ func TestComponent_Computed(t *testing.T) {
 				"wow",
 				this.GetData("type"))
 		})
-	c.be = getEmptyBackend()
+	c.BE = GetEmptyBackend()
 
 	val := c.Computed("getTypePlus2")
 	if val == nil {

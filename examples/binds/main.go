@@ -41,11 +41,8 @@ func main() {
 
 										// REMEMBER!
 										// Bind attributes appends over normal attributes, you will lose your normal attribute value
-										return fmt.Sprintf("%s; background-color: rgb(%d, %d, %d)", this2.Attrs["style"], foo, 255-foo, foo)
+										return fmt.Sprintf("width: 48px; height: 36px; margin: 0 18px; border-radius: 4px; background-color: rgb(%d, %d, %d)", foo, 255-foo, foo)
 									},
-								},
-								Attrs: map[string]string{
-									"style": "width: 48px; height: 36px; margin: 0 18px; border-radius: 4px;",
 								},
 								Tag: "div",
 							}),

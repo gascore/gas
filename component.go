@@ -173,6 +173,20 @@ func renderChild(component *Component, arr []interface{}, child interface{}) []i
 	return append(arr, child)
 }
 
+func UnSpliceBody(body []interface{}) []interface{} {
+	var arr []interface{}
+	for _, el := range body {
+		if IsChildesArr(el) {
+			for _, c := range el.([]interface{}) {
+				arr = append(arr, c)
+			}
+			continue
+		}
+		arr = append(arr, el)
+	}
+	return arr
+}
+
 // NewFor create new FOR directive
 func NewFor(data string, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
 	dataForList, ok := this.Data[data].([]interface{})

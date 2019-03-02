@@ -50,8 +50,8 @@ func main() {
 			},
 			func(this *gas.Component) []interface{} {
 				return gas.CL(
-					getButton(this.GetData("show").(bool), this.GetPocketMethod("toggle")),
-					getHiddenText(this.GetData("show").(bool), this.GetPocketComputed("number")))
+					getButton(this.GetData("show").(bool), this.PocketMethod("toggle")),
+					getHiddenText(this.GetData("show").(bool), this.PocketComputed("number")))
 			})
 	must(err)
 

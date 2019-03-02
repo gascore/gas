@@ -10,7 +10,7 @@ type PocketComputed func(...interface{}) interface{}
 
 // Method runs a component method and updates component after
 func (c *Component) Method(name string, values ...interface{}) error {
-	method := c.GetPocketMethod(name)
+	method := c.PocketMethod(name)
 	if method == nil {
 		return fmt.Errorf("invalid method name: %s", name)
 	}
@@ -23,8 +23,8 @@ func (c *Component) Method(name string, values ...interface{}) error {
 	return nil
 }
 
-// GetPocketMethod return function returns executing method with binding component
-func (c *Component) GetPocketMethod(name string) PocketMethod {
+// PocketMethod return function returns executing method with binding component
+func (c *Component) PocketMethod(name string) PocketMethod {
 	method := c.Methods[name]
 	if method == nil {
 		c.WarnError(fmt.Errorf("invalid method name: %s", name))
@@ -38,7 +38,7 @@ func (c *Component) GetPocketMethod(name string) PocketMethod {
 
 // Computed runs a component computed and returns values from it
 func (c *Component) Computed(name string, values ...interface{}) interface{} {
-	computed := c.GetPocketComputed(name)
+	computed := c.PocketComputed(name)
 	if computed == nil {
 		return nil
 	}
@@ -48,8 +48,8 @@ func (c *Component) Computed(name string, values ...interface{}) interface{} {
 	return value
 }
 
-// GetPocketComputed return function returns executing computed with binding component
-func (c *Component) GetPocketComputed(name string) PocketComputed {
+// PocketComputed return function returns executing computed with binding component
+func (c *Component) PocketComputed(name string) PocketComputed {
 	computed := c.Computeds[name]
 	if computed == nil {
 		c.WarnError(fmt.Errorf("invalid computed name: %s", name))

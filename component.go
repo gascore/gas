@@ -46,6 +46,13 @@ type Directives struct {
 type ModelDirective struct {
 	Data      string
 	Component *Component
+	Deep []ModelDirectiveDeepData
+}
+
+// ModelDirectiveDeepData
+type ModelDirectiveDeepData struct {
+	Data interface{}
+	Brackets bool
 }
 
 // ForDirective struct for For Directive (needful because `for` want name and render function)

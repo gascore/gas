@@ -117,6 +117,11 @@ type Component struct {
 	isElement bool // childes don't have parent context
 	Parent    *Component
 
+	Ref string
+
+	RefsAllowed bool           // if true component can have Refs
+	Refs map[string]*Component // childes have g-ref attribute. Only for Component.isElement == false
+
 	BE BackEnd
 }
 
@@ -240,15 +245,35 @@ func (c *Component) ForItemInfo() (isItem bool, i int, val interface{}) {
 	return true, c.Directives.For.itemValueI, c.Directives.For.itemValueVal
 }
 
-// GetElement return *dom.Element by component
-func (c *Component) GetElement() interface{} {
+// Element return *dom.Element by component
+func (c *Component) Element() interface{} {
 	_el := c.BE.GetElement(c)
 	if _el == nil {
-		c.WarnError(fmt.Errorf("component GetElement: %s, returning nil", c.UUID))
+		c.WarnError(fmt.Errorf("component Element: %s, returning nil", c.UUID))
 		return nil
 	}
 
 	return _el
+}
+
+// ParentComponent return first *true component* in component parents tree
+func (c *Component) ParentComponent() *Component {
+	// if c.Parent == nil => c - is the root (gas.App) component
+	if c.Parent == nil || !c.Parent.isElement {
+		return c.Parent
+	} else {
+		return c.Parent.ParentComponent()
+	}
+}
+
+// ParentWthAllowedRefs return first *true component* in component parents tree with allowed refs
+func (c *Component) ParentWthAllowedRefs() *Component {
+	// if c.Parent == nil => c - is the root (gas.App) component
+	if c.Parent == nil || (!c.Parent.isElement && c.Parent.RefsAllowed) {
+		return c.Parent
+	} else {
+		return c.Parent.ParentWthAllowedRefs()
+	}
 }
 
 // GetElementUnsafely return *dom.Element by component without warning

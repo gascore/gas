@@ -2,9 +2,9 @@ package gas
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created      Hook // When component has been created in golang only (GetElement isn't available)
-	Mounted      Hook // When component has been mounted (GetElement is available)
-	WillDestroy  Hook // Before component destroy (GetElement is available)
+	Created      Hook // When component has been created in golang only (Element isn't available)
+	Mounted      Hook // When component has been mounted (Element is available)
+	WillDestroy  Hook // Before component destroy (Element is available)
 	BeforeUpdate Hook // When component child don't updated
 	Updated      Hook // After component child was updated
 }
@@ -19,19 +19,19 @@ func RunMountedIfCan(i interface{}) error {
 
 	c := I2C(i)
 
+	if c.Hooks.Mounted != nil {
+		err := c.Hooks.Mounted(c)
+		if err != nil {
+			return err
+		}
+	}
+
 	for _, child := range c.RChildes {
 		if !IsComponent(child) {
 			continue
 		}
 
 		err := RunMountedIfCan(I2C(child))
-		if err != nil {
-			return err
-		}
-	}
-
-	if c.Hooks.Mounted != nil {
-		err := c.Hooks.Mounted(c)
 		if err != nil {
 			return err
 		}
@@ -46,19 +46,20 @@ func RunWillDestroyIfCan(i interface{}) error {
 	}
 
 	c := I2C(i)
+
+	if c.Hooks.WillDestroy != nil {
+		err := c.Hooks.WillDestroy(c)
+		if err != nil {
+			return err
+		}
+	}
+
 	for _, child := range c.RChildes {
 		if !IsComponent(child) {
 			continue
 		}
 
 		err := RunWillDestroyIfCan(I2C(child))
-		if err != nil {
-			return err
-		}
-	}
-
-	if c.Hooks.WillDestroy != nil {
-		err := c.Hooks.WillDestroy(c)
 		if err != nil {
 			return err
 		}

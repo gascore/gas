@@ -130,7 +130,7 @@ func TestGetElement(t *testing.T) {
 
 	for _, el := range data {
 		el.c.BE = GetEmptyBackend()
-		_c := el.c.GetElement()
+		_c := el.c.Element()
 		if _c == nil && !el.isNil {
 			t.Error("meh, I just want 100% coverage")
 			continue

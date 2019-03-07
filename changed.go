@@ -24,14 +24,14 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 }
 
 func isComponentsEquals(newC, oldC *Component) bool {
-	// if one of element and second is component return false
-	if (newC.isElement && !oldC.isElement) || (!newC.isElement && oldC.isElement) {
+	if newC.isElement != oldC.isElement {
 		return false
 	}
 
 	// if components are elements
 	if newC.isElement && oldC.isElement {
 		return newC.Tag == oldC.Tag &&
+			newC.Ref == oldC.Ref &&
 			newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
 
 			reflect.DeepEqual(newC.Attrs, oldC.Attrs) &&
@@ -46,6 +46,7 @@ func isComponentsEquals(newC, oldC *Component) bool {
 	// if components are *true* components
 	return newC.Tag == oldC.Tag &&
 		newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
+		newC.RefsAllowed == oldC.RefsAllowed &&
 
 		reflect.DeepEqual(newC.Data, oldC.Data) &&
 		compareWatchers(newC.Watchers, oldC.Watchers) &&

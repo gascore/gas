@@ -3,6 +3,7 @@ package gas
 import (
 	"fmt"
 	"github.com/frankenbeanies/uuid4"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -36,7 +37,10 @@ type Bind func() string
 // Directives struct storing component if-directive
 type Directives struct {
 	If    func(*Component) bool
+	Else  bool
+	// (If != nil) + (Else) = else-if
 	Show  func(*Component) bool
+
 	For   ForDirective
 	Model ModelDirective
 	HTML  HTMLDirective
@@ -145,9 +149,44 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 	}
 
 	component.Childes = func(this *Component) []interface{} {
+		var lastIfValue, lastIfIsFresh bool
 		var compiled []interface{}
-		for _, child := range getChildes(component) {
-			compiled = renderChild(this, compiled, child)
+		for _, child := range UnSpliceBody(getChildes(component)) {
+			if !IsComponent(child) {
+				compiled = append(compiled, child)
+				continue
+			}
+
+			childC := I2C(child)
+
+			childC.BE = component.BE
+			childC.Parent = component
+
+			if childC.Directives.Else {
+				if !lastIfIsFresh {
+					this.WarnError(errors.New("invalid else or else-if directive: no if (else-if) directive before"))
+					continue
+				}
+
+				if lastIfValue {
+					lastIfValue   = false
+					lastIfIsFresh = childC.Directives.If != nil
+					continue
+				}
+			}
+
+			if childC.Directives.If != nil {
+				ifValue := childC.Directives.If(childC)
+
+				lastIfValue   = ifValue
+				lastIfIsFresh = true
+
+				if !ifValue {
+					continue
+				}
+			}
+
+			compiled = append(compiled, child)
 		}
 
 		return compiled
@@ -162,27 +201,6 @@ func NewBasicComponent(component *Component, childes ...interface{}) *Component 
 	return NewComponent(component, func(this *Component) []interface{} {
 		return childes
 	})
-}
-
-func renderChild(component *Component, arr []interface{}, child interface{}) []interface{} {
-	if IsComponent(child) {
-		childC := I2C(child)
-
-		childC.BE = component.BE
-		childC.Parent = component
-
-		if childC.Directives.If != nil && !childC.Directives.If(childC) {
-			return arr
-		}
-	} else if IsChildesArr(child) {
-		for _, el := range child.([]interface{}) {
-			arr = renderChild(component, arr, el)
-		}
-
-		return arr
-	}
-
-	return append(arr, child)
 }
 
 func UnSpliceBody(body []interface{}) []interface{} {

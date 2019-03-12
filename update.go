@@ -74,5 +74,6 @@ func RenderTree(c *Component) []interface{} {
 
 		childes = append(childes, el)
 	}
+
 	return childes
 }

@@ -2,6 +2,7 @@ package gas
 
 import (
 	"fmt"
+	"github.com/Sinicablyat/gas"
 	"github.com/frankenbeanies/uuid4"
 	"github.com/pkg/errors"
 	"strings"
@@ -206,14 +207,22 @@ func NewBasicComponent(component *Component, childes ...interface{}) *Component 
 func UnSpliceBody(body []interface{}) []interface{} {
 	var arr []interface{}
 	for _, el := range body {
-		if IsChildesArr(el) {
+		switch el.(type) {
+		case []interface{}:
 			for _, c := range el.([]interface{}) {
 				arr = append(arr, c)
 			}
 			continue
+		case []*gas.C:
+			for _, c := range el.([]interface{}) {
+				arr = append(arr, c)
+			}
+			continue
+		default:
+			arr = append(arr, el)
 		}
-		arr = append(arr, el)
 	}
+
 	return arr
 }
 

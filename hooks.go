@@ -74,7 +74,7 @@ func RunUpdatedIfCan(i interface{}) error {
 	}
 
 	// run Updated hook for component parent(!)
-	c := I2C(i).Parent
+	c := I2C(i).ParentComponent()
 
 	if c.Hooks.Updated != nil {
 		err := c.Hooks.Updated(c)

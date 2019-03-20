@@ -2,7 +2,6 @@ package gas
 
 import (
 	"fmt"
-	"github.com/Sinicablyat/gas"
 	"github.com/frankenbeanies/uuid4"
 	"github.com/pkg/errors"
 	"strings"
@@ -213,7 +212,7 @@ func UnSpliceBody(body []interface{}) []interface{} {
 				arr = append(arr, c)
 			}
 			continue
-		case []*gas.C:
+		case []*C:
 			for _, c := range el.([]interface{}) {
 				arr = append(arr, c)
 			}

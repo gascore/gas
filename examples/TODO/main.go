@@ -25,103 +25,103 @@ func main() {
 					"deleted": []interface{}{},
 				},
 				Methods: map[string]gas.Method{
-					"delete": func(this *gas.C, values ...interface{}) error {
+					"delete": func(this *gas.C, values ...interface{}) (interface{}, error) {
 						i, ok := values[0].(int)
 						if !ok {
-							return errors.New("invalid index")
+							return nil, errors.New("invalid index")
 						}
 
 						appendToDeleted, ok := values[1].(bool)
 						if !ok {
-							return errors.New("invalid appendToDeleted")
+							return nil, errors.New("invalid appendToDeleted")
 						}
 
 						list, ok := this.GetData("current").([]interface{})
 						if !ok {
-							return errors.New("invalid current list")
+							return nil, errors.New("invalid current list")
 						}
 						removedItem := list[i]
 
 						err := this.DataDeleteFromArray("current", i)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
 						err = this.SetData("currentText", "")
 						if err != nil {
-							return err
+							return nil, err
 						}
 
 						if appendToDeleted {
-							err = this.Method("append", "deleted", removedItem)
+							_, err = this.MethodSafely("append", "deleted", removedItem)
 							if err != nil {
-								return err
+								return nil, err
 							}
 						}
 
-						return nil
+						return nil, nil
 					},
-					"append": func(this *gas.C, values ...interface{}) error {
+					"append": func(this *gas.C, values ...interface{}) (interface{}, error) {
 						listTypeS, ok := values[0].(string)
 						if !ok {
-							return errors.New("invalid list type")
+							return nil, errors.New("invalid list type")
 						}
 
 						newTask, ok := values[1].(string)
 						if !ok {
-							return errors.New("invalid task")
+							return nil, errors.New("invalid task")
 						}
 
 						err := this.DataAddToArray(listTypeS, newTask)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
 						if listTypeS == "current" {
 							this.WarnError(this.SetData("currentText", ""))
 						}
 
-						return nil
+						return nil, nil
 					},
-					"markAsDone": func(this *gas.C, values ...interface{}) error {
+					"markAsDone": func(this *gas.C, values ...interface{}) (interface{}, error) {
 						i, ok := values[0].(int)
 						if !ok {
-							return errors.New("invalid index")
+							return nil, errors.New("invalid index")
 						}
 
 						list := this.GetData("current").([]interface{})
 
 						item := list[i]
 
-						err := this.Method("append", "done", item)
+						_, err := this.MethodSafely("append", "done", item)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
-						err = this.Method("delete", i, false)
+						_, err = this.MethodSafely("delete", i, false)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
-						return nil
+						return nil, nil
 					},
-					"edit": func(this *gas.C, values ...interface{}) error {
+					"edit": func(this *gas.C, values ...interface{}) (interface{}, error) {
 						i, ok := values[0].(int)
 						if !ok {
-							return errors.New("invalid index")
+							return nil, errors.New("invalid index")
 						}
 
 						newValue, ok := values[1].(string)
 						if !ok {
-							return errors.New("invalid new value")
+							return nil, errors.New("invalid new value")
 						}
 
 						err := this.DataEditArray("current", i, newValue)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
-						return nil
+						return nil, nil
 					},
 				},
 			},
@@ -161,7 +161,7 @@ func main() {
 											return
 										}
 
-										this.WarnError(this.Method("append", "current", currentText))
+										this.Method("append", "current", currentText)
 									},
 								},
 								Attrs: map[string]string{
@@ -268,7 +268,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							},
 							Handlers: map[string]gas.Handler{
 								"click": func(this5 *gas.C, e gas.Object) {
-									this.WarnError(pThis.Method("markAsDone", i))
+									pThis.Method("markAsDone", i)
 								},
 							},
 							Attrs: map[string]string{
@@ -322,7 +322,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 									newValue := this.GetData("newValue")
 
 									this.WarnError(this.SetData("isEditing", false))
-									this.WarnError(pThis.Method("edit", i, newValue))
+									pThis.Method("edit", i, newValue)
 									el = newValue
 								},
 							},
@@ -338,7 +338,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							},
 							Handlers: map[string]gas.Handler{
 								"click": func(this5 *gas.C, e gas.Object) {
-									this.WarnError(pThis.Method("delete", i, true))
+									pThis.Method("delete", i, true)
 								},
 							},
 							Attrs: map[string]string{

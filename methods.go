@@ -2,25 +2,31 @@ package gas
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 )
 
-type PocketMethod func(...interface{}) error
+type PocketMethod func(...interface{}) (interface{}, error)
 
-type PocketComputed func(...interface{}) interface{}
+type PocketComputed func(...interface{}) (interface{}, error)
 
 // Method runs a component method and updates component after
-func (c *Component) Method(name string, values ...interface{}) error {
+func (c *Component) Method(name string, values ...interface{}) interface{} {
+	out, err := c.MethodSafely(name, values...)
+	if err != nil {
+		c.ConsoleError(err.Error())
+		return nil
+	}
+
+	return out
+}
+
+func (c *Component) MethodSafely(name string, values ...interface{}) (interface{}, error) {
 	method := c.PocketMethod(name)
 	if method == nil {
-		return fmt.Errorf("invalid method name: %s", name)
+		return nil, fmt.Errorf("invalid method name: %s", name)
 	}
 
-	err := method(values...) // run method
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return method(values...)
 }
 
 // PocketMethod return function returns executing method with binding component
@@ -31,21 +37,31 @@ func (c *Component) PocketMethod(name string) PocketMethod {
 		return nil
 	}
 
-	return func(values ...interface{}) error {
+	return func(values ...interface{}) (interface{}, error) {
 		return method(c, values...)
 	}
 }
 
+// TODO: Add caching for computeds
+
 // Computed runs a component computed and returns values from it
 func (c *Component) Computed(name string, values ...interface{}) interface{} {
-	computed := c.PocketComputed(name)
-	if computed == nil {
+	out, err := c.ComputedSafely(name, values...)
+	if err != nil {
+		c.ConsoleError(err.Error())
 		return nil
 	}
 
-	value := computed(values...)
+	return out
+}
 
-	return value
+func (c *Component) ComputedSafely(name string, values ...interface{}) (interface{}, error) {
+	computed := c.PocketComputed(name)
+	if computed == nil {
+		return nil, errors.New("invalid computed: Computeds[name] is nil")
+	}
+
+	return computed(values...)
 }
 
 // PocketComputed return function returns executing computed with binding component
@@ -56,13 +72,12 @@ func (c *Component) PocketComputed(name string) PocketComputed {
 		return nil
 	}
 
-	return func(values ...interface{}) interface{} {
+	return func(values ...interface{}) (interface{}, error) {
 		val, err := computed(c, values...)
 		if err != nil {
-			c.WarnError(err)
-			return val
+			return val, err
 		}
 
-		return val
+		return val, nil
 	}
 }

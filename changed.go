@@ -48,7 +48,7 @@ func isComponentsEquals(newC, oldC *Component) bool {
 		newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
 		newC.RefsAllowed == oldC.RefsAllowed &&
 
-		reflect.DeepEqual(newC.Data, oldC.Data) &&
+		// reflect.DeepEqual(newC.Data, oldC.Data) &&
 		compareWatchers(newC.Watchers, oldC.Watchers) &&
 		compareMethods(newC.Methods, oldC.Methods) &&
 		compareComputeds(newC.Computeds, oldC.Computeds) &&

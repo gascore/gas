@@ -58,7 +58,7 @@ func RenderTree(c *Component) []interface{} {
 
 			if elC.Binds != nil {
 				if elC.RenderedBinds == nil {
-					elC.RenderedBinds = map[string]string{}
+					elC.RenderedBinds = make(map[string]string)
 				}
 
 				for bindKey, bindValue := range elC.Binds { // render binds

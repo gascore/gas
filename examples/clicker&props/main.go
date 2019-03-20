@@ -18,15 +18,15 @@ func main() {
 					"click": 0,
 				},
 				Methods: map[string]gas.Method{
-					"addClick": func(this *gas.C, i ...interface{}) error {
+					"addClick": func(this *gas.C, i ...interface{}) (interface{}, error) {
 						currentClick := this.GetData("click").(int)
 
 						err := this.SetData("click", currentClick+1)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
-						return nil
+						return nil, nil
 					},
 				},
 				Attrs: map[string]string{
@@ -39,23 +39,23 @@ func main() {
 						&gas.C{
 							Handlers: map[string]gas.Handler{
 								"click.left": func(this2 *gas.C, e gas.Object) {
-									this.WarnError(this.Method("addClick"))
+									this.Method("addClick")
 								},
 								// you need to click button once (for target it)
 								"keyup.control": func(this2 *gas.C, e gas.Object) {
-									this.WarnError(this.Method("addClick"))
+									this.Method("addClick")
 								},
 								"keyup.a": func(this2 *gas.C, e gas.Object) {
-									this.WarnError(this.Method("addClick"))
+									this.Method("addClick")
 								},
 								"keyup.s": func(this2 *gas.C, e gas.Object) {
-									this.WarnError(this.Method("addClick"))
+									this.Method("addClick")
 								},
 								"keyup.d": func(this2 *gas.C, e gas.Object) {
-									this.WarnError(this.Method("addClick"))
+									this.Method("addClick")
 								},
 								"keyup.f": func(this2 *gas.C, e gas.Object) {
-									this.WarnError(this.Method("addClick"))
+									this.Method("addClick")
 								},
 							},
 							Tag: "button",

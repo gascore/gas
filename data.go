@@ -71,7 +71,6 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 		return ErrInvalidDataFieldType
 	}
 
-	// TODO: check is it necessary
 	oldHTMLDirective := c.htmlDirective()
 
 	err := c.SetDataFree(query, remove(list, index))

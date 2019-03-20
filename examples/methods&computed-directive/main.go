@@ -23,14 +23,14 @@ func main() {
 				// Methods will do business things.
 				// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
 				Methods: map[string]gas.Method{
-					"toggle": func(this *gas.Component, values ...interface{}) error {
+					"toggle": func(this *gas.Component, values ...interface{}) (interface{}, error) {
 						_ = this.SetData("show", !this.GetData("show").(bool))
 
 						if this.GetData("show").(bool) {
 							_ = this.SetData("number", this.GetData("number").(int)+1)
 						}
 
-						return nil
+						return nil, nil
 					},
 				},
 				// Computeds can be cached
@@ -65,7 +65,8 @@ func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
 		&gas.Component{
 			Handlers: map[string]gas.Handler{
 				"click": func(this *gas.Component, e gas.Object) {
-					this.WarnError(toggleMethod())
+					_, err := toggleMethod()
+					this.WarnError(err)
 				},
 			},
 			Tag: "button",
@@ -94,7 +95,7 @@ func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
 }
 
 func getHiddenText(show bool, getNumber gas.PocketComputed) *gas.Component {
-	return gas.NE(
+	return gas.NC(
 		&gas.Component{
 			Directives: gas.Directives{
 				If: func(c *gas.Component) bool {
@@ -103,8 +104,16 @@ func getHiddenText(show bool, getNumber gas.PocketComputed) *gas.Component {
 			},
 			Tag: "i",
 		},
-		"Hidden text",
-		fmt.Sprintf("  (%s)", getNumber("something for computed")))
+		func(this *gas.Component) []interface{} {
+			n, err := getNumber("something for computed")
+			this.WarnError(err)
+
+			return []interface{} {
+				"Hidden text",
+				fmt.Sprintf("  (%s)", n),
+			}
+		},
+	)
 }
 
 func must(err error) {

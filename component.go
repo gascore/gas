@@ -12,7 +12,7 @@ import (
 type Context interface{}
 
 // Method - struct for Component methods
-type Method func(*Component, ...interface{}) error
+type Method func(*Component, ...interface{}) (interface{}, error)
 
 // Computed - struct for Component computed values
 type Computed func(*Component, ...interface{}) (interface{}, error)
@@ -94,7 +94,7 @@ type Object interface {
 }
 
 // Watcher -- function triggering after component data changed
-type Watcher func(*Component, interface{}, interface{}) error // (this, new, old)
+type Watcher func(this *Component, new interface{}, old interface{}) error // (this, new, old)
 
 // Component -- basic component struct
 type Component struct {
@@ -105,9 +105,9 @@ type Component struct {
 
 	Hooks Hooks // lifecycle hooks
 
-	Handlers      map[string]Handler // events handlers: onClick, onHover
-	Binds         map[string]Bind    // dynamic attributes
-	RenderedBinds map[string]string  // store binds for changed func
+	Handlers      map[string]Handler 	 // events handlers: onClick, onHover
+	Binds         map[string]Bind    	 // dynamic attributes
+	RenderedBinds map[string]string // store binds for changed func
 
 	Directives Directives
 

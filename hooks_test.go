@@ -35,7 +35,7 @@ func TestRunMountedIfCan(t *testing.T) {
 			)
 		},
 	)
-	c.BE = GetEmptyBackend()
+	c.RC = GetEmptyRenderCore()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
@@ -62,7 +62,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 				"childCounter": 0,
 			},
 			Hooks: Hooks{
-				WillDestroy: func(this *Component) error {
+				BeforeDestroy: func(this *Component) error {
 					return this.SetData("counter", 1)
 				},
 			},
@@ -72,7 +72,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 				NC(
 					&C{
 						Hooks: Hooks{
-							WillDestroy: func(this2 *Component) error {
+							BeforeDestroy: func(this2 *Component) error {
 								return this.SetData("childCounter", 1)
 							},
 						},
@@ -84,7 +84,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 			)
 		},
 	)
-	c.BE = GetEmptyBackend()
+	c.RC = GetEmptyRenderCore()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
@@ -126,7 +126,7 @@ func TestRunUpdatedIfCan(t *testing.T) {
 			return ToGetComponentList(c2)
 		},
 	)
-	c.BE = GetEmptyBackend()
+	c.RC = GetEmptyRenderCore()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
@@ -164,7 +164,7 @@ func TestRunBeforeUpdateIfCan(t *testing.T) {
 			return ToGetComponentList(c2)
 		},
 	)
-	c.BE = GetEmptyBackend()
+	c.RC = GetEmptyRenderCore()
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 

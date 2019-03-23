@@ -3,8 +3,20 @@ package gas
 // emptyBackEnd empty backend for testing backend calling methods
 type emptyBackEnd struct{}
 
+func GetEmptyRenderCore() *RenderCore {
+	return &RenderCore{BE:emptyBackEnd{}}
+}
+
 func GetEmptyBackend() BackEnd {
 	return emptyBackEnd{}
+}
+
+func (e emptyBackEnd) ExecNode(node *RenderNode) error {
+	return nil
+}
+
+func (e emptyBackEnd) ChildNodes(i interface{}) []interface{} {
+	return []interface{}{}
 }
 
 func (e emptyBackEnd) New(a string) (string, error) {

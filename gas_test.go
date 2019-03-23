@@ -13,11 +13,6 @@ func TestNew(t *testing.T) {
 		t.Error("in New function error can BE thrown only by backend")
 	}
 
-	if gas.App.BE != GetEmptyBackend() {
-		t.Error("invalid backend")
-		return
-	}
-
 	if len(gas.App.Attrs) == 0 {
 		t.Error("app has empty attributes")
 		return

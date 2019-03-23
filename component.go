@@ -126,7 +126,7 @@ type Component struct {
 	RefsAllowed bool           // if true component can have Refs
 	Refs map[string]*Component // childes have g-ref attribute. Only for Component.isElement == false
 
-	BE BackEnd
+	RC *RenderCore
 }
 
 // Aliases
@@ -159,7 +159,7 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 
 			childC := I2C(child)
 
-			childC.BE = component.BE
+			childC.RC = component.RC
 			childC.Parent = component
 
 			if childC.Directives.Else {
@@ -273,7 +273,7 @@ func (c *Component) ForItemInfo() (isItem bool, i int, val interface{}) {
 
 // Element return *dom.Element by component
 func (c *Component) Element() interface{} {
-	_el := c.BE.GetElement(c)
+	_el := c.RC.BE.GetElement(c)
 	if _el == nil {
 		c.WarnError(fmt.Errorf("component Element: %s, returning nil", c.UUID))
 		return nil
@@ -304,7 +304,7 @@ func (c *Component) ParentWthAllowedRefs() *Component {
 
 // GetElementUnsafely return *dom.Element by component without warning
 func (c *Component) GetElementUnsafely() interface{} {
-	return c.BE.GetElement(c)
+	return c.RC.BE.GetElement(c)
 }
 
 // I2C - convert interface{} to *Component

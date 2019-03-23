@@ -59,15 +59,34 @@ func main() {
 						&gas.C{
 							Directives: gas.Directives{
 								If: func(c *gas.C) bool {
-									return !this.GetData("show").(bool)
+									return this.GetData("show").(bool)
 								},
 							},
 							Hooks: gas.Hooks{
-								Created: func(this2 *gas.C) error {
+								Mounted: func(this2 *gas.C) error {
+									this.ConsoleLog("Visible text is created!")
+									return this.SetData("counter", this.GetData("counter").(int)+1)
+								},
+								BeforeDestroy: func(this2 *gas.C) error {
+									this.ConsoleLog("Visible text will destroy!")
+									return nil
+								},
+							},
+							Tag: "i",
+						},
+						fmt.Sprintf("Visible text"),
+					),
+					gas.NE(
+						&gas.C{
+							Directives: gas.Directives{
+								Else: true,
+							},
+							Hooks: gas.Hooks{
+								Mounted: func(this2 *gas.C) error {
 									this.ConsoleLog("Hidden text is created!")
 									return this.SetData("counter", this.GetData("counter").(int)+1)
 								},
-								WillDestroy: func(this2 *gas.C) error {
+								BeforeDestroy: func(this2 *gas.C) error {
 									this.ConsoleLog("Hidden text will destroy!")
 									return nil
 								},

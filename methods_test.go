@@ -12,25 +12,25 @@ func TestComponent_Method(t *testing.T) {
 				"type": 0,
 			},
 			Methods: map[string]Method{
-				"changeType": func(this *Component, values ...interface{}) error {
+				"changeType": func(this *Component, values ...interface{}) (interface{}, error) {
 					if len(values) == 0 {
-						return errors.New("method values are nil")
+						return nil, errors.New("method values are nil")
 					}
 					if len(values) != 1 {
-						return errors.New("not one value in method values")
+						return nil, errors.New("not one value in method values")
 					}
 
 					val, ok := values[0].(int)
 					if !ok {
-						return errors.New("invalid value type")
+						return nil, errors.New("invalid value type")
 					}
 
 					err := this.SetData("type", val)
 					if err != nil {
-						return err
+						return nil, err
 					}
 
-					return nil
+					return nil, nil
 				},
 			},
 		},
@@ -39,9 +39,9 @@ func TestComponent_Method(t *testing.T) {
 				"wow",
 				this.GetData("type"))
 		})
-	c.BE = GetEmptyBackend()
+	c.RC = GetEmptyRenderCore()
 
-	err := c.Method("changeType", 1)
+	nil, err := c.MethodSafely("changeType", 1)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err.Error())
 		return
@@ -52,8 +52,7 @@ func TestComponent_Method(t *testing.T) {
 		return
 	}
 
-	err = nil
-	err = c.Method("invalidMethodName", 1, 2, 3)
+	_, err = c.MethodSafely("invalidMethodName", 1, 2, 3)
 	if err == nil {
 		t.Error("no error after calling nil method")
 		return
@@ -80,7 +79,7 @@ func TestComponent_Computed(t *testing.T) {
 				"wow",
 				this.GetData("type"))
 		})
-	c.BE = GetEmptyBackend()
+	c.RC = GetEmptyRenderCore()
 
 	val := c.Computed("getTypePlus2")
 	if val == nil {

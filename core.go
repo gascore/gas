@@ -9,14 +9,15 @@ type Gas struct {
 }
 
 func (g *Gas) GetElement() interface{} {
-	return g.App.BE.GetGasEl(g)
+	return g.App.RC.BE.GetGasEl(g)
 }
 
 type BackEnd interface {
 	New(string) (string, error)
 	Init(Gas) error
-	UpdateComponentChildes(*Component, []interface{}, []interface{}) error
-	ReCreate(*Component) error
+
+	ExecNode(*RenderNode) error
+	ChildNodes(interface{}) []interface{}
 
 	GetElement(*Component) interface{}
 	GetGasEl(*Gas) interface{}

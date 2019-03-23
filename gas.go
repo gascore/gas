@@ -2,13 +2,18 @@ package gas
 
 import (
 	"fmt"
+	"sync"
 )
 
 // New create new gas application with custom backend
 func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChildes) (Gas, error) {
-	c.BE = be
+	c.RC = &RenderCore{
+		BE: be,
+		WG: &sync.WaitGroup{},
+		M:  &sync.Mutex{},
+	}
 
-	tagName, err := c.BE.New(startPoint)
+	tagName, err := c.RC.BE.New(startPoint)
 	if err != nil {
 		return Gas{}, err
 	}
@@ -29,7 +34,7 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 
 // Init initialize gas application
 func Init(gas Gas) error {
-	err := gas.App.BE.Init(gas)
+	err := gas.App.RC.BE.Init(gas)
 	if err != nil {
 		return err
 	}
@@ -50,7 +55,7 @@ func (c *Component) WarnError(err error) {
 		return
 	}
 
-	c.BE.ConsoleError(err.Error())
+	c.ConsoleError(err.Error())
 }
 
 // WarnIfNot console error if !ok
@@ -59,8 +64,8 @@ func (c *Component) WarnIfNot(ok bool) {
 		return
 	}
 
-	c.BE.ConsoleError(fmt.Sprintf("invalid data type"))
+	c.ConsoleError(fmt.Errorf("invalid data type").Error())
 }
 
-func (c *Component) ConsoleLog(a ...interface{})   { c.BE.ConsoleLog(a...) }
-func (c *Component) ConsoleError(a ...interface{}) { c.BE.ConsoleError(a...) }
+func (c *Component) ConsoleLog(a ...interface{})   { c.RC.BE.ConsoleLog(a...) }
+func (c *Component) ConsoleError(a ...interface{}) { c.RC.BE.ConsoleError(a...) }

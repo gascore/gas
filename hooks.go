@@ -2,11 +2,15 @@ package gas
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created      Hook // When component has been created in golang only (Element isn't available)
-	Mounted      Hook // When component has been mounted (Element is available)
-	WillDestroy  Hook // Before component destroy (Element is available)
-	BeforeUpdate Hook // When component child don't updated
-	Updated      Hook // After component child was updated
+	Created       Hook // When component has been created in golang only (Element isn't available)
+
+	BeforeMounted Hook // When parent already rendered (appended to DOM), but component Element don't yet
+	Mounted       Hook // When component has been mounted (Element is available)
+
+	BeforeDestroy Hook // Before component destroy (Element is available)
+
+	BeforeUpdate  Hook // When component child don't updated
+	Updated       Hook // After component child was updated
 }
 
 // Hook - lifecycle hook
@@ -47,8 +51,8 @@ func RunWillDestroyIfCan(i interface{}) error {
 
 	c := I2C(i)
 
-	if c.Hooks.WillDestroy != nil {
-		err := c.Hooks.WillDestroy(c)
+	if c.Hooks.BeforeDestroy != nil {
+		err := c.Hooks.BeforeDestroy(c)
 		if err != nil {
 			return err
 		}

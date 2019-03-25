@@ -38,9 +38,9 @@ func TestChanged(t *testing.T) {
 			},
 		},
 		Methods: map[string]Method{
-			"1": func(this *Component, values ...interface{}) error {
+			"1": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("method 1")
-				return nil
+				return nil, nil
 			},
 		},
 		Tag: "h2",
@@ -66,13 +66,13 @@ func TestChanged(t *testing.T) {
 			},
 		},
 		Methods: map[string]Method{
-			"1": func(this *Component, values ...interface{}) error {
+			"1": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("method 1")
-				return nil
+				return nil, nil
 			},
-			"2": func(this *Component, values ...interface{}) error {
+			"2": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("method 2")
-				return nil
+				return nil, nil
 			},
 		},
 		Tag: "h2",
@@ -85,13 +85,13 @@ func TestChanged(t *testing.T) {
 			},
 		},
 		Methods: map[string]Method{
-			"1": func(this *Component, values ...interface{}) error {
+			"1": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("method 1")
-				return nil
+				return nil, nil
 			},
-			"2": func(this *Component, values ...interface{}) error {
+			"2": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("method 31231231231231231313131")
-				return nil
+				return nil, nil
 			},
 		},
 		Tag: "h2",

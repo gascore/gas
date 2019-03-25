@@ -22,13 +22,6 @@ type GetComponent func(*Component) interface{}
 type GetComponentChildes func(*Component) []interface{}
 
 // GetChildes -- function returning component childes
-// In function parameter sends `this` component and you can get it data from this parameter
-//
-// Component childes can BE:
-//
-// 1. String (or tag_value)
-//
-// 2. Another component
 type GetChildes func(*Component) []interface{}
 
 // Bind - dynamic component attribute (analog for vue `v-bind:`).
@@ -92,7 +85,7 @@ type Object interface {
 	Raw() interface{}
 }
 
-// Watcher -- function triggering after component data changed
+// Watcher -- function triggering after component Data changed
 type Watcher func(this *Component, new interface{}, old interface{}) error // (this, new, old)
 
 // Component -- basic component struct
@@ -247,7 +240,7 @@ func NewForByData(dataForList []interface{}, this *Component, renderer func(int,
 			if I2C(item).Attrs == nil {
 				I2C(item).Attrs = make(map[string]string)
 			}
-			I2C(item).Attrs["data-for-i"] = fmt.Sprintf("%d", i)
+			I2C(item).Attrs["Data-for-i"] = fmt.Sprintf("%d", i)
 		}
 
 		items = append(items, item)

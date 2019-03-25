@@ -19,9 +19,9 @@ func main() {
 				},
 				Methods: map[string]gas.Method{
 					"addClick": func(this *gas.C, i ...interface{}) (interface{}, error) {
-						currentClick := this.GetData("click").(int)
+						currentClick := this.Get("click").(int)
 
-						err := this.SetData("click", currentClick+1)
+						err := this.SetValue("click", currentClick+1)
 						if err != nil {
 							return nil, err
 						}
@@ -72,7 +72,7 @@ func main() {
 							},
 						},
 						"You clicked button: ",
-						GetNumberViewer(this.GetData("click").(int))))
+						GetNumberViewer(this.Get("click").(int))))
 			})
 	must(err)
 	err = gas.Init(app)

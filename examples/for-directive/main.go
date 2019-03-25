@@ -34,9 +34,9 @@ func main() {
 								&gas.C{
 									Handlers: map[string]gas.Handler{
 										"click": func(c *gas.C, e gas.Object) {
-											arr := this.GetData("arr").([]interface{})
+											arr := this.Get("arr").([]interface{})
 											arr = append(arr, "Hello!") // hello, Annoy-o-Tron
-											this.WarnError(this.SetData("arr", arr))
+											this.WarnError(this.SetValue("arr", arr))
 										},
 									},
 									Tag: "li",

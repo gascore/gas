@@ -25,10 +25,7 @@ func TestComponent_Method(t *testing.T) {
 						return nil, errors.New("invalid value type")
 					}
 
-					err := this.SetData("type", val)
-					if err != nil {
-						return nil, err
-					}
+					this.Data["type"] = val
 
 					return nil, nil
 				},
@@ -37,7 +34,7 @@ func TestComponent_Method(t *testing.T) {
 		func(this *Component) []interface{} {
 			return ToGetComponentList(
 				"wow",
-				this.GetData("type"))
+				this.Get("type"))
 		})
 	c.RC = GetEmptyRenderCore()
 
@@ -47,7 +44,7 @@ func TestComponent_Method(t *testing.T) {
 		return
 	}
 
-	if c.GetData("type").(int) != 1 {
+	if c.Get("type").(int) != 1 {
 		t.Errorf("method was not called")
 		return
 	}
@@ -67,7 +64,7 @@ func TestComponent_Computed(t *testing.T) {
 			},
 			Computeds: map[string]Computed{
 				"getTypePlus2": func(this *Component, values ...interface{}) (interface{}, error) {
-					val, ok := this.GetData("type").(int)
+					val, ok := this.Get("type").(int)
 					this.WarnIfNot(ok)
 
 					return val + 2, nil
@@ -77,7 +74,7 @@ func TestComponent_Computed(t *testing.T) {
 		func(this *Component) []interface{} {
 			return ToGetComponentList(
 				"wow",
-				this.GetData("type"))
+				this.Get("type"))
 		})
 	c.RC = GetEmptyRenderCore()
 

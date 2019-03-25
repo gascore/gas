@@ -14,7 +14,8 @@ func TestRunMountedIfCan(t *testing.T) {
 			},
 			Hooks: Hooks{
 				Mounted: func(this *Component) error {
-					return this.SetData("counter", 1)
+					this.Data["counter"] = 1
+					return nil
 				},
 			},
 		},
@@ -24,7 +25,8 @@ func TestRunMountedIfCan(t *testing.T) {
 					&C{
 						Hooks: Hooks{
 							Mounted: func(this2 *Component) error {
-								return this.SetData("childCounter", 1)
+								this.Data["childCounter"] = 1
+								return nil
 							},
 						},
 					},
@@ -44,11 +46,11 @@ func TestRunMountedIfCan(t *testing.T) {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
 
-	if c.GetData("counter").(int) != 1 {
+	if c.Get("counter").(int) != 1 {
 		t.Errorf("mounted not called in parent component")
 	}
 
-	if c.GetData("childCounter").(int) != 1 {
+	if c.Get("childCounter").(int) != 1 {
 		t.Errorf("mounted not called in child component")
 	}
 }
@@ -63,7 +65,8 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 			},
 			Hooks: Hooks{
 				BeforeDestroy: func(this *Component) error {
-					return this.SetData("counter", 1)
+					this.Data["counter"] = 1
+					return nil
 				},
 			},
 		},
@@ -73,7 +76,8 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 					&C{
 						Hooks: Hooks{
 							BeforeDestroy: func(this2 *Component) error {
-								return this.SetData("childCounter", 1)
+								this.Data["childCounter"] = 1
+								return nil
 							},
 						},
 					},
@@ -93,11 +97,11 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
 
-	if c.GetData("counter").(int) != 1 {
+	if c.Get("counter").(int) != 1 {
 		t.Errorf("willDestroy not called in parent component")
 	}
 
-	if c.GetData("childCounter").(int) != 1 {
+	if c.Get("childCounter").(int) != 1 {
 		t.Errorf("willDestroy not called in child component")
 	}
 }
@@ -118,7 +122,8 @@ func TestRunUpdatedIfCan(t *testing.T) {
 			},
 			Hooks: Hooks{
 				Updated: func(this *Component) error {
-					return this.SetData("counter", 1)
+					this.Data["counter"] = 1
+					return nil
 				},
 			},
 		},
@@ -135,7 +140,7 @@ func TestRunUpdatedIfCan(t *testing.T) {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
 
-	if c.GetData("counter").(int) != 1 {
+	if c.Get("counter").(int) != 1 {
 		t.Errorf("updated not called in parent component")
 	}
 }
@@ -156,7 +161,8 @@ func TestRunBeforeUpdateIfCan(t *testing.T) {
 			},
 			Hooks: Hooks{
 				BeforeUpdate: func(this *Component) error {
-					return this.SetData("counter", 1)
+					this.Data["counter"] = 1
+					return nil
 				},
 			},
 		},
@@ -173,7 +179,7 @@ func TestRunBeforeUpdateIfCan(t *testing.T) {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
 
-	if c.GetData("counter").(int) != 1 {
+	if c.Get("counter").(int) != 1 {
 		t.Errorf("updated not called in parent component")
 	}
 }

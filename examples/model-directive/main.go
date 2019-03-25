@@ -30,7 +30,7 @@ func main() {
 						},
 						func(this *gas.Component) []interface{} {
 							return gas.CL(
-								fmt.Sprintf("Your text: %s", this.GetData("foo").(string)),
+								fmt.Sprintf("Your text: %s", this.Get("foo").(string)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
@@ -65,11 +65,11 @@ func main() {
 										Tag: "span",
 										Binds: map[string]gas.Bind{
 											"style": func() string {
-												return fmt.Sprintf("color: %s", this.GetData("foo"))
+												return fmt.Sprintf("color: %s", this.Get("foo"))
 											},
 										},
 									},
-									this.GetData("foo").(string),
+									this.Get("foo").(string),
 								),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
@@ -102,7 +102,7 @@ func main() {
 						},
 						func(this *gas.Component) []interface{} {
 							return gas.CL(
-								fmt.Sprintf("Your range: %d", this.GetData("foo").(int)),
+								fmt.Sprintf("Your range: %d", this.Get("foo").(int)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
@@ -134,7 +134,7 @@ func main() {
 						},
 						func(this *gas.Component) []interface{} {
 							return gas.CL(
-								fmt.Sprintf("Your checkbox: %t", this.GetData("foo").(bool)),
+								fmt.Sprintf("Your checkbox: %t", this.Get("foo").(bool)),
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{

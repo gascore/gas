@@ -23,7 +23,7 @@ func main() {
 					"show": func(this *gas.Component, new interface{}, old interface{}) error {
 						this.ConsoleLog(fmt.Sprintf("Watcher is triggered! New value: %t, old value: %t", new, old))
 
-						err := this.SetDataFree("watcherIsTriggered", true)
+						err := this.SetValueFree("watcherIsTriggered", true)
 						if err != nil {
 							this.WarnError(err)
 							return err
@@ -42,7 +42,7 @@ func main() {
 						&gas.Component{
 							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.Component, e gas.Object) {
-									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+									this.WarnError(this.SetValue("show", !this.Get("show").(bool)))
 								},
 							},
 							Tag: "button",
@@ -54,7 +54,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									Show: func(c *gas.C) bool {
-										return this.GetData("show").(bool)
+										return this.Get("show").(bool)
 									},
 								},
 								Tag: "i",
@@ -64,7 +64,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									Show: func(c *gas.C) bool {
-										return !this.GetData("show").(bool)
+										return !this.Get("show").(bool)
 									},
 								},
 								Tag: "i",
@@ -76,7 +76,7 @@ func main() {
 						&gas.Component{
 							Directives: gas.Directives{
 								If: func(c *gas.Component) bool {
-									return !this.GetData("show").(bool)
+									return !this.Get("show").(bool)
 								},
 							},
 							Tag: "i",
@@ -87,7 +87,7 @@ func main() {
 						&gas.Component{
 							Directives: gas.Directives{
 								If: func(this2 *gas.Component) bool {
-									watcherIsTriggered, ok := this.GetData("watcherIsTriggered").(bool)
+									watcherIsTriggered, ok := this.Get("watcherIsTriggered").(bool)
 									this.WarnIfNot(ok)
 									return watcherIsTriggered
 								},

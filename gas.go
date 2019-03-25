@@ -1,16 +1,21 @@
 package gas
 
 import (
+	"container/heap"
 	"fmt"
 	"sync"
 )
 
 // New create new gas application with custom backend
 func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChildes) (Gas, error) {
+	pq := make(PriorityQueue, 0)
+	heap.Init(&pq)
+
 	c.RC = &RenderCore{
 		BE: be,
 		WG: &sync.WaitGroup{},
 		M:  &sync.Mutex{},
+		Queue: &pq,
 	}
 
 	tagName, err := c.RC.BE.New(startPoint)
@@ -64,7 +69,7 @@ func (c *Component) WarnIfNot(ok bool) {
 		return
 	}
 
-	c.ConsoleError(fmt.Errorf("invalid data type").Error())
+	c.ConsoleError(fmt.Errorf("invalid Data type").Error())
 }
 
 func (c *Component) ConsoleLog(a ...interface{})   { c.RC.BE.ConsoleLog(a...) }

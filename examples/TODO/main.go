@@ -36,7 +36,7 @@ func main() {
 							return nil, errors.New("invalid appendToDeleted")
 						}
 
-						list, ok := this.GetData("current").([]interface{})
+						list, ok := this.Get("current").([]interface{})
 						if !ok {
 							return nil, errors.New("invalid current list")
 						}
@@ -47,7 +47,7 @@ func main() {
 							return nil, err
 						}
 
-						err = this.SetData("currentText", "")
+						err = this.SetValue("currentText", "")
 						if err != nil {
 							return nil, err
 						}
@@ -78,7 +78,7 @@ func main() {
 						}
 
 						if listTypeS == "current" {
-							this.WarnError(this.SetData("currentText", ""))
+							this.WarnError(this.SetValue("currentText", ""))
 						}
 
 						return nil, nil
@@ -89,7 +89,7 @@ func main() {
 							return nil, errors.New("invalid index")
 						}
 
-						list := this.GetData("current").([]interface{})
+						list := this.Get("current").([]interface{})
 
 						item := list[i]
 
@@ -146,7 +146,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return this.GetData("currentList").(string) == "0"
+										return this.Get("currentList").(string) == "0"
 									},
 									Model: gas.ModelDirective{
 										Data:      "currentText",
@@ -156,7 +156,7 @@ func main() {
 								Tag: "input",
 								Handlers: map[string]gas.Handler{
 									"keyup.enter": func(p *gas.C, e gas.Object) {
-										currentText := this.GetData("currentText").(string)
+										currentText := this.Get("currentText").(string)
 										if len(currentText) == 0 {
 											return
 										}
@@ -223,7 +223,7 @@ func getList(pThis *gas.C, index int) interface{} {
 		&gas.C{
 			Directives: gas.Directives{
 				Show: func(p *gas.C) bool {
-					return pThis.GetData("currentList") == fmt.Sprintf("%d", index)
+					return pThis.Get("currentList") == fmt.Sprintf("%d", index)
 				},
 			},
 			Tag: "ul",
@@ -287,7 +287,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							Tag: "i",
 							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
-									return !this.GetData("isEditing").(bool)
+									return !this.Get("isEditing").(bool)
 								},
 							},
 							Handlers: map[string]gas.Handler{
@@ -296,8 +296,8 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 										return
 									}
 
-									this.WarnError(this.SetData("newValue", el))
-									this.WarnError(this.SetData("isEditing", true))
+									this.WarnError(this.SetValue("newValue", el))
+									this.WarnError(this.SetValue("isEditing", true))
 								},
 							},
 						},
@@ -310,7 +310,7 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							},
 							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
-									return this.GetData("isEditing").(bool)
+									return this.Get("isEditing").(bool)
 								},
 								Model: gas.ModelDirective{
 									Component: this,
@@ -319,9 +319,9 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							},
 							Handlers: map[string]gas.Handler{
 								"keyup.enter": func(p *gas.C, e gas.Object) {
-									newValue := this.GetData("newValue")
+									newValue := this.Get("newValue")
 
-									this.WarnError(this.SetData("isEditing", false))
+									this.WarnError(this.SetValue("isEditing", false))
 									pThis.Method("edit", i, newValue)
 									el = newValue
 								},
@@ -469,12 +469,12 @@ func getNavEl(this *gas.C, index, name string) interface{} {
 			Handlers: map[string]gas.Handler{
 				"click": func(p *gas.C, e gas.Object) {
 					this.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
-					this.WarnError(this.SetData("currentList", index))
+					this.WarnError(this.SetValue("currentList", index))
 				},
 			},
 			Binds: map[string]gas.Bind{
 				"class": func() string {
-					if this.GetData("currentList").(string) == index {
+					if this.Get("currentList").(string) == index {
 						return "active"
 					}
 					return ""

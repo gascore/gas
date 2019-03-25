@@ -45,8 +45,8 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						&gas.C{
 							Handlers: map[string]gas.Handler{
 								"click": func(this2 *gas.C, e gas.Object) {
-									currentIsArticleActive := this.GetData("isArticleActive").(bool)
-									this.WarnError(this.SetData("isArticleActive", !currentIsArticleActive))
+									currentIsArticleActive := this.Get("isArticleActive").(bool)
+									this.WarnError(this.SetValue("isArticleActive", !currentIsArticleActive))
 								},
 							},
 							Tag: "button",
@@ -55,7 +55,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return this.GetData("isArticleActive").(bool)
+										return this.Get("isArticleActive").(bool)
 									},
 								},
 							},
@@ -64,7 +64,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return !this.GetData("isArticleActive").(bool)
+										return !this.Get("isArticleActive").(bool)
 									},
 								},
 							},
@@ -74,13 +74,13 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 						&gas.C{
 							Directives: gas.Directives{
 								HTML: gas.HTMLDirective{Render: func(this2 *gas.C) string {
-									isArticleActive, ok := this.GetData("isArticleActive").(bool)
+									isArticleActive, ok := this.Get("isArticleActive").(bool)
 
 									var html string
 									if isArticleActive {
-										html, ok = this.GetData("articleText").(string)
+										html, ok = this.Get("articleText").(string)
 									} else {
-										html, ok = this.GetData("helloText").(string)
+										html, ok = this.Get("helloText").(string)
 									}
 									this.WarnIfNot(ok)
 

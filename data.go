@@ -7,11 +7,11 @@ import (
 var (
 	ErrComponentDataIsNil   = errors.New("component Data is nil")
 	ErrNilField             = errors.New("trying to set value to nil field")
-	ErrInvalidDataFieldType = errors.New("invalid data field type")
+	ErrInvalidDataFieldType = errors.New("invalid Data field type")
 )
 
-// GetData return data field by query string
-func (c *Component) GetData(query string) interface{} {
+// Get return Data field by query string
+func (c *Component) Get(query string) interface{} {
 	if c.Data == nil {
 		c.ConsoleError(ErrComponentDataIsNil.Error())
 		return nil
@@ -22,24 +22,39 @@ func (c *Component) GetData(query string) interface{} {
 		return nil
 	}
 
-	// There will BE callbacks, events, e.t.c.
 	data := c.Data[query]
 
 	return data
 }
 
-// SetData set data field and ForceUpdate component (after changes)
-func (c *Component) SetData(query string, value interface{}) error {
-	oldHTMLDirective := c.htmlDirective()
-
-	oldValue := c.Data[query]
-	err := c.SetDataFree(query, value)
-	if err != nil {
-		return err
+// Set set many values for many Data fields and ForceUpdate component
+func (c *Component) Set(data map[string]interface{}) error {
+	if data == nil {
+		return errors.New("invalid Data for Set")
 	}
 
-	if c.Watchers[query] != nil {
-		err = c.Watchers[query](c, value, oldValue)
+	c.RC.Add(singleNode(&RenderNode{
+		Type:DataType,
+		Priority:EventPriority,
+
+		New:  c,
+		Data: data,
+	}))
+
+	return nil
+}
+
+
+// Set set many values for many Data fields and ForceUpdate component
+func (c *Component) realSet(node *RenderNode) error {
+	oldHTMLDirective := c.htmlDirective()
+
+	if node.Data == nil {
+		return errors.New("invalid Data for Set")
+	}
+
+	for key, value := range node.Data {
+		err := c.SetValueFree(key, value)
 		if err != nil {
 			return err
 		}
@@ -48,8 +63,13 @@ func (c *Component) SetData(query string, value interface{}) error {
 	return c.update(oldHTMLDirective)
 }
 
-// SetDataFree set data without ForceUpdate
-func (c *Component) SetDataFree(query string, value interface{}) error {
+// SetValue set Data field and ForceUpdate component
+func (c *Component) SetValue(query string, value interface{}) error {
+	return c.Set(map[string]interface{}{query: value})
+}
+
+// SetValueFree set Data without ForceUpdate
+func (c *Component) SetValueFree(query string, value interface{}) error {
 	if c.Data == nil {
 		c.Data = make(map[string]interface{})
 		return ErrComponentDataIsNil
@@ -59,21 +79,30 @@ func (c *Component) SetDataFree(query string, value interface{}) error {
 		return ErrNilField
 	}
 
+	oldValue := c.Data[query]
 	c.Data[query] = value
+
+	if c.Watchers[query] != nil {
+		err := c.Watchers[query](c, value, oldValue)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
-// DataDeleteFromArray remove element from data field
+
+// DataDeleteFromArray remove element from Data field
 func (c *Component) DataDeleteFromArray(query string, index int) error {
-	list, ok := c.GetData(query).([]interface{})
+	list, ok := c.Get(query).([]interface{})
 	if !ok {
 		return ErrInvalidDataFieldType
 	}
 
 	oldHTMLDirective := c.htmlDirective()
 
-	err := c.SetDataFree(query, remove(list, index))
+	err := c.SetValueFree(query, remove(list, index))
 	if err != nil {
 		return err
 	}
@@ -86,16 +115,16 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 	return nil
 }
 
-// DataAddToArray add element to data field
+// DataAddToArray add element to Data field
 func (c *Component) DataAddToArray(query string, value interface{}) error {
-	list, ok := c.GetData(query).([]interface{})
+	list, ok := c.Get(query).([]interface{})
 	if !ok {
 		return ErrInvalidDataFieldType
 	}
 
 	list = append(list, value)
 
-	err := c.SetData(query, list)
+	err := c.SetValue(query, list)
 	if err != nil {
 		return err
 	}
@@ -103,9 +132,9 @@ func (c *Component) DataAddToArray(query string, value interface{}) error {
 	return nil
 }
 
-// DataEditArray edit element in data field
+// DataEditArray edit element in Data field
 func (c *Component) DataEditArray(query string, index int, value interface{}) error {
-	list, ok := c.GetData(query).([]interface{})
+	list, ok := c.Get(query).([]interface{})
 	if !ok {
 		return ErrInvalidDataFieldType
 	}
@@ -122,18 +151,9 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 	return nil
 }
 
-// remove remove item from element
-func remove(a []interface{}, i int) []interface{} {
-	copy(a[i:], a[i+1:]) // Shift a[i+1:] left one index
-	a[len(a)-1] = ""     // Erase last element (write zero value)
-	a = a[:len(a)-1]     // Truncate slice
-
-	return a
-}
-
-// DataDeleteFromArray remove element from data field (works only with map[string]interface{} maps)
+// DataDeleteFromArray remove element from Data field (works only with map[string]interface{} maps)
 func (c *Component) DataDeleteFromMap(query, key string) error {
-	m, ok := c.GetData(query).(map[string]interface{})
+	m, ok := c.Get(query).(map[string]interface{})
 	if !ok {
 		return ErrInvalidDataFieldType
 	}
@@ -150,9 +170,9 @@ func (c *Component) DataDeleteFromMap(query, key string) error {
 	return nil
 }
 
-// DataEditMap edit element to data field (works only with map[string]interface{} maps)
+// DataEditMap edit element to Data field (works only with map[string]interface{} maps)
 func (c *Component) DataEditMap(query, key string, value interface{}) error {
-	m, ok := c.GetData(query).(map[string]interface{})
+	m, ok := c.Get(query).(map[string]interface{})
 	if !ok {
 		return ErrInvalidDataFieldType
 	}
@@ -167,4 +187,13 @@ func (c *Component) DataEditMap(query, key string, value interface{}) error {
 	}
 
 	return nil
+}
+
+// remove remove item from element
+func remove(a []interface{}, i int) []interface{} {
+	copy(a[i:], a[i+1:]) // Shift a[i+1:] left one index
+	a[len(a)-1] = ""     // Erase last element (write zero value)
+	a = a[:len(a)-1]     // Truncate slice
+
+	return a
 }

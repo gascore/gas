@@ -31,12 +31,12 @@ func main() {
 								"style": "display: flex;",
 							},
 						},
-						fmt.Sprintf("Your range: %d", this.GetData("foo").(int)),
+						fmt.Sprintf("Your range: %d", this.Get("foo").(int)),
 						gas.NE(
 							&gas.C{
 								Binds: map[string]gas.Bind{
 									"style": func() string {
-										foo, ok := this.GetData("foo").(int)
+										foo, ok := this.Get("foo").(int)
 										this.WarnIfNot(ok)
 
 										// REMEMBER!

@@ -27,7 +27,7 @@ func main() {
 						&gas.C{
 							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.C, e gas.Object) {
-									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+									this.WarnError(this.SetValue("show", !this.Get("show").(bool)))
 								},
 							},
 							Tag: "button",
@@ -39,7 +39,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return this.GetData("show").(bool)
+										return this.Get("show").(bool)
 									},
 								},
 							},
@@ -48,7 +48,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return !this.GetData("show").(bool)
+										return !this.Get("show").(bool)
 									},
 								},
 							},
@@ -58,7 +58,7 @@ func main() {
 							Directives: gas.Directives{
 								// If `Directives.Show == false` set `display: none` to element styles
 								Show: func(c *gas.C) bool {
-									return !this.GetData("show").(bool)
+									return !this.Get("show").(bool)
 								},
 							},
 							Tag: "i",
@@ -68,7 +68,7 @@ func main() {
 						&gas.C{
 							Directives: gas.Directives{
 								If: func(c *gas.C) bool {
-									return this.GetData("show").(bool)
+									return this.Get("show").(bool)
 								},
 							},
 							Tag: "b",

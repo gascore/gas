@@ -35,8 +35,7 @@ func (c *Component) update(oldHTMLDirective string) error {
 	c.RChildes = newTree
 	c.UpdateHTMLDirective()
 
-	c.RC.AddMany(renderNodes)
-	c.RC.Run()
+	c.RC.Add(renderNodes)
 
 	return nil
 }
@@ -55,12 +54,11 @@ func (c *Component) ForceUpdate() error {
 
 // ReCreate re create component
 func (c *Component) ReCreate() {
-	c.RC.Add(&RenderNode{
+	c.RC.Add(singleNode(&RenderNode{
 		Type: RecreateType,
+		Priority: RenderPriority,
 		New: c,
-	})
-
-	c.RC.Run()
+	}))
 }
 
 // RenderTree return full rendered childes tree of component
@@ -126,6 +124,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	if old == nil {
 		nodes = append(nodes, &RenderNode{
 			Type: CreateType,
+			Priority: RenderPriority,
 			New: new,
 			NodeParent: _parent,
 		})
@@ -155,6 +154,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	if new == nil {
 		nodes = append(nodes, &RenderNode{
 			Type:DeleteType,
+			Priority: RenderPriority,
 			NodeParent:_parent,
 			NodeOld: _el,
 			Old: old,
@@ -171,6 +171,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	if isChanged {
 		nodes = append(nodes, &RenderNode{
 			Type:ReplaceType,
+			Priority: RenderPriority,
 			NodeParent:_parent,
 			NodeOld:_el,
 			New: new,
@@ -186,7 +187,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 
 	oldC := I2C(old)
 
-	if newC.UUID != oldC.UUID { // update *element context* in old
+	if newC.UUID != oldC.UUID { // update *element context* in new
 		newC.UUID = oldC.UUID
 	}
 
@@ -197,6 +198,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 
 	nodes = append(nodes, &RenderNode{
 		Type: SyncType,
+		Priority: RenderPriority,
 		New: newC,
 		NodeNew: _el,
 	})

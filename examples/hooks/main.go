@@ -29,7 +29,7 @@ func main() {
 						&gas.C{
 							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.C, e gas.Object) {
-									this.WarnError(this.SetData("show", !this.GetData("show").(bool)))
+									this.WarnError(this.SetValue("show", !this.Get("show").(bool)))
 								},
 							},
 							Tag: "button",
@@ -41,7 +41,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return this.GetData("show").(bool)
+										return this.Get("show").(bool)
 									},
 								},
 							},
@@ -50,7 +50,7 @@ func main() {
 							&gas.C{
 								Directives: gas.Directives{
 									If: func(p *gas.C) bool {
-										return !this.GetData("show").(bool)
+										return !this.Get("show").(bool)
 									},
 								},
 							},
@@ -59,13 +59,13 @@ func main() {
 						&gas.C{
 							Directives: gas.Directives{
 								If: func(c *gas.C) bool {
-									return this.GetData("show").(bool)
+									return this.Get("show").(bool)
 								},
 							},
 							Hooks: gas.Hooks{
 								Mounted: func(this2 *gas.C) error {
 									this.ConsoleLog("Visible text is created!")
-									return this.SetData("counter", this.GetData("counter").(int)+1)
+									return this.SetValue("counter", this.Get("counter").(int)+1)
 								},
 								BeforeDestroy: func(this2 *gas.C) error {
 									this.ConsoleLog("Visible text will destroy!")
@@ -84,7 +84,7 @@ func main() {
 							Hooks: gas.Hooks{
 								Mounted: func(this2 *gas.C) error {
 									this.ConsoleLog("Hidden text is created!")
-									return this.SetData("counter", this.GetData("counter").(int)+1)
+									return this.SetValue("counter", this.Get("counter").(int)+1)
 								},
 								BeforeDestroy: func(this2 *gas.C) error {
 									this.ConsoleLog("Hidden text will destroy!")
@@ -93,7 +93,7 @@ func main() {
 							},
 							Tag: "i",
 						},
-						fmt.Sprintf("Hidden text (you show hidden text %d times)", this.GetData("counter")),
+						fmt.Sprintf("Hidden text (you show hidden text %d times)", this.Get("counter")),
 					),
 				)
 			})

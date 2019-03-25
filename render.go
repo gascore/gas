@@ -4,73 +4,128 @@ import (
 	"sync"
 )
 
+// RenderCore
 type RenderCore struct {
-	Queue []*RenderNode
+	Queue *PriorityQueue
 	BE    BackEnd
 
 	WG *sync.WaitGroup
 	M  *sync.Mutex
 }
 
+// RenderNode
 type RenderNode struct {
+	index int // The index of the item in the heap.
+
 	Type RenderType
+	Priority Priority
 
 	New, Old interface{} // *Component, string, int, etc
 	NodeParent, NodeNew, NodeOld interface{} // *dom.Element, etc
+
+	Data map[string]interface{} // using only for Type == DataType
 }
 
+// RenderType renderNode type
 type RenderType int
 const (
 	ReplaceType RenderType = iota
 	CreateType
 	DeleteType
+	DataType // Set, SetValue
 	SyncType // update g-model value, remove g-show styles
 	RecreateType // ReCreate
 )
 
-func (rc *RenderCore) Add(node *RenderNode) {
+// RenderType renderNode priority (the more the more important)
+type Priority int
+const (
+	EventPriority Priority = iota // Set, SetValue
+	RenderPriority // Create, Replace, Delete, ForceUpdate, ReCreate
+	InputPriority // Using in g-model input events
+)
+
+func (rc *RenderCore) Add(nodes []*RenderNode) {
 	rc.WG.Add(1)
 	go func() {
 		rc.M.Lock()
-
-		rc.Queue = append(rc.Queue, node)
-
+		for _, node := range nodes {
+			rc.Queue.Push(node)
+		}
 		rc.M.Unlock()
+
 		rc.WG.Done()
 	}()
-}
+	// rc.WG.Wait()
 
-func (rc *RenderCore) AddMany(nodes []*RenderNode) {
-	for _, node := range nodes {
-		rc.Add(node)
-	}
-}
-
-func (rc *RenderCore) Run() {
+	// trying to execute all renderNodes in queue
 	go func() {
 		rc.WG.Wait()
 		rc.M.Lock()
 
-		for len(rc.Queue) != 0 {
-			node := rc.Queue[0]
+		for rc.Queue.Len() > 0 {
+			node := rc.Queue.Pop().(*RenderNode)
 
-			err := rc.BE.ExecNode(node)
-			if err != nil {
-				rc.M.Unlock()
-				rc.BE.ConsoleError(err.Error())
-				return
+			switch node.Type {
+			case DataType:
+				newC, ok := node.New.(*Component)
+				if !ok {
+					rc.M.Unlock()
+					rc.BE.ConsoleError("invalid New type in RenderNode with DataType")
+					return
+				}
+
+				err := newC.realSet(node)
+				if err != nil {
+					rc.M.Unlock()
+					rc.BE.ConsoleError(err.Error())
+					return
+				}
+			default:
+				err := rc.BE.ExecNode(node)
+				if err != nil {
+					rc.M.Unlock()
+					rc.BE.ConsoleError(err.Error())
+					return
+				}
 			}
-
-			// remove first element from queue
-			copy(rc.Queue[0:], rc.Queue[1:])
-			rc.Queue[len(rc.Queue)-1] = nil
-			rc.Queue = rc.Queue[:len(rc.Queue)-1]
 		}
 
 		rc.M.Unlock()
 	}()
 }
 
-func aloneNode(node *RenderNode) []*RenderNode {
+func singleNode(node *RenderNode) []*RenderNode {
 	return []*RenderNode{node}
+}
+
+// A PriorityQueue implements heap.Interface and holds Items.
+type PriorityQueue []*RenderNode
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
+	return pq[i].Priority > pq[j].Priority
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	n := len(*pq)
+	item := x.(*RenderNode)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	item := old[0]
+	item.index = -1 // for safety
+	*pq = old[1:]
+	return item
 }

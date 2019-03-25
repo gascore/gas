@@ -28,7 +28,7 @@ func main() {
 								"class": "greeting h1",
 							},
 						},
-						this.GetData("hello")),
+						this.Get("hello")),
 					gas.NE(
 						&gas.C{
 							Tag: "i",

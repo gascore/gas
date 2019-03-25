@@ -24,10 +24,10 @@ func main() {
 				// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
 				Methods: map[string]gas.Method{
 					"toggle": func(this *gas.Component, values ...interface{}) (interface{}, error) {
-						_ = this.SetData("show", !this.GetData("show").(bool))
+						_ = this.SetValue("show", !this.Get("show").(bool))
 
-						if this.GetData("show").(bool) {
-							_ = this.SetData("number", this.GetData("number").(int)+1)
+						if this.Get("show").(bool) {
+							_ = this.SetValue("number", this.Get("number").(int)+1)
 						}
 
 						return nil, nil
@@ -38,7 +38,7 @@ func main() {
 					"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
 						this.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
 
-						currentNumber, ok := this.GetData("number").(int)
+						currentNumber, ok := this.Get("number").(int)
 						this.WarnIfNot(ok) // it's good practise to your data for valid type
 						explanation := fmt.Sprintf("You showed hidden text: %d times", currentNumber)
 						return explanation, nil
@@ -50,8 +50,8 @@ func main() {
 			},
 			func(this *gas.Component) []interface{} {
 				return gas.CL(
-					getButton(this.GetData("show").(bool), this.PocketMethod("toggle")),
-					getHiddenText(this.GetData("show").(bool), this.PocketComputed("number")))
+					getButton(this.Get("show").(bool), this.PocketMethod("toggle")),
+					getHiddenText(this.Get("show").(bool), this.PocketComputed("number")))
 			})
 	must(err)
 

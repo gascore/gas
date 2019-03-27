@@ -14,7 +14,6 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 	c.RC = &RenderCore{
 		BE: be,
 		WG: &sync.WaitGroup{},
-		M:  &sync.Mutex{},
 		Queue: &pq,
 	}
 

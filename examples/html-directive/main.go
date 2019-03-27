@@ -46,34 +46,30 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 							Handlers: map[string]gas.Handler{
 								"click": func(this2 *gas.C, e gas.Object) {
 									currentIsArticleActive := this.Get("isArticleActive").(bool)
-									this.WarnError(this.SetValue("isArticleActive", !currentIsArticleActive))
+									this.SetValue("isArticleActive", !currentIsArticleActive)
 								},
 							},
 							Tag: "button",
 						},
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									If: func(p *gas.C) bool {
-										return this.Get("isArticleActive").(bool)
-									},
+								If: func(p *gas.C) bool {
+									return this.Get("isArticleActive").(bool)
 								},
 							},
 							"Hide article"),
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									If: func(p *gas.C) bool {
-										return !this.Get("isArticleActive").(bool)
-									},
+								If: func(p *gas.C) bool {
+									return !this.Get("isArticleActive").(bool)
 								},
 							},
 							"Show article"),
 					),
 					gas.NE(
 						&gas.C{
-							Directives: gas.Directives{
-								HTML: gas.HTMLDirective{Render: func(this2 *gas.C) string {
+							HTML: gas.HTMLDirective{
+								Render: func(this2 *gas.C) string {
 									isArticleActive, ok := this.Get("isArticleActive").(bool)
 
 									var html string
@@ -85,7 +81,7 @@ Donec dapibus dolor in massa vehicula ornare. Duis molestie velit vitae purus co
 									this.WarnIfNot(ok)
 
 									return html
-								}},
+								},
 							},
 							Tag: "article",
 							Attrs: map[string]string{

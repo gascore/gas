@@ -42,7 +42,7 @@ func main() {
 						&gas.Component{
 							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.Component, e gas.Object) {
-									this.WarnError(this.SetValue("show", !this.Get("show").(bool)))
+									this.SetValue("show", !this.Get("show").(bool))
 								},
 							},
 							Tag: "button",
@@ -52,20 +52,16 @@ func main() {
 						},
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									Show: func(c *gas.C) bool {
-										return this.Get("show").(bool)
-									},
+								Show: func(c *gas.C) bool {
+									return this.Get("show").(bool)
 								},
 								Tag: "i",
 							},
 							"Show text"),
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									Show: func(c *gas.C) bool {
-										return !this.Get("show").(bool)
-									},
+								Show: func(c *gas.C) bool {
+									return !this.Get("show").(bool)
 								},
 								Tag: "i",
 							},
@@ -74,10 +70,8 @@ func main() {
 					),
 					gas.NE(
 						&gas.Component{
-							Directives: gas.Directives{
-								If: func(c *gas.Component) bool {
-									return !this.Get("show").(bool)
-								},
+							If: func(c *gas.Component) bool {
+								return !this.Get("show").(bool)
 							},
 							Tag: "i",
 						},
@@ -85,12 +79,10 @@ func main() {
 					),
 					gas.NE(
 						&gas.Component{
-							Directives: gas.Directives{
-								If: func(this2 *gas.Component) bool {
-									watcherIsTriggered, ok := this.Get("watcherIsTriggered").(bool)
-									this.WarnIfNot(ok)
-									return watcherIsTriggered
-								},
+							If: func(this2 *gas.Component) bool {
+								watcherIsTriggered, ok := this.Get("watcherIsTriggered").(bool)
+								this.WarnIfNot(ok)
+								return watcherIsTriggered
 							},
 							Tag: "strong",
 							Attrs: map[string]string{

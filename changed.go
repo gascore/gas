@@ -32,45 +32,30 @@ func isComponentsEquals(newC, oldC *Component) bool {
 	if newC.isElement && oldC.isElement {
 		return newC.Tag == oldC.Tag &&
 			newC.Ref == oldC.Ref &&
-			newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
+			newC.HTML.Rendered == oldC.HTML.Rendered &&
 
 			reflect.DeepEqual(newC.Attrs, oldC.Attrs) &&
 			reflect.DeepEqual(newC.RenderedBinds, oldC.RenderedBinds) &&
 
-			reflect.ValueOf(newC.Directives.HTML.Render).Pointer() == reflect.ValueOf(oldC.Directives.HTML.Render).Pointer() &&
-			reflect.ValueOf(newC.Directives.If).Pointer() == reflect.ValueOf(oldC.Directives.If).Pointer() &&
+			reflect.ValueOf(newC.HTML.Render).Pointer() == reflect.ValueOf(oldC.HTML.Render).Pointer() &&
+			reflect.ValueOf(newC.If).Pointer() == reflect.ValueOf(oldC.If).Pointer() &&
 			compareForDirectives(newC, oldC) &&
-			newC.Directives.Model.Data == oldC.Directives.Model.Data
+			newC.Model.Data == oldC.Model.Data
 	}
 
 	// if components are *true* components
 	return newC.Tag == oldC.Tag &&
-		newC.Directives.HTML.Rendered == oldC.Directives.HTML.Rendered &&
+		newC.HTML.Rendered == oldC.HTML.Rendered &&
 		newC.RefsAllowed == oldC.RefsAllowed &&
 
 		// reflect.DeepEqual(newC.Data, oldC.Data) &&
 		compareWatchers(newC.Watchers, oldC.Watchers) &&
 		compareMethods(newC.Methods, oldC.Methods) &&
-		compareComputeds(newC.Computeds, oldC.Computeds) &&
 
 		compareHooks(newC, oldC)
 }
 
 func compareWatchers(a, b map[string]Watcher) bool {
-	n := make(map[string]interface{})
-	for key, val := range a {
-		n[key] = val
-	}
-
-	o := make(map[string]interface{})
-	for key, val := range b {
-		o[key] = val
-	}
-
-	return compareMapStringFunc(n, o)
-}
-
-func compareComputeds(a, b map[string]Computed) bool {
 	n := make(map[string]interface{})
 	for key, val := range a {
 		n[key] = val

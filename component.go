@@ -13,9 +13,6 @@ type Context interface{}
 // Method - struct for Component methods
 type Method func(*Component, ...interface{}) (interface{}, error)
 
-// Computed - struct for Component computed values
-type Computed func(*Component, ...interface{}) (interface{}, error)
-
 // GetComponent returns component child
 type GetComponent func(*Component) interface{}
 
@@ -26,18 +23,6 @@ type GetChildes func(*Component) []interface{}
 
 // Bind - dynamic component attribute (analog for vue `v-bind:`).
 type Bind func() string
-
-// Directives struct storing component if-directive
-type Directives struct {
-	If    func(*Component) bool
-	Else  bool
-	// (If != nil) + (Else) = else-if
-	Show  func(*Component) bool
-
-	For   ForDirective
-	Model ModelDirective
-	HTML  HTMLDirective
-}
 
 // ModelDirective struct for Model directive
 type ModelDirective struct {
@@ -73,6 +58,7 @@ type Handler func(*Component, Object)
 type Object interface {
 	String() string
 	Int() int
+	Float() float64
 
 	Get(string) Object
 	Set(string, interface{})
@@ -93,7 +79,6 @@ type Component struct {
 	Data      map[string]interface{}
 	Watchers  map[string]Watcher
 	Methods   map[string]Method
-	Computeds map[string]Computed
 
 	Hooks Hooks // lifecycle hooks
 
@@ -101,7 +86,14 @@ type Component struct {
 	Binds         map[string]Bind    	 // dynamic attributes
 	RenderedBinds map[string]string // store binds for changed func
 
-	Directives Directives
+	/* directives */
+	If    func(*Component) bool
+	Else  bool
+	// (If != nil) + (Else) = else-if
+	Show  func(*Component) bool
+	For   ForDirective
+	Model ModelDirective
+	HTML  HTMLDirective
 
 	Childes  GetChildes
 	RChildes []interface{} // rendered childes
@@ -115,7 +107,6 @@ type Component struct {
 	Parent    *Component
 
 	Ref string
-
 	RefsAllowed bool           // if true component can have Refs
 	Refs map[string]*Component // childes have g-ref attribute. Only for Component.isElement == false
 
@@ -155,7 +146,7 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 			childC.RC = component.RC
 			childC.Parent = component
 
-			if childC.Directives.Else {
+			if childC.Else {
 				if !lastIfIsFresh {
 					this.WarnError(errors.New("invalid else or else-if directive: no if (else-if) directive before"))
 					continue
@@ -163,13 +154,13 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 
 				if lastIfValue {
 					lastIfValue   = false
-					lastIfIsFresh = childC.Directives.If != nil
+					lastIfIsFresh = childC.If != nil
 					continue
 				}
 			}
 
-			if childC.Directives.If != nil {
-				ifValue := childC.Directives.If(childC)
+			if childC.If != nil {
+				ifValue := childC.If(childC)
 
 				lastIfValue   = ifValue
 				lastIfIsFresh = true
@@ -226,16 +217,16 @@ func NewFor(data string, this *Component, renderer func(int, interface{}) interf
 		return nil
 	}
 
-	return NewForByData(dataForList, this, renderer)
+	return NewForByData(dataForList, renderer)
 }
 
-func NewForByData(dataForList []interface{}, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
+func NewForByData(dataForList []interface{}, renderer func(int, interface{}) interface{}) []interface{} {
 	var items []interface{}
 	for i, el := range dataForList {
 		item := renderer(i, el)
 
 		if IsComponent(item) {
-			I2C(item).Directives.For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
+			I2C(item).For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
 
 			if I2C(item).Attrs == nil {
 				I2C(item).Attrs = make(map[string]string)
@@ -257,11 +248,11 @@ func (c *Component) IsElement() bool {
 
 // ForItemInfo return info about FOR directive
 func (c *Component) ForItemInfo() (isItem bool, i int, val interface{}) {
-	if !c.Directives.For.isItem {
+	if !c.For.isItem {
 		return false, 0, nil
 	}
 
-	return true, c.Directives.For.itemValueI, c.Directives.For.itemValueVal
+	return true, c.For.itemValueI, c.For.itemValueVal
 }
 
 // Element return *dom.Element by component
@@ -308,12 +299,6 @@ func I2C(a interface{}) *Component {
 // IsComponent return true if interface is *Component
 func IsComponent(c interface{}) bool {
 	_, ok := c.(*Component)
-	return ok
-}
-
-// IsComponent return true if interface is array of interfaces
-func IsChildesArr(c interface{}) bool {
-	_, ok := c.([]interface{})
 	return ok
 }
 

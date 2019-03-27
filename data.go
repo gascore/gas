@@ -28,9 +28,9 @@ func (c *Component) Get(query string) interface{} {
 }
 
 // Set set many values for many Data fields and ForceUpdate component
-func (c *Component) Set(data map[string]interface{}) error {
+func (c *Component) Set(data map[string]interface{}) {
 	if data == nil {
-		return errors.New("invalid Data for Set")
+		return
 	}
 
 	c.RC.Add(singleNode(&RenderNode{
@@ -40,8 +40,6 @@ func (c *Component) Set(data map[string]interface{}) error {
 		New:  c,
 		Data: data,
 	}))
-
-	return nil
 }
 
 
@@ -64,8 +62,8 @@ func (c *Component) realSet(node *RenderNode) error {
 }
 
 // SetValue set Data field and ForceUpdate component
-func (c *Component) SetValue(query string, value interface{}) error {
-	return c.Set(map[string]interface{}{query: value})
+func (c *Component) SetValue(query string, value interface{}) {
+	c.Set(map[string]interface{}{query: value})
 }
 
 // SetValueFree set Data without ForceUpdate
@@ -124,10 +122,7 @@ func (c *Component) DataAddToArray(query string, value interface{}) error {
 
 	list = append(list, value)
 
-	err := c.SetValue(query, list)
-	if err != nil {
-		return err
-	}
+	c.SetValue(query, list)
 
 	return nil
 }

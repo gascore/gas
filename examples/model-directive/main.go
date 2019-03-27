@@ -34,11 +34,9 @@ func main() {
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
-										Directives: gas.Directives{
-											Model: gas.ModelDirective{
-												Data:      "foo",
-												Component: this,
-											},
+										Model: gas.ModelDirective{
+											Data:      "foo",
+											Component: this,
 										},
 										Tag: "input",
 									},
@@ -74,11 +72,9 @@ func main() {
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
-										Directives: gas.Directives{
-											Model: gas.ModelDirective{
-												Data:      "foo",
-												Component: this,
-											},
+										Model: gas.ModelDirective{
+											Data:      "foo",
+											Component: this,
 										},
 										Tag: "input",
 										Attrs: map[string]string{
@@ -106,11 +102,9 @@ func main() {
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
-										Directives: gas.Directives{
-											Model: gas.ModelDirective{
-												Data:      "foo",
-												Component: this,
-											},
+										Model: gas.ModelDirective{
+											Data:      "foo",
+											Component: this,
 										},
 										Tag: "input",
 										Attrs: map[string]string{
@@ -138,11 +132,9 @@ func main() {
 								gas.NE(&gas.Component{Tag: "br"}),
 								gas.NE(
 									&gas.Component{
-										Directives: gas.Directives{
-											Model: gas.ModelDirective{
-												Data:      "foo",
-												Component: this,
-											},
+										Model: gas.ModelDirective{
+											Data:      "foo",
+											Component: this,
 										},
 										Tag: "input",
 										Attrs: map[string]string{

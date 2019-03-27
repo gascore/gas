@@ -29,7 +29,7 @@ func main() {
 						&gas.C{
 							Handlers: map[string]gas.Handler{
 								"click": func(c *gas.C, e gas.Object) {
-									this.WarnError(this.SetValue("show", !this.Get("show").(bool)))
+									this.SetValue("show", !this.Get("show").(bool))
 								},
 							},
 							Tag: "button",
@@ -39,33 +39,28 @@ func main() {
 						},
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									If: func(p *gas.C) bool {
-										return this.Get("show").(bool)
-									},
+								If: func(p *gas.C) bool {
+									return this.Get("show").(bool)
 								},
 							},
 							"Show text"),
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									If: func(p *gas.C) bool {
-										return !this.Get("show").(bool)
-									},
+								If: func(p *gas.C) bool {
+									return !this.Get("show").(bool)
 								},
 							},
 							"Hide text")),
 					gas.NE(
 						&gas.C{
-							Directives: gas.Directives{
-								If: func(c *gas.C) bool {
-									return this.Get("show").(bool)
-								},
+							If: func(c *gas.C) bool {
+								return this.Get("show").(bool)
 							},
 							Hooks: gas.Hooks{
 								Mounted: func(this2 *gas.C) error {
 									this.ConsoleLog("Visible text is created!")
-									return this.SetValue("counter", this.Get("counter").(int)+1)
+									this.SetValue("counter", this.Get("counter").(int)+1)
+									return nil
 								},
 								BeforeDestroy: func(this2 *gas.C) error {
 									this.ConsoleLog("Visible text will destroy!")
@@ -78,13 +73,12 @@ func main() {
 					),
 					gas.NE(
 						&gas.C{
-							Directives: gas.Directives{
-								Else: true,
-							},
+							Else: true,
 							Hooks: gas.Hooks{
 								Mounted: func(this2 *gas.C) error {
 									this.ConsoleLog("Hidden text is created!")
-									return this.SetValue("counter", this.Get("counter").(int)+1)
+									this.SetValue("counter", this.Get("counter").(int)+1)
+									return nil
 								},
 								BeforeDestroy: func(this2 *gas.C) error {
 									this.ConsoleLog("Hidden text will destroy!")

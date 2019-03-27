@@ -24,17 +24,14 @@ func main() {
 				// Computed will return value from data, libraries, /dev/random, e.t.c. with some changes (or just raw)
 				Methods: map[string]gas.Method{
 					"toggle": func(this *gas.Component, values ...interface{}) (interface{}, error) {
-						_ = this.SetValue("show", !this.Get("show").(bool))
+						this.SetValue("show", !this.Get("show").(bool))
 
 						if this.Get("show").(bool) {
-							_ = this.SetValue("number", this.Get("number").(int)+1)
+							this.SetValue("number", this.Get("number").(int)+1)
 						}
 
 						return nil, nil
 					},
-				},
-				// Computeds can be cached
-				Computeds: map[string]gas.Computed{
 					"number": func(this *gas.Component, values ...interface{}) (interface{}, error) {
 						this.ConsoleLog(fmt.Sprintf("Some values: %s", values[0].(string)))
 
@@ -51,7 +48,7 @@ func main() {
 			func(this *gas.Component) []interface{} {
 				return gas.CL(
 					getButton(this.Get("show").(bool), this.PocketMethod("toggle")),
-					getHiddenText(this.Get("show").(bool), this.PocketComputed("number")))
+					getHiddenText(this.Get("show").(bool), this.PocketMethod("number")))
 			})
 	must(err)
 
@@ -76,31 +73,25 @@ func getButton(show bool, toggleMethod gas.PocketMethod) *gas.Component {
 		},
 		gas.NE(
 			&gas.C{
-				Directives: gas.Directives{
-					If: func(p *gas.C) bool {
-						return show
-					},
+				If: func(p *gas.C) bool {
+					return show
 				},
 			},
 			"Show text"),
 		gas.NE(
 			&gas.C{
-				Directives: gas.Directives{
-					If: func(p *gas.C) bool {
-						return !show
-					},
+				If: func(p *gas.C) bool {
+					return !show
 				},
 			},
 			"Hide text"))
 }
 
-func getHiddenText(show bool, getNumber gas.PocketComputed) *gas.Component {
+func getHiddenText(show bool, getNumber gas.PocketMethod) *gas.Component {
 	return gas.NC(
 		&gas.Component{
-			Directives: gas.Directives{
-				If: func(c *gas.Component) bool {
-					return !show
-				},
+			If: func(c *gas.Component) bool {
+				return !show
 			},
 			Tag: "i",
 		},

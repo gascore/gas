@@ -10,7 +10,6 @@ type RenderCore struct {
 	BE    BackEnd
 
 	WG *sync.WaitGroup
-	M  *sync.Mutex
 }
 
 // RenderNode
@@ -48,51 +47,41 @@ const (
 func (rc *RenderCore) Add(nodes []*RenderNode) {
 	rc.WG.Add(1)
 	go func() {
-		rc.M.Lock()
 		for _, node := range nodes {
 			rc.Queue.Push(node)
 		}
-		rc.M.Unlock()
-
 		rc.WG.Done()
 	}()
-	// rc.WG.Wait()
 
 	// trying to execute all renderNodes in queue
-	go func() {
-		rc.WG.Wait()
-		rc.M.Lock()
+	rc.WG.Wait()
+	for rc.Queue.Len() > 0 {
+		node := rc.Queue.Pop().(*RenderNode)
 
-		for rc.Queue.Len() > 0 {
-			node := rc.Queue.Pop().(*RenderNode)
+		switch node.Type {
+		case DataType:
+			newC, ok := node.New.(*Component)
+			if !ok {
+				// rc.M.Unlock()
+				rc.BE.ConsoleError("invalid New type in RenderNode with DataType")
+				return
+			}
 
-			switch node.Type {
-			case DataType:
-				newC, ok := node.New.(*Component)
-				if !ok {
-					rc.M.Unlock()
-					rc.BE.ConsoleError("invalid New type in RenderNode with DataType")
-					return
-				}
-
-				err := newC.realSet(node)
-				if err != nil {
-					rc.M.Unlock()
-					rc.BE.ConsoleError(err.Error())
-					return
-				}
-			default:
-				err := rc.BE.ExecNode(node)
-				if err != nil {
-					rc.M.Unlock()
-					rc.BE.ConsoleError(err.Error())
-					return
-				}
+			err := newC.realSet(node)
+			if err != nil {
+				// rc.M.Unlock()
+				rc.BE.ConsoleError(err.Error())
+				return
+			}
+		default:
+			err := rc.BE.ExecNode(node)
+			if err != nil {
+				// rc.M.Unlock()
+				rc.BE.ConsoleError(err.Error())
+				return
 			}
 		}
-
-		rc.M.Unlock()
-	}()
+	}
 }
 
 func singleNode(node *RenderNode) []*RenderNode {

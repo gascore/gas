@@ -7,8 +7,8 @@ import (
 // htmlDirective return compiled component HTMLDirective
 func (c *Component) htmlDirective() string {
 	var htmlDirective string
-	if c.Directives.HTML.Render != nil {
-		htmlDirective = c.Directives.HTML.Render(c)
+	if c.HTML.Render != nil {
+		htmlDirective = c.HTML.Render(c)
 	}
 
 	return htmlDirective
@@ -42,14 +42,14 @@ func (c *Component) update(oldHTMLDirective string) error {
 
 // UpdateHTMLDirective trying rerender component html directive
 func (c *Component) UpdateHTMLDirective() {
-	if c.Directives.HTML.Render != nil {
-		c.Directives.HTML.Rendered = c.Directives.HTML.Render(c)
+	if c.HTML.Render != nil {
+		c.HTML.Rendered = c.HTML.Render(c)
 	}
 }
 
 // ForceUpdate force update component
 func (c *Component) ForceUpdate() error {
-	return c.update(c.Directives.HTML.Rendered)
+	return c.update(c.HTML.Rendered)
 }
 
 // ReCreate re create component
@@ -134,7 +134,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 
 	_childes := rc.BE.ChildNodes(_parent)
 	if _childes == nil {
-		return nil, errors.New("_parent doesn't have childes")
+		_childes = []interface{}{}
 	}
 
 	var _el interface{}
@@ -192,7 +192,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	}
 
 	// if old and new is equals and they have html directives => they are two commons components
-	if IsComponent(old) && oldC.Directives.HTML.Render != nil && newC.Directives.HTML.Render != nil {
+	if IsComponent(old) && oldC.HTML.Render != nil && newC.HTML.Render != nil {
 		return nodes, nil
 	}
 

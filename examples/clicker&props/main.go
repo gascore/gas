@@ -20,12 +20,7 @@ func main() {
 				Methods: map[string]gas.Method{
 					"addClick": func(this *gas.C, i ...interface{}) (interface{}, error) {
 						currentClick := this.Get("click").(int)
-
-						err := this.SetValue("click", currentClick+1)
-						if err != nil {
-							return nil, err
-						}
-
+						this.SetValue("click", currentClick+1)
 						return nil, nil
 					},
 				},

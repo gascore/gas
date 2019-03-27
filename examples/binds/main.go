@@ -59,11 +59,9 @@ func main() {
 					gas.NE(&gas.C{Tag: "br"}),
 					gas.NE(
 						&gas.C{
-							Directives: gas.Directives{
-								Model: gas.ModelDirective{
-									Data:      "foo",
-									Component: this,
-								},
+							Model: gas.ModelDirective{
+								Data:      "foo",
+								Component: this,
 							},
 							Tag: "input",
 							Attrs: map[string]string{

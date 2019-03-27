@@ -36,7 +36,7 @@ func main() {
 										"click": func(c *gas.C, e gas.Object) {
 											arr := this.Get("arr").([]interface{})
 											arr = append(arr, "Hello!") // hello, Annoy-o-Tron
-											this.WarnError(this.SetValue("arr", arr))
+											this.SetValue("arr", arr)
 										},
 									},
 									Tag: "li",

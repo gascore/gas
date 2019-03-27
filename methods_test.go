@@ -55,38 +55,3 @@ func TestComponent_Method(t *testing.T) {
 		return
 	}
 }
-
-func TestComponent_Computed(t *testing.T) {
-	c := NC(
-		&C{
-			Data: map[string]interface{}{
-				"type": 0,
-			},
-			Computeds: map[string]Computed{
-				"getTypePlus2": func(this *Component, values ...interface{}) (interface{}, error) {
-					val, ok := this.Get("type").(int)
-					this.WarnIfNot(ok)
-
-					return val + 2, nil
-				},
-			},
-		},
-		func(this *Component) []interface{} {
-			return ToGetComponentList(
-				"wow",
-				this.Get("type"))
-		})
-	c.RC = GetEmptyRenderCore()
-
-	val := c.Computed("getTypePlus2")
-	if val == nil {
-		t.Error("invalid computed response")
-		return
-	}
-
-	val = c.Computed("invalidMethodName", 1, 2, 3)
-	if val != nil {
-		t.Error("value not nil after calling nil method")
-		return
-	}
-}

@@ -47,10 +47,7 @@ func main() {
 							return nil, err
 						}
 
-						err = this.SetValue("currentText", "")
-						if err != nil {
-							return nil, err
-						}
+						this.SetValue("currentText", "")
 
 						if appendToDeleted {
 							_, err = this.MethodSafely("append", "deleted", removedItem)
@@ -78,7 +75,7 @@ func main() {
 						}
 
 						if listTypeS == "current" {
-							this.WarnError(this.SetValue("currentText", ""))
+							this.SetValue("currentText", "")
 						}
 
 						return nil, nil
@@ -144,14 +141,12 @@ func main() {
 							getNavEl(this, "2", "Deleted")),
 						gas.NE(
 							&gas.C{
-								Directives: gas.Directives{
-									If: func(p *gas.C) bool {
-										return this.Get("currentList").(string) == "0"
-									},
-									Model: gas.ModelDirective{
-										Data:      "currentText",
-										Component: this,
-									},
+								If: func(p *gas.C) bool {
+									return this.Get("currentList").(string) == "0"
+								},
+								Model: gas.ModelDirective{
+									Data:      "currentText",
+									Component: this,
 								},
 								Tag: "input",
 								Handlers: map[string]gas.Handler{
@@ -221,10 +216,8 @@ func main() {
 func getList(pThis *gas.C, index int) interface{} {
 	return gas.NE(
 		&gas.C{
-			Directives: gas.Directives{
-				Show: func(p *gas.C) bool {
-					return pThis.Get("currentList") == fmt.Sprintf("%d", index)
-				},
+			Show: func(p *gas.C) bool {
+				return pThis.Get("currentList") == fmt.Sprintf("%d", index)
 			},
 			Tag: "ul",
 			Attrs: map[string]string{
@@ -261,10 +254,8 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 					gas.NE(
 						&gas.C{
 							Tag: "button",
-							Directives: gas.Directives{
-								If: func(p *gas.C) bool {
-									return listType == 0
-								},
+							If: func(p *gas.C) bool {
+								return listType == 0
 							},
 							Handlers: map[string]gas.Handler{
 								"click": func(this5 *gas.C, e gas.Object) {
@@ -285,19 +276,19 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 					gas.NE(
 						&gas.C{
 							Tag: "i",
-							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return !this.Get("isEditing").(bool)
 								},
-							},
 							Handlers: map[string]gas.Handler{
 								"dblclick": func(p *gas.C, e gas.Object) {
 									if listType != 0 {
 										return
 									}
 
-									this.WarnError(this.SetValue("newValue", el))
-									this.WarnError(this.SetValue("isEditing", true))
+									this.Set(map[string]interface{}{
+										"newValue": el,
+										"isEditing": true,
+									})
 								},
 							},
 						},
@@ -308,7 +299,6 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 							Attrs: map[string]string{
 								"style": "margin-right: 8px",
 							},
-							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return this.Get("isEditing").(bool)
 								},
@@ -316,12 +306,11 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 									Component: this,
 									Data:      "newValue",
 								},
-							},
 							Handlers: map[string]gas.Handler{
 								"keyup.enter": func(p *gas.C, e gas.Object) {
 									newValue := this.Get("newValue")
 
-									this.WarnError(this.SetValue("isEditing", false))
+									this.SetValue("isEditing", false)
 									pThis.Method("edit", i, newValue)
 									el = newValue
 								},
@@ -331,11 +320,9 @@ func getLi(pThis *gas.C, listType int) []interface{} {
 					gas.NE(
 						&gas.C{
 							Tag: "button",
-							Directives: gas.Directives{
 								If: func(p *gas.C) bool {
 									return listType == 0
 								},
-							},
 							Handlers: map[string]gas.Handler{
 								"click": func(this5 *gas.C, e gas.Object) {
 									pThis.Method("delete", i, true)
@@ -361,7 +348,6 @@ func getStyleEl() interface{} {
 		&gas.C{
 			Tag:   "style",
 			Attrs: map[string]string{"type": "text/css"},
-			Directives: gas.Directives{
 				HTML: gas.HTMLDirective{
 					Render: func(this2 *gas.C) string {
 						return `
@@ -456,7 +442,6 @@ footer a {
 }
 
 `
-					},
 				},
 			},
 		})
@@ -469,7 +454,7 @@ func getNavEl(this *gas.C, index, name string) interface{} {
 			Handlers: map[string]gas.Handler{
 				"click": func(p *gas.C, e gas.Object) {
 					this.ConsoleLog(e.GetInt("x"), e.GetInt("y"))
-					this.WarnError(this.SetValue("currentList", index))
+					this.SetValue("currentList", index)
 				},
 			},
 			Binds: map[string]gas.Bind{

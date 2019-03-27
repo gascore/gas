@@ -141,7 +141,7 @@ func TestChanged(t *testing.T) {
 				return nil
 			},
 		},
-		Computeds: map[string]Computed{
+		Methods: map[string]Method{
 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("computed 1")
 				return 1, nil
@@ -160,7 +160,7 @@ func TestChanged(t *testing.T) {
 				return nil
 			},
 		},
-		Computeds: map[string]Computed{
+		Methods: map[string]Method{
 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("watcher 1")
 				return 1, nil
@@ -179,7 +179,7 @@ func TestChanged(t *testing.T) {
 				return nil
 			},
 		},
-		Computeds: map[string]Computed{
+		Methods: map[string]Method{
 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
 				log.Println("watcher 1")
 				return 1, nil
@@ -223,12 +223,10 @@ func TestChanged(t *testing.T) {
 	e4 := &C{
 		Tag:       "li",
 		isElement: true,
-		Directives: Directives{
-			For: ForDirective{
-				isItem:       true,
-				itemValueI:   0,
-				itemValueVal: "some",
-			},
+		For: ForDirective{
+			isItem:       true,
+			itemValueI:   0,
+			itemValueVal: "some",
 		},
 	}
 	e5 := &C{
@@ -238,12 +236,10 @@ func TestChanged(t *testing.T) {
 	e6 := &C{
 		Tag:       "li",
 		isElement: true,
-		Directives: Directives{
-			For: ForDirective{
-				isItem:       true,
-				itemValueI:   1,
-				itemValueVal: "some",
-			},
+		For: ForDirective{
+			isItem:       true,
+			itemValueI:   1,
+			itemValueVal: "some",
 		},
 	}
 

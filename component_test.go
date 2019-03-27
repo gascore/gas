@@ -62,10 +62,8 @@ func TestNewComponent(t *testing.T) {
 				return ToGetComponentList(
 					NE(
 						&C{
-							Directives: Directives{
-								If: func(p *Component) bool {
-									return this.Attrs["id"] != "hide"
-								},
+							If: func(p *Component) bool {
+								return this.Attrs["id"] != "hide"
 							},
 						},
 						"wow"),

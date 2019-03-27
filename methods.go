@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// PocketMethod executeble component Method passing to non-component-context places (to component childes, etc)
 type PocketMethod func(...interface{}) (interface{}, error)
 
 // Method runs a component method and updates component after
@@ -17,6 +18,7 @@ func (c *Component) Method(name string, values ...interface{}) interface{} {
 	return out
 }
 
+// MethodSafely call component Method safely with returning error
 func (c *Component) MethodSafely(name string, values ...interface{}) (interface{}, error) {
 	method := c.PocketMethod(name)
 	if method == nil {

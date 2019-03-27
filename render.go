@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-// RenderCore
+// RenderCore render station
 type RenderCore struct {
 	Queue *PriorityQueue
 	BE    BackEnd
@@ -12,14 +12,14 @@ type RenderCore struct {
 	WG *sync.WaitGroup
 }
 
-// RenderNode
+// RenderNode node storing changes
 type RenderNode struct {
 	index int // The index of the item in the heap.
 
-	Type RenderType
+	Type     RenderType
 	Priority Priority
 
-	New, Old interface{} // *Component, string, int, etc
+	New, Old                     interface{} // *Component, string, int, etc
 	NodeParent, NodeNew, NodeOld interface{} // *dom.Element, etc
 
 	Data map[string]interface{} // using only for Type == DataType
@@ -27,23 +27,42 @@ type RenderNode struct {
 
 // RenderType renderNode type
 type RenderType int
+
 const (
+	// ReplaceType type for replace node
 	ReplaceType RenderType = iota
+
+	// CreateType type for create nodes
 	CreateType
+
+	// DeleteType type for delete node
 	DeleteType
-	DataType // Set, SetValue
-	SyncType // update g-model value, remove g-show styles
-	RecreateType // ReCreate
+
+	// DataType type for Set, SetValue
+	DataType
+
+	// SyncType type for update g-model value, remove g-show styles
+	SyncType
+
+	// RecreateType type for ReCreate
+	RecreateType
 )
 
-// RenderType renderNode priority (the more the more important)
+// Priority RenderNode priority (the more the more important)
 type Priority int
+
 const (
-	EventPriority Priority = iota // Set, SetValue
-	RenderPriority // Create, Replace, Delete, ForceUpdate, ReCreate
-	InputPriority // Using in g-model input events
+	// EventPriority pritority for Set, SetValue
+	EventPriority Priority = iota
+
+	// RenderPriority priority for Create, Replace, Delete, ForceUpdate, ReCreate
+	RenderPriority
+
+	// InputPriority priority for g-model input events
+	InputPriority
 )
 
+// Add push render nodes to render queue and trying to execute all queue
 func (rc *RenderCore) Add(nodes []*RenderNode) {
 	rc.WG.Add(1)
 	go func() {
@@ -98,12 +117,14 @@ func (pq PriorityQueue) Less(i, j int) bool {
 	return pq[i].Priority > pq[j].Priority
 }
 
+// Swap swap two nodes in queue
 func (pq PriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 	pq[i].index = i
 	pq[j].index = j
 }
 
+// Push push node to queue
 func (pq *PriorityQueue) Push(x interface{}) {
 	n := len(*pq)
 	item := x.(*RenderNode)
@@ -111,6 +132,7 @@ func (pq *PriorityQueue) Push(x interface{}) {
 	*pq = append(*pq, item)
 }
 
+// Pop pop node from queue
 func (pq *PriorityQueue) Pop() interface{} {
 	old := *pq
 	item := old[0]

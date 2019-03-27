@@ -2,9 +2,10 @@ package gas
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/frankenbeanies/uuid4"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 // Context - in context component send c.Data and c.Props to method
@@ -16,6 +17,7 @@ type Method func(*Component, ...interface{}) (interface{}, error)
 // GetComponent returns component child
 type GetComponent func(*Component) interface{}
 
+// GetComponentChildes return component childes
 type GetComponentChildes func(*Component) []interface{}
 
 // GetChildes -- function returning component childes
@@ -28,12 +30,12 @@ type Bind func() string
 type ModelDirective struct {
 	Data      string
 	Component *Component
-	Deep []ModelDirectiveDeepData
+	Deep      []ModelDirectiveDeepData
 }
 
-// ModelDirectiveDeepData
+// ModelDirectiveDeepData way to deep value of data field need to update by model directive
 type ModelDirectiveDeepData struct {
-	Data interface{}
+	Data     interface{}
 	Brackets bool
 }
 
@@ -76,19 +78,19 @@ type Watcher func(this *Component, new interface{}, old interface{}) error // (t
 
 // Component -- basic component struct
 type Component struct {
-	Data      map[string]interface{}
-	Watchers  map[string]Watcher
-	Methods   map[string]Method
+	Data     map[string]interface{}
+	Watchers map[string]Watcher
+	Methods  map[string]Method
 
 	Hooks Hooks // lifecycle hooks
 
-	Handlers      map[string]Handler 	 // events handlers: onClick, onHover
-	Binds         map[string]Bind    	 // dynamic attributes
-	RenderedBinds map[string]string // store binds for changed func
+	Handlers      map[string]Handler // events handlers: onClick, onHover
+	Binds         map[string]Bind    // dynamic attributes
+	RenderedBinds map[string]string  // store binds for changed func
 
 	/* directives */
-	If    func(*Component) bool
-	Else  bool
+	If   func(*Component) bool
+	Else bool
 	// (If != nil) + (Else) = else-if
 	Show  func(*Component) bool
 	For   ForDirective
@@ -106,18 +108,23 @@ type Component struct {
 	isElement bool // childes don't have parent context
 	Parent    *Component
 
-	Ref string
-	RefsAllowed bool           // if true component can have Refs
-	Refs map[string]*Component // childes have g-ref attribute. Only for Component.isElement == false
+	Ref         string
+	RefsAllowed bool                  // if true component can have Refs
+	Refs        map[string]*Component // childes have g-ref attribute. Only for Component.isElement == false
 
 	RC *RenderCore
 }
 
-// Aliases
+// C alias for Component
 type C = Component
+
+// G alias for Gas
 type G = Gas
 
+// NC alias for NewComponent
 var NC = NewComponent
+
+// NE alias for NewBasicComponent (NewElement)
 var NE = NewBasicComponent
 
 // NewComponent create new component
@@ -153,7 +160,7 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 				}
 
 				if lastIfValue {
-					lastIfValue   = false
+					lastIfValue = false
 					lastIfIsFresh = childC.If != nil
 					continue
 				}
@@ -162,7 +169,7 @@ func NewComponent(component *Component, getChildes GetComponentChildes) *Compone
 			if childC.If != nil {
 				ifValue := childC.If(childC)
 
-				lastIfValue   = ifValue
+				lastIfValue = ifValue
 				lastIfIsFresh = true
 
 				if !ifValue {
@@ -187,6 +194,7 @@ func NewBasicComponent(component *Component, childes ...interface{}) *Component 
 	})
 }
 
+// UnSpliceBody extract values fromm array to component childes
 func UnSpliceBody(body []interface{}) []interface{} {
 	var arr []interface{}
 	for _, el := range body {
@@ -220,6 +228,7 @@ func NewFor(data string, this *Component, renderer func(int, interface{}) interf
 	return NewForByData(dataForList, renderer)
 }
 
+// NewForByData create new FOR directive by []interface{}
 func NewForByData(dataForList []interface{}, renderer func(int, interface{}) interface{}) []interface{} {
 	var items []interface{}
 	for i, el := range dataForList {
@@ -271,19 +280,19 @@ func (c *Component) ParentComponent() *Component {
 	// if c.Parent == nil => c - is the root (gas.App) component
 	if c.Parent == nil || !c.Parent.isElement {
 		return c.Parent
-	} else {
-		return c.Parent.ParentComponent()
 	}
+
+	return c.Parent.ParentComponent()
 }
 
-// ParentWthAllowedRefs return first *true component* in component parents tree with allowed refs
-func (c *Component) ParentWthAllowedRefs() *Component {
+// ParentWithAllowedRefs return first *true component* in component parents tree with allowed refs
+func (c *Component) ParentWithAllowedRefs() *Component {
 	// if c.Parent == nil => c - is the root (gas.App) component
 	if c.Parent == nil || (!c.Parent.isElement && c.Parent.RefsAllowed) {
 		return c.Parent
-	} else {
-		return c.Parent.ParentWthAllowedRefs()
 	}
+
+	return c.Parent.ParentWithAllowedRefs()
 }
 
 // GetElementUnsafely return *dom.Element by component without warning
@@ -302,7 +311,7 @@ func IsComponent(c interface{}) bool {
 	return ok
 }
 
-// IsComponent return true if interface is string
+// IsString return true if interface is string
 func IsString(c interface{}) bool {
 	_, ok := c.(string)
 	return ok

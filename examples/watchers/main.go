@@ -23,7 +23,7 @@ func main() {
 					"show": func(this *gas.Component, new interface{}, old interface{}) error {
 						this.ConsoleLog(fmt.Sprintf("Watcher is triggered! New value: %t, old value: %t", new, old))
 
-						err := this.SetValueFree("watcherIsTriggered", true)
+						err := this.SetValueImm("watcherIsTriggered", true)
 						if err != nil {
 							this.WarnError(err)
 							return err

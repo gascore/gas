@@ -55,9 +55,9 @@ func (c *Component) ForceUpdate() error {
 // ReCreate re create component
 func (c *Component) ReCreate() {
 	c.RC.Add(singleNode(&RenderNode{
-		Type: RecreateType,
+		Type:     RecreateType,
 		Priority: RenderPriority,
-		New: c,
+		New:      c,
 	}))
 }
 
@@ -90,6 +90,7 @@ func RenderTree(c *Component) []interface{} {
 	return childes
 }
 
+// UpdateComponentChildes compare new and old trees
 func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []interface{}) ([]*RenderNode, error) {
 	var nodes []*RenderNode
 
@@ -123,9 +124,9 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	// if component has created
 	if old == nil {
 		nodes = append(nodes, &RenderNode{
-			Type: CreateType,
-			Priority: RenderPriority,
-			New: new,
+			Type:       CreateType,
+			Priority:   RenderPriority,
+			New:        new,
 			NodeParent: _parent,
 		})
 
@@ -153,11 +154,11 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	// if component has deleted
 	if new == nil {
 		nodes = append(nodes, &RenderNode{
-			Type:DeleteType,
-			Priority: RenderPriority,
-			NodeParent:_parent,
-			NodeOld: _el,
-			Old: old,
+			Type:       DeleteType,
+			Priority:   RenderPriority,
+			NodeParent: _parent,
+			NodeOld:    _el,
+			Old:        old,
 		})
 
 		return nodes, nil
@@ -170,12 +171,12 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	}
 	if isChanged {
 		nodes = append(nodes, &RenderNode{
-			Type:ReplaceType,
-			Priority: RenderPriority,
-			NodeParent:_parent,
-			NodeOld:_el,
-			New: new,
-			Old: old,
+			Type:       ReplaceType,
+			Priority:   RenderPriority,
+			NodeParent: _parent,
+			NodeOld:    _el,
+			New:        new,
+			Old:        old,
 		})
 
 		return nodes, nil
@@ -192,16 +193,22 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	}
 
 	// if old and new is equals and they have html directives => they are two commons components
-	if IsComponent(old) && oldC.HTML.Render != nil && newC.HTML.Render != nil {
+	if oldC.HTML.Render != nil && newC.HTML.Render != nil {
 		return nodes, nil
 	}
 
 	nodes = append(nodes, &RenderNode{
-		Type: SyncType,
+		Type:     SyncType,
 		Priority: RenderPriority,
-		New: newC,
-		NodeNew: _el,
+		New:      newC,
+		NodeNew:  _el,
 	})
+
+	if !newC.isElement && !oldC.isElement {
+		/* Seems like it's very big pice of shit */
+		newC.Data = oldC.Data
+		newC.RChildes = RenderTree(newC)
+	}
 
 	renderNodes, err := UpdateComponentChildes(newC, _el, newC.RChildes, oldC.RChildes)
 	if err != nil {

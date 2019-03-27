@@ -2,21 +2,25 @@ package gas
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created       Hook // When component has been created in golang only (Element isn't available)
+	Created Hook // When component has been created in golang only (Element isn't available)
 
-	BeforeMounted Hook // When parent already rendered (appended to DOM), but component Element don't yet
-	Mounted       Hook // When component has been mounted (Element is available)
+	BeforeMounted HookWithControl // When parent already rendered (appended to DOM), but component Element don't yet
+	Mounted       Hook            // When component has been mounted (Element is available)
 
 	BeforeDestroy Hook // Before component destroy (Element is available)
 
-	BeforeUpdate  Hook // When component child don't updated
-	Updated       Hook // After component child was updated
+	BeforeUpdate Hook // When component child don't updated
+	Updated      Hook // After component child was updated
 }
 
 // Hook - lifecycle hook
 type Hook func(*Component) error
 
-func RunMountedIfCan(i interface{}) error {
+// HookWithControl - lifecycle hook. Return true for rerender component childes
+type HookWithControl func(this *Component) (rerender bool, err error)
+
+// CallMountedIfCan call component and it's childes Mounted hook
+func CallMountedIfCan(i interface{}) error {
 	if !IsComponent(i) {
 		return nil
 	}
@@ -35,7 +39,7 @@ func RunMountedIfCan(i interface{}) error {
 			continue
 		}
 
-		err := RunMountedIfCan(I2C(child))
+		err := CallMountedIfCan(I2C(child))
 		if err != nil {
 			return err
 		}
@@ -44,7 +48,8 @@ func RunMountedIfCan(i interface{}) error {
 	return nil
 }
 
-func RunWillDestroyIfCan(i interface{}) error {
+// CallWillDestroyIfCan call component and it's childes WillDestroy hook
+func CallWillDestroyIfCan(i interface{}) error {
 	if !IsComponent(i) {
 		return nil
 	}
@@ -63,7 +68,7 @@ func RunWillDestroyIfCan(i interface{}) error {
 			continue
 		}
 
-		err := RunWillDestroyIfCan(I2C(child))
+		err := CallWillDestroyIfCan(I2C(child))
 		if err != nil {
 			return err
 		}
@@ -72,7 +77,8 @@ func RunWillDestroyIfCan(i interface{}) error {
 	return nil
 }
 
-func RunUpdatedIfCan(i interface{}) error {
+// CallUpdatedIfCan call component parent (true component) Updated hook
+func CallUpdatedIfCan(i interface{}) error {
 	if !IsComponent(i) {
 		return nil
 	}
@@ -90,7 +96,8 @@ func RunUpdatedIfCan(i interface{}) error {
 	return nil
 }
 
-func RunBeforeUpdateIfCan(i interface{}) error {
+// CallBeforeUpdateIfCan call component parent (true component) BeforeUpdate
+func CallBeforeUpdateIfCan(i interface{}) error {
 	if !IsComponent(i) {
 		return nil
 	}

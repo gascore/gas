@@ -8,10 +8,12 @@ type Gas struct {
 	// Other stuff
 }
 
+// GetElement return root element
 func (g *Gas) GetElement() interface{} {
 	return g.App.RC.BE.GetGasEl(g)
 }
 
+// BackEnd interface for calling platform-specific code
 type BackEnd interface {
 	New(string) (string, error)
 	Init(Gas) error

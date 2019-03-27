@@ -5,8 +5,13 @@ import (
 )
 
 var (
-	ErrComponentDataIsNil   = errors.New("component Data is nil")
-	ErrNilField             = errors.New("trying to set value to nil field")
+	// ErrComponentDataIsNil if component.Data == nil
+	ErrComponentDataIsNil = errors.New("component Data is nil")
+
+	// ErrNilField if field == nil
+	ErrNilField = errors.New("trying to set value to nil field")
+
+	// ErrInvalidDataFieldType if fieldValue.(type) != newFieldValue.(type)
 	ErrInvalidDataFieldType = errors.New("invalid Data field type")
 )
 
@@ -18,7 +23,7 @@ func (c *Component) Get(query string) interface{} {
 	}
 
 	if _, ok := c.Data[query]; !ok {
-		c.ConsoleError(ErrNilField.Error())
+		c.ConsoleError("field is undefined")
 		return nil
 	}
 
@@ -34,14 +39,18 @@ func (c *Component) Set(data map[string]interface{}) {
 	}
 
 	c.RC.Add(singleNode(&RenderNode{
-		Type:DataType,
-		Priority:EventPriority,
+		Type:     DataType,
+		Priority: EventPriority,
 
 		New:  c,
 		Data: data,
 	}))
 }
 
+// SetValue set Data field and ForceUpdate component
+func (c *Component) SetValue(query string, value interface{}) {
+	c.Set(map[string]interface{}{query: value})
+}
 
 // Set set many values for many Data fields and ForceUpdate component
 func (c *Component) realSet(node *RenderNode) error {
@@ -51,23 +60,16 @@ func (c *Component) realSet(node *RenderNode) error {
 		return errors.New("invalid Data for Set")
 	}
 
-	for key, value := range node.Data {
-		err := c.SetValueFree(key, value)
-		if err != nil {
-			return err
-		}
+	err := c.SetImm(node.Data)
+	if err != nil {
+		return err
 	}
 
 	return c.update(oldHTMLDirective)
 }
 
-// SetValue set Data field and ForceUpdate component
-func (c *Component) SetValue(query string, value interface{}) {
-	c.Set(map[string]interface{}{query: value})
-}
-
-// SetValueFree set Data without ForceUpdate
-func (c *Component) SetValueFree(query string, value interface{}) error {
+// SetValueImm set data immediately + without ForceUpdate
+func (c *Component) SetValueImm(query string, value interface{}) error {
 	if c.Data == nil {
 		c.Data = make(map[string]interface{})
 		return ErrComponentDataIsNil
@@ -90,6 +92,17 @@ func (c *Component) SetValueFree(query string, value interface{}) error {
 	return nil
 }
 
+// SetImm SetValueImm by map
+func (c *Component) SetImm(data map[string]interface{}) error {
+	for key, value := range data {
+		err := c.SetValueImm(key, value)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 // DataDeleteFromArray remove element from Data field
 func (c *Component) DataDeleteFromArray(query string, index int) error {
@@ -100,7 +113,7 @@ func (c *Component) DataDeleteFromArray(query string, index int) error {
 
 	oldHTMLDirective := c.htmlDirective()
 
-	err := c.SetValueFree(query, remove(list, index))
+	err := c.SetValueImm(query, remove(list, index))
 	if err != nil {
 		return err
 	}
@@ -146,7 +159,7 @@ func (c *Component) DataEditArray(query string, index int, value interface{}) er
 	return nil
 }
 
-// DataDeleteFromArray remove element from Data field (works only with map[string]interface{} maps)
+// DataDeleteFromMap remove element from Data field (works only with map[string]interface{} maps)
 func (c *Component) DataDeleteFromMap(query, key string) error {
 	m, ok := c.Get(query).(map[string]interface{})
 	if !ok {

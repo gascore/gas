@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestRunMountedIfCan(t *testing.T) {
+func TestCallMountedIfCan(t *testing.T) {
 	c := NC(
 		&C{
 			Tag: "h1",
@@ -41,7 +41,7 @@ func TestRunMountedIfCan(t *testing.T) {
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
-	err := RunMountedIfCan(c)
+	err := CallMountedIfCan(c)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
@@ -55,7 +55,7 @@ func TestRunMountedIfCan(t *testing.T) {
 	}
 }
 
-func TestRunWillDestroyIfCan(t *testing.T) {
+func TestCallWillDestroyIfCan(t *testing.T) {
 	c := NC(
 		&C{
 			Tag: "h1",
@@ -92,7 +92,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
-	err := RunWillDestroyIfCan(c)
+	err := CallWillDestroyIfCan(c)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
@@ -106,7 +106,7 @@ func TestRunWillDestroyIfCan(t *testing.T) {
 	}
 }
 
-func TestRunUpdatedIfCan(t *testing.T) {
+func TestCallUpdatedIfCan(t *testing.T) {
 	c2 := NC(
 		&C{Tag: "i"},
 		func(this2 *Component) []interface{} {
@@ -135,7 +135,7 @@ func TestRunUpdatedIfCan(t *testing.T) {
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
-	err := RunUpdatedIfCan(c2)
+	err := CallUpdatedIfCan(c2)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err.Error())
 	}
@@ -145,7 +145,7 @@ func TestRunUpdatedIfCan(t *testing.T) {
 	}
 }
 
-func TestRunBeforeUpdateIfCan(t *testing.T) {
+func TestCallBeforeUpdateIfCan(t *testing.T) {
 	c2 := NC(
 		&C{Tag: "i"},
 		func(this2 *Component) []interface{} {
@@ -174,7 +174,7 @@ func TestRunBeforeUpdateIfCan(t *testing.T) {
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
-	err := RunBeforeUpdateIfCan(c2)
+	err := CallBeforeUpdateIfCan(c2)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err.Error())
 	}

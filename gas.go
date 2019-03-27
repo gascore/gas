@@ -12,8 +12,8 @@ func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChi
 	heap.Init(&pq)
 
 	c.RC = &RenderCore{
-		BE: be,
-		WG: &sync.WaitGroup{},
+		BE:    be,
+		WG:    &sync.WaitGroup{},
 		Queue: &pq,
 	}
 
@@ -51,6 +51,7 @@ func ToGetComponentList(childes ...interface{}) []interface{} {
 	return childes
 }
 
+// CL alias for ToGetComponentList
 var CL = ToGetComponentList
 
 // WarnError log error
@@ -71,5 +72,8 @@ func (c *Component) WarnIfNot(ok bool) {
 	c.ConsoleError(fmt.Errorf("invalid Data type").Error())
 }
 
-func (c *Component) ConsoleLog(a ...interface{})   { c.RC.BE.ConsoleLog(a...) }
+// ConsoleLog call BackEnd.ConsoleLog
+func (c *Component) ConsoleLog(a ...interface{}) { c.RC.BE.ConsoleLog(a...) }
+
+// ConsoleError call BackEnd.ConsoleError
 func (c *Component) ConsoleError(a ...interface{}) { c.RC.BE.ConsoleError(a...) }

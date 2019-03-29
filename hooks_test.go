@@ -55,7 +55,7 @@ func TestCallMountedIfCan(t *testing.T) {
 	}
 }
 
-func TestCallWillDestroyIfCan(t *testing.T) {
+func TestCallBeforeDestroyIfCan(t *testing.T) {
 	c := NC(
 		&C{
 			Tag: "h1",
@@ -92,7 +92,7 @@ func TestCallWillDestroyIfCan(t *testing.T) {
 
 	c.RChildes = c.Childes(c) // Run{HookName}IfCan works with rendered childes
 
-	err := CallWillDestroyIfCan(c)
+	err := CallBeforeDestroyIfCan(c)
 	if err != nil {
 		t.Errorf("unexpected error: %s", err.Error())
 	}

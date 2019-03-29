@@ -24,7 +24,7 @@ func (c *Component) update(oldHTMLDirective string) error {
 
 	_el := c.Element()
 	if _el == nil {
-		return errors.New("invalid '_el' value in DeepUpdateComponentChildes")
+		return errors.New("invalid '_el' in update function")
 	}
 
 	renderNodes, err := UpdateComponentChildes(c, _el, newTree, c.RChildes)

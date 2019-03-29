@@ -2,10 +2,10 @@ package gas
 
 // Hooks component lifecycle hooks
 type Hooks struct {
-	Created Hook // When component has been created in golang only (Element isn't available)
+	BeforeCreated HookWithControl // When parent already rendered (appended to DOM), but component Element don't yet (you can rerender childes)
+	Created       Hook            // When component has been created in golang only (Element isn't available)
 
-	BeforeMounted HookWithControl // When parent already rendered (appended to DOM), but component Element don't yet
-	Mounted       Hook            // When component has been mounted (Element is available)
+	Mounted Hook // When component has been mounted (Element is available)
 
 	BeforeDestroy Hook // Before component destroy (Element is available)
 
@@ -18,6 +18,34 @@ type Hook func(*Component) error
 
 // HookWithControl - lifecycle hook. Return true for rerender component childes
 type HookWithControl func(this *Component) (rerender bool, err error)
+
+// CallBeforeCreatedIfCan call component and it's childes BeforeCreated hook
+func CallBeforeCreatedIfCan(i interface{}) error {
+	if !IsComponent(i) {
+		return nil
+	}
+
+	c := I2C(i)
+	if c.Hooks.BeforeCreated != nil {
+		rerender, err := c.Hooks.BeforeCreated(c)
+		if err != nil {
+			return err
+		}
+
+		if rerender {
+			c.RChildes = RenderTree(c)
+		}
+	}
+
+	for _, child := range c.RChildes {
+		err := CallBeforeCreatedIfCan(child)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 // CallMountedIfCan call component and it's childes Mounted hook
 func CallMountedIfCan(i interface{}) error {
@@ -48,8 +76,8 @@ func CallMountedIfCan(i interface{}) error {
 	return nil
 }
 
-// CallWillDestroyIfCan call component and it's childes WillDestroy hook
-func CallWillDestroyIfCan(i interface{}) error {
+// CallBeforeDestroyIfCan call component and it's childes WillDestroy hook
+func CallBeforeDestroyIfCan(i interface{}) error {
 	if !IsComponent(i) {
 		return nil
 	}
@@ -68,7 +96,7 @@ func CallWillDestroyIfCan(i interface{}) error {
 			continue
 		}
 
-		err := CallWillDestroyIfCan(I2C(child))
+		err := CallBeforeDestroyIfCan(I2C(child))
 		if err != nil {
 			return err
 		}
@@ -103,7 +131,7 @@ func CallBeforeUpdateIfCan(i interface{}) error {
 	}
 
 	// run BeforeUpdate hook for component parent(!)
-	c := I2C(i).Parent
+	c := I2C(i).ParentComponent()
 
 	if c.Hooks.BeforeUpdate != nil {
 		err := c.Hooks.BeforeUpdate(c)

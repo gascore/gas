@@ -100,7 +100,7 @@ func compareMapStringFunc(newMap, oldMap map[string]interface{}) bool {
 func compareHooks(newHooks, oldHooks *Component) bool {
 	return compareHook(newHooks.Hooks.Created, oldHooks.Hooks.Created) &&
 		compareHook(newHooks.Hooks.Mounted, oldHooks.Hooks.Mounted) &&
-		compareHookWithControl(newHooks.Hooks.BeforeMounted, oldHooks.Hooks.BeforeMounted) &&
+		compareHookWithControl(newHooks.Hooks.BeforeCreated, oldHooks.Hooks.BeforeCreated) &&
 		compareHook(newHooks.Hooks.BeforeDestroy, oldHooks.Hooks.BeforeDestroy) &&
 		compareHook(newHooks.Hooks.BeforeUpdate, oldHooks.Hooks.BeforeUpdate) &&
 		compareHook(newHooks.Hooks.Updated, oldHooks.Hooks.Updated)

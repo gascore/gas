@@ -34,8 +34,8 @@ func isComponentsEquals(newC, oldC *Component) bool {
 			newC.Ref == oldC.Ref &&
 			newC.HTML.Rendered == oldC.HTML.Rendered &&
 
-			reflect.DeepEqual(newC.Attrs, oldC.Attrs) &&
-			reflect.DeepEqual(newC.RenderedBinds, oldC.RenderedBinds) &&
+			compareAttributes(newC.Attrs, oldC.Attrs) &&
+			compareAttributes(newC.RenderedBinds, oldC.RenderedBinds) &&
 
 			reflect.ValueOf(newC.HTML.Render).Pointer() == reflect.ValueOf(oldC.HTML.Render).Pointer() &&
 			reflect.ValueOf(newC.If).Pointer() == reflect.ValueOf(oldC.If).Pointer() &&
@@ -53,6 +53,20 @@ func isComponentsEquals(newC, oldC *Component) bool {
 		compareMethods(newC.Methods, oldC.Methods) &&
 
 		compareHooks(newC, oldC)
+}
+
+func compareAttributes(newMap, oldMap map[string]string) bool {
+	if len(newMap) != len(oldMap) {
+		return false
+	}
+
+	for i, el := range newMap {
+		if el != oldMap[i] {
+			return false
+		}
+	}
+
+	return true
 }
 
 func compareWatchers(a, b map[string]Watcher) bool {

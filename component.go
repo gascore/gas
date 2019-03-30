@@ -316,3 +316,15 @@ func IsString(c interface{}) bool {
 	_, ok := c.(string)
 	return ok
 }
+
+// RemoveStrings remove all strings from []interface{}
+func RemoveStrings(arr []interface{}) []interface{} {
+	var out []interface{}
+	for _, el := range arr {
+		if IsString(el) {
+			continue
+		}
+		out = append(out, el)
+	}
+	return out
+}

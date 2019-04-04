@@ -55,15 +55,16 @@ const (
 	// EventPriority pritority for Set, SetValue
 	EventPriority Priority = iota
 
-	// RenderPriority priority for Create, Replace, Delete, ForceUpdate, ReCreate
-	RenderPriority
-
 	// InputPriority priority for g-model input events
 	InputPriority
+
+	// RenderPriority priority for Create, Replace, Delete, ForceUpdate, ReCreate
+	RenderPriority
 )
 
 // Add push render nodes to render queue and trying to execute all queue
 func (rc *RenderCore) Add(nodes []*RenderNode) {
+	rc.WG.Wait()
 	rc.WG.Add(1)
 	go func() {
 		for _, node := range nodes {
@@ -81,21 +82,19 @@ func (rc *RenderCore) Add(nodes []*RenderNode) {
 		case DataType:
 			newC, ok := node.New.(*Component)
 			if !ok {
-				// rc.M.Unlock()
 				rc.BE.ConsoleError("invalid New type in RenderNode with DataType")
 				return
 			}
 
 			err := newC.realSet(node)
 			if err != nil {
-				// rc.M.Unlock()
 				rc.BE.ConsoleError(err.Error())
 				return
 			}
+			break
 		default:
 			err := rc.BE.ExecNode(node)
 			if err != nil {
-				// rc.M.Unlock()
 				rc.BE.ConsoleError(err.Error())
 				return
 			}

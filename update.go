@@ -2,6 +2,7 @@ package gas
 
 import (
 	"errors"
+	"sync"
 )
 
 // htmlDirective return compiled component HTMLDirective
@@ -94,6 +95,10 @@ func RenderTree(c *Component) []interface{} {
 func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []interface{}) ([]*RenderNode, error) {
 	var nodes []*RenderNode
 
+	var wg sync.WaitGroup
+	var m sync.Mutex
+	var errG error
+
 	for i := 0; i < len(newTree) || i < len(oldTree); i++ {
 		var elFromNew interface{}
 		if len(newTree) > i {
@@ -105,17 +110,27 @@ func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []in
 			elFromOld = oldTree[i]
 		}
 
-		renderNodes, err := c.RC.updateComponent(_el, elFromNew, elFromOld, i)
-		if err != nil {
-			return nil, err
-		}
+		wg.Add(1)
+		go func(index int, new, old interface{}) {
+			renderNodes, err := c.RC.updateComponent(_el, new, old, index)
+			if err != nil {
+				m.Lock()
+				errG = err
+				m.Unlock()
+			}
 
-		if renderNodes != nil {
-			nodes = append(nodes, renderNodes...)
-		}
+			if renderNodes != nil {
+				m.Lock()
+				nodes = append(nodes, renderNodes...)
+				m.Unlock()
+			}
+
+			wg.Done()
+		}(i, elFromNew, elFromOld)
 	}
 
-	return nodes, nil
+	wg.Wait()
+	return nodes, errG
 }
 
 // updateComponent trying to update component

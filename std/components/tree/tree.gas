@@ -1,0 +1,128 @@
+<template>
+    <div :class="fmt.Sprintf(`tree tree-%s`, cName)">
+        <div :class="fmt.Sprintf(`tree-header tree-%s-header`, cName)">
+            <b>
+                {{ c.Name }}
+            </b>
+            <button
+                :class="fmt.Sprintf(`tree-hide-btn tree-%s-hide-btn`, cName)"
+                @click="this.SetValue(`isHidden`, !this.Get(`isHidden`).(bool))"
+                g-if="c.CanBeHidden">
+                <span g-if="this.Get(`isHidden`).(bool)">
+                    Show
+                </span>
+                <span g-else>
+                    Hide
+                </span>
+            </button>
+        </div>
+        <ul :class="fmt.Sprintf(`tree-items tree-%s-items`, cName)" g-show="!this.Get(`isHidden`).(bool)">
+            <li g-for="nItem in @toIA(c.Items)">
+                <e run="renderItem(nItem.(Item), c)"></e>
+            </li>
+        </ul>
+    </div>
+</template>
+
+<script>
+package tree
+
+import (
+	"fmt"
+	"github.com/gascore/dom"
+	"github.com/gascore/gas"
+	"strings"
+)
+
+type Config struct {
+	Name 		string
+	CanBeHidden bool
+	Events 	    Events
+
+	Items       []Item
+}
+
+type Events struct {
+	ItemClick func(item Item) error
+}
+
+type Item struct {
+	IsDirectory       bool
+	Childes           []Item // if is directory
+
+	Name string
+	Renderer func(Item) *gas.C // if null render item name
+
+	Data interface{}
+}
+
+func toIA(items []Item) []interface{} {
+    var a []interface{}
+    for _, el := range items {
+        a = append(a, el)
+    }
+    return a
+}
+
+func GetTree(c Config) *gas.Component {
+	if c.Items == nil {
+		dom.ConsoleError("invalid items")
+		return nil
+	}
+
+	cName := strings.Replace(c.Name, " ", "_", -1)
+
+	return gas.NC(
+		&gas.C{
+			Data: map[string]interface{}{
+				"isHidden": false,
+			},
+		},
+		treeT,)
+}
+
+var treeT gas.GetComponentChildes
+</script>
+
+<style>
+.tree-header {
+  display: flex;
+
+  .tree-hide-btn {
+    margin: 0  0 0 auto;
+
+    border: 0;
+    padding: 0;
+    background: inherit;
+  }
+}
+
+ul.tree-items, .directory-item ul {
+  padding: 0 0 0 12px;
+  margin: 0;
+  list-style-type: none;
+}
+
+.tree-items {
+  span.tree-item {
+    cursor: pointer;
+  }
+
+  .directory-item {
+    .directory-item-header {
+      button.directory-item-header__hide-btn {
+        margin: 0 6px 0 0;
+        border: 0;
+        padding: 0;
+        background: inherit;
+        display: inline-block;
+      }
+
+      .directory-item-header__name {
+        cursor: pointer;
+        display: inline-block;
+      }
+    }
+  }
+}
+</style>

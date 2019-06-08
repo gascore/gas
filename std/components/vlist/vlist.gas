@@ -1,0 +1,34 @@
+<script src="vlist.gos"></script>
+
+<template>
+    <div class="vlist" @scroll="this.Method(`onScroll`, e)">
+        <div
+             class="vlist-padding"
+             :style="fmt.Sprintf(`%s: %dpx;`, config.directionV, this.Get(`scrollHeight`))"></div>
+        <e run="this.Method(`genItems`, this.Get(`items`)).(interface{})"></e>
+    </div>
+</template>
+
+<style>
+.vlist {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    position: relative;
+}
+
+.vlist-content {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.vlist-padding {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+</style>

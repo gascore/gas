@@ -95,41 +95,34 @@ func RenderTree(c *Component) []interface{} {
 func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []interface{}) ([]*RenderNode, error) {
 	var nodes []*RenderNode
 
-	var wg sync.WaitGroup
 	var m sync.Mutex
 	var errG error
 
 	for i := 0; i < len(newTree) || i < len(oldTree); i++ {
-		var elFromNew interface{}
+		var newEl interface{}
 		if len(newTree) > i {
-			elFromNew = newTree[i]
+			newEl = newTree[i]
 		}
 
-		var elFromOld interface{}
+		var oldEl interface{}
 		if len(oldTree) > i {
-			elFromOld = oldTree[i]
+			oldEl = oldTree[i]
 		}
 
-		wg.Add(1)
-		go func(index int, new, old interface{}) {
-			renderNodes, err := c.RC.updateComponent(_el, new, old, index)
-			if err != nil {
-				m.Lock()
-				errG = err
-				m.Unlock()
-			}
+		renderNodes, err := c.RC.updateComponent(_el, newEl, oldEl, i)
+		if err != nil {
+			m.Lock()
+			errG = err
+			m.Unlock()
+		}
 
-			if renderNodes != nil {
-				m.Lock()
-				nodes = append(nodes, renderNodes...)
-				m.Unlock()
-			}
-
-			wg.Done()
-		}(i, elFromNew, elFromOld)
+		if renderNodes != nil {
+			m.Lock()
+			nodes = append(nodes, renderNodes...)
+			m.Unlock()
+		}
 	}
 
-	wg.Wait()
 	return nodes, errG
 }
 

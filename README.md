@@ -10,7 +10,7 @@
 
 ### Related packages:
 
-1. [gascore/gas-web](https://github.com/gascore/gas-web) - wasm/gojs backend
-2. [gascore/gasx](https://github.com/gascore/gasx) - project manager for gas applications
-3. [gascore/gas-router](https://github.com/gascore/gas-router) - web router
-4. [gascore/gas-store](https://github.com/gascore/gas-store) - redux-like store
+1. [gascore/gas-web](https://github.com/gascore/gas/web) - wasm/gojs backend
+2. [gascore/gasx](https://github.com/gascore/gas/gasx) - project manager for gas applications
+3. [gascore/gas-router](https://github.com/gascore/gas/std/router) - web router
+4. [gascore/gas-store](https://github.com/gascore/gas/std/store) - redux-like store

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gascore/gas"
-	"github.com/gascore/gas-web"
+	"github.com/gascore/gas/web"
 )
 
 // Example application #8

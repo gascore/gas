@@ -1,6 +1,6 @@
 # Examples
 
-*all examples here uses [wasm](https://github.com/gascore/gas-web) backend.
+*all examples here uses [wasm](https://github.com/gascore/gas/web) backend.
 If you need gopherjs see [gojs.md](https://github.com/gascore/gas/blob/master/examples/gojs.md)*
 
 For running test you need [wasmgo](https://github.com/dave/wasmgo).

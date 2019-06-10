@@ -28,17 +28,25 @@ func Build() *cobra.Command {
 func BuildBody(allConfig *cfg.Config) error {
 	var outJS, outCSS string
 	for _, dep := range allConfig.Deps.Deps {
-		file, err := ioutil.ReadFile(packagesFolder + "/" + dep.Name + dep.DefaultFile)
-		if err != nil {
-			return err
+		var files []string
+		if len(dep.DefaultFile) != 0 {
+			files = []string{dep.DefaultFile}
 		}
+		files = append(files, dep.RequiredFiles...)
 
-		if strings.HasSuffix(dep.DefaultFile, ".js") {
-			outJS = outJS + "\n\n" + string(file)
-		} else if strings.HasSuffix(dep.DefaultFile, ".css") {
-			outCSS = outCSS + "\n\n" + string(file)
-		} else {
-			panic("invalid package default file type")
+		for _, depFile := range files {
+			file, err := ioutil.ReadFile(packagesFolder + "/" + dep.Name + depFile)
+			if err != nil {
+				return err
+			}
+
+			if strings.HasSuffix(depFile, ".js") {
+				outJS = outJS + "\n\n" + string(file)
+			} else if strings.HasSuffix(depFile, ".css") {
+				outCSS = outCSS + "\n\n" + string(file)
+			} else {
+				panic("invalid package default file type")
+			}
 		}
 	}
 

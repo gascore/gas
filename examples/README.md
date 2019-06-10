@@ -1,16 +1,11 @@
 # Examples
 
-*all examples here uses [wasm](https://github.com/gascore/gas/web) backend.
-If you need gopherjs see [gojs.md](https://github.com/gascore/gas/blob/master/examples/gojs.md)*
-
-For running test you need [wasmgo](https://github.com/dave/wasmgo).
-You can install it by `go get -u github.com/dave/wasmgo`
-
 How to run example:
 
 1. Go into directory
 2. Run `wasmgo serve -i "../index.wasmgo.html"`
 
+If you want run them with gopherjs see [gojs.md](https://github.com/gascore/gas/blob/master/examples/gojs.md)
 
 Hosting in [jsgo.io](https://jsgo.io) examples:
 

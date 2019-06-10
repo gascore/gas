@@ -1,0 +1,51 @@
+<template>
+    <div id="links" class="centerizeContent boxShadow page">
+        <h1>
+            {{ this.Get("links").(string) }}
+        </h1>
+        <ul>
+            <li>
+                <e run="i.LinkDynamic(`link`, map[string]string{`name`: `gas`}, map[string]string{`main`: `true`}, false)">
+                    <i> gas </i> - <b> core </b>
+                </e>
+            </li>
+            <li>
+                <e run="i.LinkDynamic(`link`, map[string]string{`name`: `gas-web`}, nil, false)">
+                    gas-web
+                </e>
+            </li>
+            <li>
+                <e run="i.LinkDynamic(`link`, map[string]string{`name`: `gasx`}, nil, false)">
+                    gasx
+                </e>
+            </li>
+            <li>
+                <e run="i.LinkDynamic(`link`, map[string]string{`name`: `gas-router`}, nil, false)">
+                    gas-router
+                </e>
+            </li>
+        </ul>
+    </div>
+</template>
+
+<script>
+package components
+
+import (
+    r "github.com/gascore/gas/std/router"
+    "github.com/gascore/gas"
+    . "github.com/gascore/gas/examples/main/store"
+)
+
+func Links(i r.RouteInfo) *gas.Component {
+    return S.RC(gas.NC(
+        &gas.C{
+            Data: map[string]interface{} {
+                "links": "some links here",
+            },
+        },
+        linksT,), nil)
+}
+
+var linksT gas.GetComponentChildes
+</script>

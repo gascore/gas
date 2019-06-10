@@ -1,0 +1,455 @@
+<script src="components.gos"></script>
+
+<template>
+	<div id="components"  class="centerizeContent">
+	    <div class="wrap">
+	        <header class="wrap-title">
+                Basic Drag and drop
+            </header>
+            <div class="wrap-body dndFreeBoundary">
+                <e run="dndFree.DNDFree(this.Method(`dndFreeConfig1`).(dndFree.Config))">
+                    Basic example
+                </e>
+                <e run="dndFree.DNDFree(this.Method(`dndFreeConfig2`).(dndFree.Config))">
+                    <span>Handle only</span>
+                    <i class="icon icon-menu dndFree-handle"></i>
+                </e>
+                <e run="dndFree.DNDFree(this.Method(`dndFreeConfig3`).(dndFree.Config))">
+                    <span>Bounded in div</span>
+                </e>
+                <e run="dndFree.DNDFree(this.Method(`dndFreeConfig4`).(dndFree.Config))">
+                    <span>Ydispabled</span>
+                </e>
+                <e run="dndFree.DNDFree(this.Method(`dndFreeConfig5`).(dndFree.Config))">
+                    <span>Xdispabled</span>
+                </e>
+            </div>
+	    </div>
+
+        <div class="wrap">
+            <header class="wrap-title">
+                Modal
+            </header>
+
+            <div class="wrap-body">
+                <button class="h(2.4rem) w(6rem) btn" g-on:click="this.SetValue(`isActiveModal`, !this.Get(`isActiveModal`).(bool))">
+                    <span g-if="this.Get(`isActiveModal`).(bool)">
+                        Hide
+                    </span>
+                    <span g-else>
+                        Show
+                    </span>
+                </button>
+                <e run="modal.GetModal(this.Method(`getModal`).(modal.Config))">
+                    <div class="p(.8rem)">
+                        <header class="customModal-header d(flex) p(0) m(0,0,.5rem,0)">
+                            <h3 class="h3 m(0)">
+                                Header inside modal window
+                            </h3>
+                            <button class="btn btn-clear ml(auto,!important) fz(22px,!important)" @click="this.SetValue(`isActiveModal`, !this.Get(`isActiveModal`).(bool))">
+                                <!-- Icon here -->
+                            </button>
+                        </header>
+                        <div class="customModal-body">
+                            <p class="mb(0)">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tincidunt viverra vestibulum. Cras finibus convallis ipsum, sit amet finibus justo dapibus non. Maecenas ultrices velit ac nunc convallis pulvinar. In a hendrerit mi. Nulla orci nisi, tempus quis rhoncus vitae, ornare sit amet risus. Nullam eleifend velit tempor pharetra pretium. Fusce blandit felis a volutpat convallis. Nulla volutpat in purus nec luctus. Donec eget placerat purus, vel faucibus enim. Vivamus a posuere felis, eu sagittis eros.</p>
+                        </div>
+                    </div>
+                </e>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <header class="wrap-title">
+                Layout
+            </header>
+
+            <div class="wrap-body">
+                <div id="layout-wrap">
+                    <e run="layout.Layout(this.Method(`layoutConfig`).(*layout.Config))">
+                        <div class="layout-item-1">
+                            GopherJS
+                        </div>
+
+                        <e run="layout.Layout(this.Method(`layoutConfig2`).(*layout.Config))">
+                            <div>
+                                WebAssembly
+                            </div>
+                            <div>
+                                Tinygo
+                            </div>
+                        </e>
+                    </e>
+                </div>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <header class="wrap-title">
+                Virtual list
+            </header>
+
+            <div class="wrap-body">
+                <div class="vlist-wrap h(50vw) bd(b) mb(1em)">
+                    <e run="vlist.List(this.Method(`vListConfig`).(*vlist.Config))">
+                        <template name="item" types="i := values[0].(int); item := values[1].(string); start := values[2].(int)">
+                            <div class="p(.4em) bdt(b) bdb(b) w(100%)" :style="fmt.Sprintf(`height: %dpx;`, this.Get(`vItemsHeight`).([]int)[i+start])">
+                                {{ item }}
+                            </div>
+                        </template>
+                    </e>
+                </div>
+                <div class="vlist-wrap h(15vw) w(100%) bd(b)">
+                    <e run="vlist.List(this.Method(`vListConfig2`).(*vlist.Config))">
+                        <template name="item" types="i := values[0].(int); item := values[1].(string); start := values[2].(int)">
+                            <li class="p(.4em) bdr(b) bdl(b) h(100%)" :style="fmt.Sprintf(`width: %dpx;`, this.Get(`vItemsHeight`).([]int)[i+start]*2)">
+                                {{ item }}
+                            </li>
+                        </template>
+                    </e>
+                </div>
+            </div>
+        </div>
+
+	    <div class="wrap">
+	        <header class="wrap-title">
+                <div>
+                    Drag and drop linked lists
+                </dvi>
+                <div class="c(#ff0033) fz(.8rem)">
+                    Doesn't work with touchscreen
+                </div>
+            </header>
+            
+            <div class="wrap-body">
+                <div id="dnds" class="d(inline-block) p(0)">
+                    <div id="dnd1">
+                        <h3>
+                            To do
+                        </h3>                   
+                        <e run="dndLists.Lists(this.Method(`dndListsConfig`).(dndLists.Config))">
+                            <div g-for="i, item in `dndTodo`" class="dnd-item">
+                                {{ item }}
+                            </div>
+                        </e>
+                    </div>
+                    <div id="dnd2">
+                        <h3>
+                            In progress
+                        </h3>
+                        <e run="dndLists.Lists(this.Method(`dndListsConfig2`).(dndLists.Config))">
+                            <div g-for="i, item in `dndInprogress`" class="dnd-item">
+                                {{ item }}
+                            </div>
+                        </e>
+                    </div>
+                    <div id="dnd3">
+                        <h3>
+                            Done
+                        </h3>
+                        <e run="dndLists.Lists(this.Method(`dndListsConfig3`).(dndLists.Config))">
+                            <div g-for="i, item in `dndDone`" class="dnd-item">
+                                {{ item }}
+                            </div>
+                        </e>
+                    </div>
+                    <div id="dndLipsum">
+                        <h3>
+                            Lipsum
+                        </h3>
+                        <e run="dndLists.Lists(this.Method(`dndListsConfigA`).(dndLists.Config))">
+                            <div g-for="i, item in `lipsumTasks`" class="dnd-item">
+                                {{ item }}
+                            </div>
+                        </e>
+                    </div>
+                </div>
+            </div>
+	    </div>
+
+        <div class="wrap">
+            <header class="wrap-title">
+                Tree
+            </header>
+            
+            <div class="wrap-body">
+                <div id="trees">
+                    <e run="tree.GetTree(this.Method(`getFirstTree`).(tree.Config))"></e>
+                    <e run="tree.GetTree(this.Method(`getSecondTree`).(tree.Config))"></e>
+                </div>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <header class="wrap-title">
+                Spectre css things
+                <small class="label ml(4px)">
+                    <a href="https://picturepan2.github.io/spectre">
+                        spectre css documentation
+                    </a>
+                </small>
+            </header>
+            <div class="wrap-body">
+                <button class="btn m(8px)">default button</button>
+                <br>
+                <span class="label m(8px)">default label</span>
+                <br>
+                <i class="icon icon-3x icon-mail m(8px)"></i>
+                <br>
+                <div class="m(4px,8px)">
+                    <ul class="tab">
+                        <li class="tab-item active">
+                            <a class="cur(pointer)">
+                                Music
+                                <span class="btn btn-clear"></span>
+                            </a>
+                        </li>
+                        <li class="tab-item">
+                            <a class="cur(pointer)">
+                                Radio
+                                <span class="btn btn-clear"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <br>
+                <div>
+                    <div class="popover popover-right">
+                        <button class="btn btn-primary">popover</button>
+                        <div class="popover-container">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title h5">Gas</div>
+                                    <div class="card-subtitle text-gray">Golang frontend framework</div>
+                                </div>
+                                <div class="card-body">To create isomorphic golang applications</div>
+                                <div class="card-footer">
+                                    <a class="btn btn-primary" href="https://gascore.github.io" target="_blank">
+                                        See more
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group w(40%) bd(1px,solid,#ccc) bdrs(4px) p(8px,16px)">
+                <label class="form-label" for="input-example-1">Name</label>
+                <input class="form-input" type="text" id="input-example-1" placeholder="Name">
+                </div>
+            </div>
+        </div>
+	</div>
+</template>
+
+<style>
+#components {
+    .layout {
+        height: 25vw;
+        @media(max-width:750px) {
+            height: 60vw;
+        }
+
+        width: 100%;
+        display:flex;
+
+        .layout-item-1 {
+            height: 100%;
+            width: 100%;
+            border: 1px solid #dedede;
+            border-radius: 0.12em;
+            box-shadow: 0px 0px 30px 5px rgba(209,209,209,0.27);
+            padding: 4px 8px;
+            padding: .5em .3em;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    }
+
+    .layout2 {
+        height: 25vw;
+        @media(max-width:750px) {
+            height: 60vw;
+        }
+
+        width: 100%;
+        
+        .layout2-item {
+            height: 100%;
+            border: 1px solid #ccc;
+            border-radius: 0.12em;
+            box-shadow: 0px 0px 30px 5px rgba(209,209,209,0.27);
+            padding: 4px 8px;
+            padding: .5em .3em;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    }
+
+    .vlist {
+        ul {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+
+            li {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .dndFreeBoundary {
+        display:flex;
+        flex-wrap: wrap;
+
+        .dndFree-wrap, .dndFreeWithHandle-wrap {
+            margin: 12px 24px 12px 0;
+            &:last-child {
+                margin-right: 0;
+            }
+
+            .dndFree, .dndFreeWithHandle {
+                border: 1px solid #ccc;
+                border-radius: .2em;
+                padding: .1em .2em;
+                width: 128px;
+                height: 128px;
+                color: rgba(0, 0, 0, 0.87);
+                background: #fff;
+                font-size: 20px;
+                z-index: 1;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+
+                cursor: move;
+                user-select: none;
+                touch-action: none;
+                
+                transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+
+                box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 
+                        0 2px 2px 0 rgba(0, 0, 0, 0.14), 
+                        0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            }
+            .dndFree-active, .dndFreeWithHandle-active {
+                //transition: all 1.3s;
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+            }
+
+            .dndFreeWithHandle {
+                cursor: default;
+                .dndFree-handle {
+                    position: absolute;
+                    top: .6em;
+                    right: .6em;
+                    color: #ccc;
+                    font-size: .8em;
+                    cursor: move;
+                }
+            }
+        }
+    }
+
+    .dnd-group {
+        min-height: 96px;
+        min-width: 192px;
+        list-style-type: none;
+        padding: 2px 4px 12px 4px;
+        margin: 0;
+        height: 100%;
+    }
+    .dnd-group-wrap {
+        height: 100%;
+        width: 100%;
+    }
+
+    .dnd {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 0;
+        list-style-type: none;
+
+        display: inline-block;
+        vertical-align: top;
+
+        min-height: 64px;
+        min-width: 148px;
+        max-width: 100%;
+        background: white;
+        overflow: hidden;
+        
+        .dnd-placeholder {
+            opacity: 0;
+        }
+
+        .dnd-item {
+            background: #ffffff;
+            border-bottom: 1px solid #ccc;
+            padding: .4em .8em .2em .8em;
+            min-height: 2.6rem;
+
+            &:last-child {
+                border-bottom: 0;
+            }
+
+            .dnd-preview {
+                //box-sizing: border-box;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+            }
+        }
+    }
+    #dnds {
+        h3 {
+            font-size: 1.05rem;
+        }
+
+        #dndLipsum {
+            .dnd-item {
+                color: #302ECD;
+            }
+        }
+
+        #dnd1, #dnd2, #dnd3, #dndLipsum {
+            margin: 0 .2rem;
+            padding: 0;
+            display: inline-block;
+        }
+    }
+    .dnd-dragging .dnd:not(.dnd-placeholder) {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .tree {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        width: 100%;
+        border-radius: 0.08em;
+        margin-bottom: 8px;
+    }
+
+    .wrap {
+        border: 1px solid rgba(0,0,0,.03);
+        box-shadow: 0 2px 2px rgba(0,0,0,.24), 0 0 2px rgba(0,0,0,.12);
+        margin: 1.2em 0.2em;
+
+        .wrap-title {
+            padding: 8px 20px;
+            color: rgba(0,0,0,.54);
+            background: rgba(0,0,0,.03);
+            font-size: 1rem;
+        }
+
+        .wrap-body {
+            padding: 30px;
+        }
+    }
+}
+</style>

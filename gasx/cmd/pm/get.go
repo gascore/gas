@@ -55,7 +55,7 @@ func Get() *cobra.Command {
 				DefaultFile: defaultFile,
 			}
 
-			fileBody, err := getFile(dep)
+			fileBody, err := getFile(dep, defaultFile)
 			utils.Must(err)
 
 			allConfig.Deps.Deps = append(allConfig.Deps.Deps, dep)
@@ -132,10 +132,10 @@ func savePackage(dep cfg.Dep, fileBody []byte) error {
 	return nil
 }
 
-func getFile(dep cfg.Dep) ([]byte, error) {
+func getFile(dep cfg.Dep, file string) ([]byte, error) {
 	client := fasthttp.Client{}
 	req := fasthttp.AcquireRequest()
-	req.SetRequestURI(getFileURL + dep.Name + "@" + dep.Version + dep.DefaultFile)
+	req.SetRequestURI(getFileURL + dep.Name + "@" + dep.Version + file)
 	res := fasthttp.AcquireResponse()
 
 	err := client.Do(req, res)

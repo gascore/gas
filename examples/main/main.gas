@@ -1,0 +1,251 @@
+<template>
+    <div>
+        <header class="navbar bdb(1px,solid,#dedede) mb(12px)">
+            <section class="navbar-section">
+                <span class="btn btn-link">
+                    <e run="ctx.LinkStatic(`/`, true)">
+                        Home
+                    </e>
+                </span>
+                <span class="btn btn-link">
+                    <e run="ctx.LinkStatic(`/todo/all`, true)">
+                        TODO
+                    </e>
+                </span>
+                <span class="btn btn-link">
+                    <e run="ctx.LinkStatic(`/links`, true)">
+                        Links
+                    </e>
+                </span>
+                <span class="btn btn-link">
+                    <e run="ctx.LinkStatic(`/components`, true)">
+                        Components
+                    </e>
+                </span>
+            </section>
+            <section class="navbar-section">
+                <e run="ctx.LinkStatic(`/about`, true)" class="btn btn-link">
+                    About
+                </e>
+            </section>
+        </header>
+
+        <div>
+            <e run="r.InitRouter(ctx)"></e>
+        </div>
+
+        <footer>
+            Created by
+            <a href="https://noartem.github.io/" target="_blank">
+                Noskov Atrem
+            </a>
+            with
+            <a href="https://github.com/gascore/gas" target="_blank">
+                gas
+            </a>
+            and love
+        </footer>
+</template>
+
+<script>
+package main
+
+import (
+	"github.com/gascore/gas"
+	"github.com/gascore/gas/web"
+	r "github.com/gascore/gas/std/router"
+
+    . "github.com/gascore/gas/examples/main/store"
+)
+
+func main() {
+    err := InitStore()
+    must(err)
+
+    app, err :=
+        gas.New(
+            web.GetBackEnd(),
+            "app",
+            &gas.Component{},
+            mainT,)
+    must(err)
+
+    err = gas.Init(app)
+    must(err)
+    web.KeepAlive()
+}
+
+func must(err error) {
+    if err != nil {
+        panic(err)
+    }
+}
+
+var mainT gas.GetComponentChildes
+</script>
+
+<style>
+a {
+  display: inline-block;
+  color: #00CC99;
+
+  &:hover, &:focus {
+    color: #009966;
+  }
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  padding-bottom: 3rem;
+  min-height: 100%;
+}
+
+header {
+    padding: 4px 8px;
+}
+
+main {
+    padding: 0 8px;
+}
+
+footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 6px;
+    background-color: #efefef;
+    text-align: center;
+}
+
+.td-list_wrap {
+  padding: 0 16px;
+  margin: 12px 0;
+}
+
+.td-list {
+  list-style-type: none;
+  padding-left: 0;
+
+  li #li-body {
+    display: flex;
+    padding: 4px 8px;
+    border-bottom: 1px solid #dedede;
+    font-size: 18px;
+
+    button {
+      border: 0;
+      padding: 0;
+      background-color: inherit;
+      cursor: pointer;
+
+      &#submit {
+        margin-right: 8px;
+
+        &:hover {
+          color: #009966;
+        }
+
+        i {
+          margin-left: 0;
+        }
+      }
+
+      &#delete {
+        &:hover, &:focus {
+          color: #ff0033;
+        }
+
+        margin: 0 0 0 auto;
+      }
+    }
+  }
+}
+
+#new {
+  button {
+    margin-left: 8px;
+  }
+}
+
+button#submit:focus {
+  color: #009966;
+}
+
+.boxShadow {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.boxShadow-hovering {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease-in-out;
+}
+
+.boxShadow-hovering:hover {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.centerizeContent {
+    @media (min-width: 0px) {
+        width: 94%;
+    }
+    @media (min-width: 840px) {
+        width: 78%;
+    }
+    @media (min-width: 1400px) {
+        width: 48%;
+    }
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+}
+
+.centerizeContent-header {
+    padding: .2rem 0;
+    .centerizeContent {
+        display: flex;
+    }
+}
+
+.page {
+    padding: .2rem .4rem;
+    margin-top: .6rem;
+}
+
+.page-label {
+    h1 {
+        font-size: 1.6rem;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+    margin-bottom: .6rem;
+}
+
+.mini-block {
+    @media (min-width: 0px) {
+        width: 100%;
+    }
+    @media (min-width: 840px) {
+        width: 62%;
+    }
+    @media (min-width: 1400px) {
+        width: 48%;
+    }
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>

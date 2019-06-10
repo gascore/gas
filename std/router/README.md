@@ -2,5 +2,5 @@
 
 ### Dependencies:
 
-0. [gascore/gas](https://github.com/gascore/gas)
-1. [noartem/dom](https://github.com/noartem/dom) (fork from [dennwc/dom](https://github.com/dennwc/dom)) - wasm/gopherjs DOM bindings
+0. [gas](https://github.com/gascore/gas)
+1. [gascore/dom](https://github.com/noartem/dom) (fork from [dennwc/dom](https://github.com/dennwc/dom)) - DOM bindings

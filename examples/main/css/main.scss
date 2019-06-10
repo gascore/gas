@@ -1,0 +1,459 @@
+/*=== Styles from main.gas ===*/
+
+a {
+  display: inline-block;
+  color: #00CC99;
+
+  &:hover, &:focus {
+    color: #009966;
+  }
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  padding-bottom: 3rem;
+  min-height: 100%;
+}
+
+header {
+    padding: 4px 8px;
+}
+
+main {
+    padding: 0 8px;
+}
+
+footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 6px;
+    background-color: #efefef;
+    text-align: center;
+}
+
+.td-list_wrap {
+  padding: 0 16px;
+  margin: 12px 0;
+}
+
+.td-list {
+  list-style-type: none;
+  padding-left: 0;
+
+  li #li-body {
+    display: flex;
+    padding: 4px 8px;
+    border-bottom: 1px solid #dedede;
+    font-size: 18px;
+
+    button {
+      border: 0;
+      padding: 0;
+      background-color: inherit;
+      cursor: pointer;
+
+      &#submit {
+        margin-right: 8px;
+
+        &:hover {
+          color: #009966;
+        }
+
+        i {
+          margin-left: 0;
+        }
+      }
+
+      &#delete {
+        &:hover, &:focus {
+          color: #ff0033;
+        }
+
+        margin: 0 0 0 auto;
+      }
+    }
+  }
+}
+
+#new {
+  button {
+    margin-left: 8px;
+  }
+}
+
+button#submit:focus {
+  color: #009966;
+}
+
+.boxShadow {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.boxShadow-hovering {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease-in-out;
+}
+
+.boxShadow-hovering:hover {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.centerizeContent {
+    @media (min-width: 0px) {
+        width: 94%;
+    }
+    @media (min-width: 840px) {
+        width: 78%;
+    }
+    @media (min-width: 1400px) {
+        width: 48%;
+    }
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+}
+
+.centerizeContent-header {
+    padding: .2rem 0;
+    .centerizeContent {
+        display: flex;
+    }
+}
+
+.page {
+    padding: .2rem .4rem;
+    margin-top: .6rem;
+}
+
+.page-label {
+    h1 {
+        font-size: 1.6rem;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+    margin-bottom: .6rem;
+}
+
+.mini-block {
+    @media (min-width: 0px) {
+        width: 100%;
+    }
+    @media (min-width: 840px) {
+        width: 62%;
+    }
+    @media (min-width: 1400px) {
+        width: 48%;
+    }
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/*=== Styles from /home/noartem/go/src/github.com/gascore/gas/std/components/tree/tree.gas ===*/
+
+.tree-header {
+  display: flex;
+
+  .tree-hide-btn {
+    margin: 0  0 0 auto;
+
+    border: 0;
+    padding: 0;
+    background: inherit;
+  }
+}
+
+ul.tree-items, .directory-item ul {
+  padding: 0 0 0 12px;
+  margin: 0;
+  list-style-type: none;
+}
+
+.tree-items {
+  span.tree-item {
+    cursor: pointer;
+  }
+
+  .directory-item {
+    .directory-item-header {
+      button.directory-item-header__hide-btn {
+        margin: 0 6px 0 0;
+        border: 0;
+        padding: 0;
+        background: inherit;
+        display: inline-block;
+      }
+
+      .directory-item-header__name {
+        cursor: pointer;
+        display: inline-block;
+      }
+    }
+  }
+}
+
+/*=== Styles from /home/noartem/go/src/github.com/gascore/gas/std/components/vlist/vlist.gas ===*/
+
+.vlist {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    position: relative;
+}
+
+.vlist-content {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.vlist-padding {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+/*=== Styles from components/components.gas ===*/
+
+#components {
+    .layout {
+        height: 25vw;
+        @media(max-width:750px) {
+            height: 60vw;
+        }
+
+        width: 100%;
+        display:flex;
+
+        .layout-item-1 {
+            height: 100%;
+            width: 100%;
+            border: 1px solid #dedede;
+            border-radius: 0.12em;
+            box-shadow: 0px 0px 30px 5px rgba(209,209,209,0.27);
+            padding: 4px 8px;
+            padding: .5em .3em;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    }
+
+    .layout2 {
+        height: 25vw;
+        @media(max-width:750px) {
+            height: 60vw;
+        }
+
+        width: 100%;
+        
+        .layout2-item {
+            height: 100%;
+            border: 1px solid #ccc;
+            border-radius: 0.12em;
+            box-shadow: 0px 0px 30px 5px rgba(209,209,209,0.27);
+            padding: 4px 8px;
+            padding: .5em .3em;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    }
+
+    .vlist {
+        ul {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+
+            li {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .dndFreeBoundary {
+        display:flex;
+        flex-wrap: wrap;
+
+        .dndFree-wrap, .dndFreeWithHandle-wrap {
+            margin: 12px 24px 12px 0;
+            &:last-child {
+                margin-right: 0;
+            }
+
+            .dndFree, .dndFreeWithHandle {
+                border: 1px solid #ccc;
+                border-radius: .2em;
+                padding: .1em .2em;
+                width: 128px;
+                height: 128px;
+                color: rgba(0, 0, 0, 0.87);
+                background: #fff;
+                font-size: 20px;
+                z-index: 1;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+
+                cursor: move;
+                user-select: none;
+                touch-action: none;
+                
+                transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+
+                box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 
+                        0 2px 2px 0 rgba(0, 0, 0, 0.14), 
+                        0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            }
+            .dndFree-active, .dndFreeWithHandle-active {
+                //transition: all 1.3s;
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+            }
+
+            .dndFreeWithHandle {
+                cursor: default;
+                .dndFree-handle {
+                    position: absolute;
+                    top: .6em;
+                    right: .6em;
+                    color: #ccc;
+                    font-size: .8em;
+                    cursor: move;
+                }
+            }
+        }
+    }
+
+    .dnd-group {
+        min-height: 96px;
+        min-width: 192px;
+        list-style-type: none;
+        padding: 2px 4px 12px 4px;
+        margin: 0;
+        height: 100%;
+    }
+    .dnd-group-wrap {
+        height: 100%;
+        width: 100%;
+    }
+
+    .dnd {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 0;
+        list-style-type: none;
+
+        display: inline-block;
+        vertical-align: top;
+
+        min-height: 64px;
+        min-width: 148px;
+        max-width: 100%;
+        background: white;
+        overflow: hidden;
+        
+        .dnd-placeholder {
+            opacity: 0;
+        }
+
+        .dnd-item {
+            background: #ffffff;
+            border-bottom: 1px solid #ccc;
+            padding: .4em .8em .2em .8em;
+            min-height: 2.6rem;
+
+            &:last-child {
+                border-bottom: 0;
+            }
+
+            .dnd-preview {
+                //box-sizing: border-box;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+            }
+        }
+    }
+    #dnds {
+        h3 {
+            font-size: 1.05rem;
+        }
+
+        #dndLipsum {
+            .dnd-item {
+                color: #302ECD;
+            }
+        }
+
+        #dnd1, #dnd2, #dnd3, #dndLipsum {
+            margin: 0 .2rem;
+            padding: 0;
+            display: inline-block;
+        }
+    }
+    .dnd-dragging .dnd:not(.dnd-placeholder) {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .tree {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        width: 100%;
+        border-radius: 0.08em;
+        margin-bottom: 8px;
+    }
+
+    .wrap {
+        border: 1px solid rgba(0,0,0,.03);
+        box-shadow: 0 2px 2px rgba(0,0,0,.24), 0 0 2px rgba(0,0,0,.12);
+        margin: 1.2em 0.2em;
+
+        .wrap-title {
+            padding: 8px 20px;
+            color: rgba(0,0,0,.54);
+            background: rgba(0,0,0,.03);
+            font-size: 1rem;
+        }
+
+        .wrap-body {
+            padding: 30px;
+        }
+    }
+}
+
+/*=== Styles from components/todo.gas ===*/
+
+#todoList-wrap {
+    nav {
+        a {
+            margin: 0 .24em;
+        }
+        &:first-child {
+            margin: 0 .24em 0 0;
+        }
+    }
+}
+

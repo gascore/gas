@@ -1,0 +1,55 @@
+<script src="todo.gos"></script>
+
+<template>
+    <div id="todoList-wrap" class="centerizeContent">
+        <div id="todoList" class="bd(1px,solid,#dedede) bdrs(4px)">
+            <nav class="bdb(1px,solid,#dedede) p(4px,8px) fz(18px)">
+                <a @click="this.Method(`changeList`, `0`, e)" g-bind:class="this.Method(`isActive`, `0`).(string)" href="#all">
+                    All
+                </a>
+                <a @click="this.Method(`changeList`, `1`, e)" g-bind:class="this.Method(`isActive`, `1`).(string)" href="#completed">
+                    Completed
+                </a>
+                <a @click="this.Method(`changeList`, `2`, e)" g-bind:class="this.Method(`isActive`, `2`).(string)" href="#deleted">
+                    Deleted
+                </a>
+            </nav>
+            <div id="new" g-if="this.Get(`currentList`).(string) == `0`">
+                <input g-model="currentText" id="new" placeholder="New task" @keyup.enter="this.Method(`createNewTask`)" class="m(8px,0,0,12px)"/>
+                <button class="btn" @click="this.Method(`createNewTask`)">
+                    Create
+                </button>
+            </div>
+            <div>
+                <div g-for="x, listI in @listsList" g-if="this.Get(`currentList`) == listI" class="td-list_wrap">
+                    <ul class="td-list">
+                        <li g-for="y, el in @S.Get(nameByI(listI.(string))).([]interface{})">
+                            <e run="getLi(this, x, y, el)"></e>
+                        </li>
+                    </ul>
+                    <button g-if="len(S.Get(nameByI(listI.(string))).([]interface{})) != 0" @click="S.Emit(`clearList`, nameByI(listI.(string)))" class="btn">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="todoListFooter" class="m(8px) c(gray) fz(12px)" g-show="this.Get(`currentList`) == `0`">
+            <i>
+                Double-click to edit a task
+            </i>
+        </div>
+    </div>
+</template>
+
+<style>
+#todoList-wrap {
+    nav {
+        a {
+            margin: 0 .24em;
+        }
+        &:first-child {
+            margin: 0 .24em 0 0;
+        }
+    }
+}
+</style>

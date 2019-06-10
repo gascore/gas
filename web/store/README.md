@@ -1,6 +1,5 @@
-## Forked from [Humble/locstor](https://github.com/go-humble/locstor) 
-
-> forked for add wasm support and *include* to [gas](https://github.com/gascore/gas) ecosystem
+> Forked from [Humble/locstor](https://github.com/go-humble/locstor) 
+> Forked for add wasm support and *include* to [gas](https://github.com/gascore/gas) ecosystem
 
 gas-web/store
 =============

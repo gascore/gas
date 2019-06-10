@@ -1,3 +1,17 @@
+web_modules/**/dist/**
+web_modules/
+web_modules/**
+
+css/a.scss
+css/main.scss
+
+# ignore generated .go files in examples
+*_gas.go
+*_gas_e.go
+
+# ignore app.js files
+*app.js*
+
 .idea/
 # Created by https://www.gitignore.io/api/go,code,webstorm
 # Edit at https://www.gitignore.io/?templates=go,code,webstorm

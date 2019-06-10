@@ -1,0 +1,402 @@
+/*=== Styles from main.gas ===*/
+a {
+  display: inline-block;
+  color: #00CC99;
+}
+a:hover, a:focus {
+  color: #009966;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  padding-bottom: 3rem;
+  min-height: 100%;
+}
+
+header {
+  padding: 4px 8px;
+}
+
+main {
+  padding: 0 8px;
+}
+
+footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 6px;
+  background-color: #efefef;
+  text-align: center;
+}
+
+.td-list_wrap {
+  padding: 0 16px;
+  margin: 12px 0;
+}
+
+.td-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+.td-list li #li-body {
+  display: flex;
+  padding: 4px 8px;
+  border-bottom: 1px solid #dedede;
+  font-size: 18px;
+}
+.td-list li #li-body button {
+  border: 0;
+  padding: 0;
+  background-color: inherit;
+  cursor: pointer;
+}
+.td-list li #li-body button#submit {
+  margin-right: 8px;
+}
+.td-list li #li-body button#submit:hover {
+  color: #009966;
+}
+.td-list li #li-body button#submit i {
+  margin-left: 0;
+}
+.td-list li #li-body button#delete {
+  margin: 0 0 0 auto;
+}
+.td-list li #li-body button#delete:hover, .td-list li #li-body button#delete:focus {
+  color: #ff0033;
+}
+
+#new button {
+  margin-left: 8px;
+}
+
+button#submit:focus {
+  color: #009966;
+}
+
+.boxShadow {
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.boxShadow-hovering {
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease-in-out;
+}
+
+.boxShadow-hovering:hover {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.centerizeContent {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+}
+@media (min-width: 0px) {
+  .centerizeContent {
+    width: 94%;
+  }
+}
+@media (min-width: 840px) {
+  .centerizeContent {
+    width: 78%;
+  }
+}
+@media (min-width: 1400px) {
+  .centerizeContent {
+    width: 48%;
+  }
+}
+
+.centerizeContent-header {
+  padding: 0.2rem 0;
+}
+.centerizeContent-header .centerizeContent {
+  display: flex;
+}
+
+.page {
+  padding: 0.2rem 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.page-label {
+  margin-bottom: 0.6rem;
+}
+.page-label h1 {
+  font-size: 1.6rem;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.mini-block {
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 0px) {
+  .mini-block {
+    width: 100%;
+  }
+}
+@media (min-width: 840px) {
+  .mini-block {
+    width: 62%;
+  }
+}
+@media (min-width: 1400px) {
+  .mini-block {
+    width: 48%;
+  }
+}
+
+/*=== Styles from /home/noartem/go/src/github.com/gascore/gas/std/components/tree/tree.gas ===*/
+.tree-header {
+  display: flex;
+}
+.tree-header .tree-hide-btn {
+  margin: 0 0 0 auto;
+  border: 0;
+  padding: 0;
+  background: inherit;
+}
+
+ul.tree-items, .directory-item ul {
+  padding: 0 0 0 12px;
+  margin: 0;
+  list-style-type: none;
+}
+
+.tree-items span.tree-item {
+  cursor: pointer;
+}
+.tree-items .directory-item .directory-item-header button.directory-item-header__hide-btn {
+  margin: 0 6px 0 0;
+  border: 0;
+  padding: 0;
+  background: inherit;
+  display: inline-block;
+}
+.tree-items .directory-item .directory-item-header .directory-item-header__name {
+  cursor: pointer;
+  display: inline-block;
+}
+
+/*=== Styles from /home/noartem/go/src/github.com/gascore/gas/std/components/vlist/vlist.gas ===*/
+.vlist {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  position: relative;
+}
+
+.vlist-content {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.vlist-padding {
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/*=== Styles from components/components.gas ===*/
+#components .layout {
+  height: 25vw;
+  width: 100%;
+  display: flex;
+}
+@media (max-width: 750px) {
+  #components .layout {
+    height: 60vw;
+  }
+}
+#components .layout .layout-item-1 {
+  height: 100%;
+  width: 100%;
+  border: 1px solid #dedede;
+  border-radius: 0.12em;
+  box-shadow: 0px 0px 30px 5px rgba(209, 209, 209, 0.27);
+  padding: 4px 8px;
+  padding: 0.5em 0.3em;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#components .layout2 {
+  height: 25vw;
+  width: 100%;
+}
+@media (max-width: 750px) {
+  #components .layout2 {
+    height: 60vw;
+  }
+}
+#components .layout2 .layout2-item {
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 0.12em;
+  box-shadow: 0px 0px 30px 5px rgba(209, 209, 209, 0.27);
+  padding: 4px 8px;
+  padding: 0.5em 0.3em;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#components .vlist ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+#components .vlist ul li {
+  margin-top: 0;
+}
+#components .dndFreeBoundary {
+  display: flex;
+  flex-wrap: wrap;
+}
+#components .dndFreeBoundary .dndFree-wrap, #components .dndFreeBoundary .dndFreeWithHandle-wrap {
+  margin: 12px 24px 12px 0;
+}
+#components .dndFreeBoundary .dndFree-wrap:last-child, #components .dndFreeBoundary .dndFreeWithHandle-wrap:last-child {
+  margin-right: 0;
+}
+#components .dndFreeBoundary .dndFree-wrap .dndFree, #components .dndFreeBoundary .dndFree-wrap .dndFreeWithHandle, #components .dndFreeBoundary .dndFreeWithHandle-wrap .dndFree, #components .dndFreeBoundary .dndFreeWithHandle-wrap .dndFreeWithHandle {
+  border: 1px solid #ccc;
+  border-radius: 0.2em;
+  padding: 0.1em 0.2em;
+  width: 128px;
+  height: 128px;
+  color: rgba(0, 0, 0, 0.87);
+  background: #fff;
+  font-size: 20px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+#components .dndFreeBoundary .dndFree-wrap .dndFree-active, #components .dndFreeBoundary .dndFree-wrap .dndFreeWithHandle-active, #components .dndFreeBoundary .dndFreeWithHandle-wrap .dndFree-active, #components .dndFreeBoundary .dndFreeWithHandle-wrap .dndFreeWithHandle-active {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+#components .dndFreeBoundary .dndFree-wrap .dndFreeWithHandle, #components .dndFreeBoundary .dndFreeWithHandle-wrap .dndFreeWithHandle {
+  cursor: default;
+}
+#components .dndFreeBoundary .dndFree-wrap .dndFreeWithHandle .dndFree-handle, #components .dndFreeBoundary .dndFreeWithHandle-wrap .dndFreeWithHandle .dndFree-handle {
+  position: absolute;
+  top: 0.6em;
+  right: 0.6em;
+  color: #ccc;
+  font-size: 0.8em;
+  cursor: move;
+}
+#components .dnd-group {
+  min-height: 96px;
+  min-width: 192px;
+  list-style-type: none;
+  padding: 2px 4px 12px 4px;
+  margin: 0;
+  height: 100%;
+}
+#components .dnd-group-wrap {
+  height: 100%;
+  width: 100%;
+}
+#components .dnd {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0;
+  list-style-type: none;
+  display: inline-block;
+  vertical-align: top;
+  min-height: 64px;
+  min-width: 148px;
+  max-width: 100%;
+  background: white;
+  overflow: hidden;
+}
+#components .dnd .dnd-placeholder {
+  opacity: 0;
+}
+#components .dnd .dnd-item {
+  background: #ffffff;
+  border-bottom: 1px solid #ccc;
+  padding: 0.4em 0.8em 0.2em 0.8em;
+  min-height: 2.6rem;
+}
+#components .dnd .dnd-item:last-child {
+  border-bottom: 0;
+}
+#components .dnd .dnd-item .dnd-preview {
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+#components #dnds h3 {
+  font-size: 1.05rem;
+}
+#components #dnds #dndLipsum .dnd-item {
+  color: #302ECD;
+}
+#components #dnds #dnd1, #components #dnds #dnd2, #components #dnds #dnd3, #components #dnds #dndLipsum {
+  margin: 0 0.2rem;
+  padding: 0;
+  display: inline-block;
+}
+#components .dnd-dragging .dnd:not(.dnd-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+#components .tree {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  width: 100%;
+  border-radius: 0.08em;
+  margin-bottom: 8px;
+}
+#components .wrap {
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.24), 0 0 2px rgba(0, 0, 0, 0.12);
+  margin: 1.2em 0.2em;
+}
+#components .wrap .wrap-title {
+  padding: 8px 20px;
+  color: rgba(0, 0, 0, 0.54);
+  background: rgba(0, 0, 0, 0.03);
+  font-size: 1rem;
+}
+#components .wrap .wrap-body {
+  padding: 30px;
+}
+
+/*=== Styles from components/todo.gas ===*/
+#todoList-wrap nav a {
+  margin: 0 0.24em;
+}
+#todoList-wrap nav:first-child {
+  margin: 0 0.24em 0 0;
+}
+
+/*# sourceMappingURL=main.css.map */

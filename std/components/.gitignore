@@ -1,9 +1,3 @@
-css/spectre
-example/*_gas.go
-example/*_gas_e.go
-example/dist
-example/css
-
 **/*_gas_e.go
 
 .sass-cache

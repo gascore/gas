@@ -26,10 +26,17 @@ func Return() *cobra.Command {
 					continue
 				}
 
-				fileBody, err := getFile(dep)
-				utils.Must(err)
+				if len(dep.DefaultFile) != 0 {
+					fileBody, err := getFile(dep, dep.DefaultFile)
+					utils.Must(err)
+					utils.Must(savePackage(dep, fileBody))
+				}
 
-				utils.Must(savePackage(dep, fileBody))
+				for _, file := range dep.RequiredFiles {
+					fileBody, err := getFile(dep, file)
+					utils.Must(err)
+					utils.Must(savePackage(dep, fileBody))
+				}
 			}
 		},
 	}

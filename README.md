@@ -2,15 +2,16 @@
 
 ![Gas logo](https://raw.githubusercontent.com/gascore/gas/master/logo.png)
 
-## All information in [gascore.github.io](https://gascore.github.io)
+## More information in [gascore.github.io](https://gascore.github.io)
 
-### Dependencies:
+### Structure:
 
-1. [frankenbeanies/uuid4](https://github.com/frankenbeanies/uuid4) - uuid generator
+0. [gas](https://github.com/gascore/gas) - gas framework core
+1. [gas/web](https://github.com/gascore/gas/blob/master/web) - wasm/gojs backend
+2. [gas/gasx](https://github.com/gascore/gas/blob/master/gasx) - project manager for gas applications
+3. [gas/std/router](https://github.com/gascore/gas/blob/master/std/router) - web router
+4. [gas/std/store](https://github.com/gascore/gas/blob/master/std/store) - redux-like store
 
-### Related packages:
+### Roadmap:
 
-1. [gascore/gas-web](https://github.com/gascore/gas/web) - wasm/gojs backend
-2. [gascore/gasx](https://github.com/gascore/gas/gasx) - project manager for gas applications
-3. [gascore/gas-router](https://github.com/gascore/gas/std/router) - web router
-4. [gascore/gas-store](https://github.com/gascore/gas/std/store) - redux-like store
+1. [Trello](https://trello.com/invite/b/vB6waN51/993a187d5dd168a9a3a05093c42ed63e/gasgasgas) - all tasks to do

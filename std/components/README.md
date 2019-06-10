@@ -1,6 +1,4 @@
-# components
-
-Recommended css framework and collection of useful gas components.
+# components - collection of useful gas components.
 
 ## Components
 
@@ -12,8 +10,3 @@ Recommended css framework and collection of useful gas components.
 | Tree                | +       | +       |
 | Modal               | +       | +       |
 | Virtual List        | +       | +       |
-
-### CSS framework
-
-I recommend to use [Spectre.css](https://picturepan2.github.io/spectre/).
-In `css/` folder storing minified spectre.css with color changes.

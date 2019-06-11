@@ -1,8 +1,8 @@
 package store
 
 import (
+	"errors"
 	"github.com/gascore/gas"
-	"github.com/pkg/errors"
 	"testing"
 )
 
@@ -99,7 +99,7 @@ func TestNew(t *testing.T) {
 	}
 
 	// Mounted
-	err = gas.RunMountedIfCan(registeredComponent)
+	err = gas.CallMountedIfCan(registeredComponent)
 	if err != nil {
 		t.Errorf("unexpected error in RunMountedIfCan: %s", err.Error())
 		return
@@ -133,7 +133,7 @@ func TestNew(t *testing.T) {
 	}
 
 	// BeforeDestroy
-	err = gas.RunWillDestroyIfCan(registeredComponent)
+	err = gas.CallBeforeDestroyIfCan(registeredComponent)
 	if err != nil {
 		t.Errorf("unexpected error in RunWillDestroyIfCan: %s", err.Error())
 		return

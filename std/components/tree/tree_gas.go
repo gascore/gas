@@ -111,17 +111,17 @@ Else: true,
 gas.NE(
 &gas.Component{Tag:"ul",
 
-Show: func(p *gas.Component) bool {
-	return !this.Get(`isHidden`).(bool)
-},
-
-
 Binds: map[string]gas.Bind{
 "class": func() string {
 	return fmt.Sprintf(`tree-items tree-%s-items`, cName)
 },
 
-},},gas.NewForByData(toIA(c.Items), func(i int, nItem interface{}) interface{} {
+},
+
+Show: func(p *gas.Component) bool {
+	return !this.Get(`isHidden`).(bool)
+},
+},gas.NewForByData(toIA(c.Items), func(i int, nItem interface{}) interface{} {
  return gas.NE(
 &gas.Component{Tag:"li",},renderItem(nItem.(Item), c),)}),),),)},)
 }

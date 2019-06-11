@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"errors"
 	"github.com/frankenbeanies/uuid4"
-	"github.com/pkg/errors"
 )
 
 // Context - in context component send c.Data and c.Props to method

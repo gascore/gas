@@ -6,7 +6,7 @@ import (
 
 	"github.com/frankenbeanies/uuid4"
 
-	web "github.com/gascore/gas/web"
+	"github.com/gascore/gas/web"
 
 	"github.com/gascore/dom"
 	"github.com/gascore/dom/js"

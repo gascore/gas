@@ -133,9 +133,6 @@ If: func(p *gas.Component) bool {
 },
 gas.NE(
 &gas.Component{Tag:"div",
-Handlers: map[string]gas.Handler{
-"click": func(p *gas.Component, e gas.Object) { disable(config) },
-},
 
 
 Binds: map[string]gas.Bind{
@@ -147,6 +144,9 @@ Binds: map[string]gas.Bind{
 	return overlayStyles
 },
 
+},
+Handlers: map[string]gas.Handler{
+"click": func(p *gas.Component, e gas.Object) { disable(config) },
 },},),
 gas.NE(
 &gas.Component{Tag:"div",

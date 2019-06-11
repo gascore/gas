@@ -52,7 +52,7 @@ func Body(allConfig *cfg.Config, gasLock *lock.Lock, buildExternal bool) error {
 
 	goFile := os.Getenv("GOFILE")
 
-	templates, err := GetGasFiles(currentDir, buildExternal, allConfig)
+	templates, err := GetGasFiles(currentDir, buildExternal)
 	if err != nil {
 		return err
 	}

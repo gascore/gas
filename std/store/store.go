@@ -1,9 +1,9 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gascore/gas"
-	"github.com/pkg/errors"
 	"reflect"
 	"strings"
 )
@@ -107,7 +107,7 @@ func (s *Store) Emit(query string, values ...interface{}) error {
 		}
 
 		if mw.Hook == nil {
-			return errors.Errorf("hook is nil in middleware with prefix '%s'", mw.Prefix)
+			return fmt.Errorf("hook is nil in middleware with prefix '%s'", mw.Prefix)
 		}
 
 		err := mw.Hook(s, values)

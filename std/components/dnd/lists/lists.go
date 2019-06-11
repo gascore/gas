@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"errors"
 	"github.com/gascore/dom"
 	"github.com/gascore/gas"
-	web "github.com/gascore/gas/web"
+	"github.com/gascore/gas/web"
 	sjs "syscall/js"
-	"github.com/pkg/errors"
 )
 
 // Config dnd-lists config

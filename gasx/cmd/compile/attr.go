@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gascore/gas"
 	"golang.org/x/net/html"
 )
 
@@ -158,13 +157,13 @@ Show: func(p *gas.Component) bool {
 						deepVal = attr.Val[strings.Index(attr.Val[bracketIndex+1:], "]")+1:]
 					}
 
-					var deepData []gas.ModelDirectiveDeepData
+					var deepData []ModelDirectiveDeepData
 					deepData = getDeepData(deepData, deepVal)
 					for _, deepEl := range deepData {
 						deep = deep + fmt.Sprintf(`{Data:%s,Brackets:%t},`, deepEl.Data.(string), deepEl.Brackets)
 					}
 
-					deep = "\nDeep: []gas.ModelDirectiveDeepData{" + deep + "},"
+					deep = "\nDeep: []ModelDirectiveDeepData{" + deep + "},"
 				} else {
 					modelData = attr.Val
 				}
@@ -220,21 +219,21 @@ HTML: gas.HTMLDirective {
 	return out, ForInfo{haveFor: haveFor, out: forForOut, rawData: forIsRawData}, nil
 }
 
-func getDeepData(arr []gas.ModelDirectiveDeepData, s string) []gas.ModelDirectiveDeepData {
+func getDeepData(arr []ModelDirectiveDeepData, s string) []ModelDirectiveDeepData {
 	dotIndex := strings.Index(s, ".")
 	bracketIndex := strings.Index(s, "[")
 
 	if dotIndex == -1 && bracketIndex == -1 {
-		return append(arr, gas.ModelDirectiveDeepData{Data: `"` + s + `"`, Brackets: false})
+		return append(arr, ModelDirectiveDeepData{Data: `"` + s + `"`, Brackets: false})
 	}
 
 	if dotIndex > bracketIndex {
 		a := s[:dotIndex]
-		arr = append(arr, gas.ModelDirectiveDeepData{Data: `"` + a + `"`})
+		arr = append(arr, ModelDirectiveDeepData{Data: `"` + a + `"`})
 		s = s[dotIndex+1:]
 	} else {
 		if bracketIndex != 0 { // '[' not first
-			arr = append(arr, gas.ModelDirectiveDeepData{Data: `"` + s[:bracketIndex] + `"`, Brackets: false})
+			arr = append(arr, ModelDirectiveDeepData{Data: `"` + s[:bracketIndex] + `"`, Brackets: false})
 			s = s[bracketIndex:]
 		}
 
@@ -244,7 +243,7 @@ func getDeepData(arr []gas.ModelDirectiveDeepData, s string) []gas.ModelDirectiv
 		}
 		a := s[1:endBracketIndex]
 
-		arr = append(arr, gas.ModelDirectiveDeepData{Data: a, Brackets: true})
+		arr = append(arr, ModelDirectiveDeepData{Data: a, Brackets: true})
 
 		s = s[endBracketIndex+1:]
 	}
@@ -254,4 +253,9 @@ func getDeepData(arr []gas.ModelDirectiveDeepData, s string) []gas.ModelDirectiv
 	}
 
 	return arr
+}
+
+type ModelDirectiveDeepData struct{
+	Data     interface{}
+	Brackets bool
 }

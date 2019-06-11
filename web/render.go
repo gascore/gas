@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"reflect"
 
+	"errors"
 	"github.com/gascore/dom"
 	"github.com/gascore/gas"
-	"github.com/pkg/errors"
 )
 
 // ExecNode execute render node

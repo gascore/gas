@@ -50,7 +50,7 @@ func ACSSBody(allConfig *cfg.Config, gasLock *lock.Lock, buildExternal bool) err
 		return err
 	}
 
-	templates, err := compile.GetGasFiles(currentDir, buildExternal, allConfig)
+	templates, err := compile.GetGasFiles(currentDir, buildExternal)
 	if err != nil {
 		return err
 	}

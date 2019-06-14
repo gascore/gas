@@ -8,13 +8,6 @@ import (
 	"github.com/gascore/gas"
 )
 
-var (
-	// ErrCookieNotFound if cookie not found
-	ErrCookieNotFound = errors.New("cookie not found")
-	// ErrInvalidCookie if cookie is invalid
-	ErrInvalidCookie = errors.New("invalid cookie")
-)
-
 // BackEnd backend for core library
 type BackEnd struct{}
 

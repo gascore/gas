@@ -6,11 +6,10 @@
 
 ### Structure:
 
-0. [gas](https://github.com/gascore/gas) - gas framework core
-1. [gas/web](https://github.com/gascore/gas/blob/master/web) - wasm/gojs backend
-2. [gas/gasx](https://github.com/gascore/gas/blob/master/gasx) - project manager for gas applications
-3. [gas/std/router](https://github.com/gascore/gas/blob/master/std/router) - web router
-4. [gas/std/store](https://github.com/gascore/gas/blob/master/std/store) - redux-like store
+0. [gascore/gas](https://github.com/gascore/gas) - gas framework core
+1. [gascore/gas/web](https://github.com/gascore/gas/blob/master/web) - wasm/gopherjs backend
+2. [gascore/gasx](https://github.com/gascore/gasx) - project manager for gas applications
+3. [gascore/std](https://github.com/gascore/std) - standard library for gas framework
 
 ### Roadmap:
 

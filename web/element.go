@@ -105,6 +105,8 @@ func CreateElement(c *gas.Component) (*dom.Element, error) {
 				}
 
 				_node.AddEventListener("click", func(e dom.Event) {
+					e.PreventDefault() // Because i don't want trigger <a>
+
 					buttonClick, err := parseInt(strings.ToLower(e.ButtonAttr()))
 					if err != nil {
 						return

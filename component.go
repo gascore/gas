@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"reflect"
 	"errors"
 	"github.com/frankenbeanies/uuid4"
 )
@@ -42,7 +43,7 @@ type ModelDirectiveDeepData struct {
 // ForDirective struct for For Directive (needful because `for` want name and render function)
 type ForDirective struct {
 	isItem       bool
-	itemValueI   int
+	itemValueI   interface{}
 	itemValueVal interface{}
 }
 
@@ -74,7 +75,7 @@ type Object interface {
 }
 
 // Watcher -- function triggering after component Data changed
-type Watcher func(this *Component, new interface{}, old interface{}) error // (this, new, old)
+type Watcher func(this *Component, new interface{}, old interface{}) error
 
 // Component -- basic component struct
 type Component struct {
@@ -88,20 +89,22 @@ type Component struct {
 	Binds         map[string]Bind    // dynamic attributes
 	RenderedBinds map[string]string  // store binds for changed func
 
+	Tag   string
+	Attrs map[string]string
+
 	/* directives */
 	If   func(*Component) bool
 	Else bool
-	// (If != nil) + (Else) = else-if
+	// ElseIf = (If != nil) + (Else)
 	Show  func(*Component) bool
 	For   ForDirective
 	Model ModelDirective
 	HTML  HTMLDirective
 
+	/* logic */
+
 	Childes  GetChildes
 	RChildes []interface{} // rendered childes
-
-	Tag   string
-	Attrs map[string]string
 
 	UUID string
 
@@ -217,36 +220,66 @@ func UnSpliceBody(body []interface{}) []interface{} {
 	return arr
 }
 
+
+type forDirRenderer func(interface{}, interface{}) interface{}
+
 // NewFor create new FOR directive
-func NewFor(data string, this *Component, renderer func(int, interface{}) interface{}) []interface{} {
-	dataForList, ok := this.Data[data].([]interface{})
+func NewFor(data string, this *Component, renderer forDirRenderer) []interface{} {
+	dataForList, ok := this.Data[data]
 	if !ok {
-		this.WarnError(fmt.Errorf("invalid FOR directive in component %s", this.UUID))
+		this.WarnError(fmt.Errorf("data for FOR directive is undefinded in component: %s", this.UUID))
 		return nil
 	}
 
-	return NewForByData(dataForList, renderer)
+	if dataForList == nil {
+		this.WarnError(fmt.Errorf("data for FOR directive is nil: %s", this.UUID))
+		return nil
+	}
+
+	return NewForByData(dataForList, this, renderer)
 }
 
 // NewForByData create new FOR directive by []interface{}
-func NewForByData(dataForList []interface{}, renderer func(int, interface{}) interface{}) []interface{} {
+func NewForByData(dataForList interface{}, this *Component, renderer forDirRenderer) []interface{} {
 	var items []interface{}
-	for i, el := range dataForList {
-		item := renderer(i, el)
-
-		if IsComponent(item) {
-			I2C(item).For = ForDirective{isItem: true, itemValueI: i, itemValueVal: el}
-
-			if I2C(item).Attrs == nil {
-				I2C(item).Attrs = make(map[string]string)
-			}
-			I2C(item).Attrs["Data-for-i"] = fmt.Sprintf("%d", i)
+	
+	dv := reflect.ValueOf(dataForList)
+	switch dv.Kind() {
+	case reflect.Array, reflect.Slice:
+		// IsArray
+		for i := 0; i < dv.Len(); i++ {
+			items = append(items, renderForItem(i, dv.Index(i).Interface(), renderer))
 		}
-
-		items = append(items, item)
+	case reflect.Map:
+		// IsMap
+		iter := dv.MapRange()
+		for iter.Next() {
+			items = append(items, renderForItem(iter.Key().Interface(), iter.Value().Interface(), renderer))
+		}
+	default:
+		// not array and not map
+		this.WarnError(fmt.Errorf("invalid data for FOR directive: %s", this.UUID))
+		return items
 	}
 
 	return items
+}
+
+func renderForItem(key, val interface{}, renderer forDirRenderer) interface{} {
+	item := renderer(key, val)
+
+	if IsComponent(item) {
+		itemC := I2C(item)
+		itemC.For = ForDirective{isItem: true, itemValueI: key, itemValueVal: val}
+
+		if itemC.Attrs == nil {
+			itemC.Attrs = make(map[string]string)
+		}
+
+		itemC.Attrs["Data-for-key"] = fmt.Sprintf("%v", key)
+	}
+
+	return item
 }
 
 // IsElement return Component.isElement.
@@ -256,7 +289,7 @@ func (c *Component) IsElement() bool {
 }
 
 // ForItemInfo return info about FOR directive
-func (c *Component) ForItemInfo() (isItem bool, i int, val interface{}) {
+func (c *Component) ForItemInfo() (isItem bool, i interface{}, val interface{}) {
 	if !c.For.isItem {
 		return false, 0, nil
 	}

@@ -161,5 +161,5 @@ func compareForDirectives(newC, oldC *Component) bool {
 		return false
 	}
 
-	return newI == oldI && reflect.DeepEqual(newVal, oldVal)
+	return newI == oldI && newI != nil && reflect.DeepEqual(newVal, oldVal)
 }

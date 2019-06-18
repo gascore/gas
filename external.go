@@ -8,4 +8,5 @@ type External struct {
 	Body      []interface{}
 	Slots     map[string]interface{}
 	Templates map[string]Template
+	Attrs     map[string]string
 }

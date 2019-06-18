@@ -6,7 +6,7 @@ import (
 
 type TestNewForData struct {
 	data          string
-	renderer      func(int, interface{}) interface{}
+	renderer      func(interface{}, interface{}) interface{}
 	childesLength int
 }
 
@@ -159,7 +159,7 @@ func TestNewFor(t *testing.T) {
 	data := []TestNewForData{
 		{
 			data: "arr",
-			renderer: func(i int, el interface{}) interface{} {
+			renderer: func(i interface{}, el interface{}) interface{} {
 				return NE(
 					&C{
 						Tag: "li",
@@ -174,7 +174,7 @@ func TestNewFor(t *testing.T) {
 		},
 		{
 			data: "anotherarr", // error here
-			renderer: func(i int, el interface{}) interface{} {
+			renderer: func(i interface{}, el interface{}) interface{} {
 				return NE(
 					&C{
 						Tag: "li",
@@ -189,7 +189,7 @@ func TestNewFor(t *testing.T) {
 		},
 		{
 			data: "arr",
-			renderer: func(i int, el interface{}) interface{} {
+			renderer: func(i interface{}, el interface{}) interface{} {
 				return NE(
 					&C{
 						Tag: "li",

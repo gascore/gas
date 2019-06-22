@@ -24,7 +24,7 @@ func (e emptyBackEnd) ChildNodes(i interface{}) []interface{} {
 }
 
 // New return nil
-func (e emptyBackEnd) New(a string) (string, error) {
+func (e emptyBackEnd) CanRender(a string) (string, error) {
 	return "app", nil
 }
 
@@ -44,7 +44,7 @@ func (e emptyBackEnd) ReCreate(c *Component) error {
 }
 
 // GetElement return not nil
-func (e emptyBackEnd) GetElement(c *Component) interface{} {
+func (e emptyBackEnd) GetElement(i *Element) interface{} {
 	return "not nil!"
 }
 
@@ -52,6 +52,9 @@ func (e emptyBackEnd) GetElement(c *Component) interface{} {
 func (e emptyBackEnd) GetGasEl(g *Gas) interface{} {
 	return "not nil!"
 }
+
+// EditWatcherValue is empty
+func (e emptyBackEnd) EditWatcherValue(el interface{}, newVal string) {}
 
 // ConsoleLog return nil
 func (e emptyBackEnd) ConsoleLog(values ...interface{}) {}

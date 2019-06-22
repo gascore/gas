@@ -21,11 +21,16 @@ type HookWithControl func(this *Component) (rerender bool, err error)
 
 // CallBeforeCreatedIfCan call component and it's childes BeforeCreated hook
 func CallBeforeCreatedIfCan(i interface{}) error {
-	if !IsComponent(i) {
+	e, ok := i.(*Element)
+	if !ok {
 		return nil
 	}
 
-	c := I2C(i)
+	c := e.Component
+	if c == nil {
+		return nil
+	}
+
 	if c.Hooks.BeforeCreated != nil {
 		rerender, err := c.Hooks.BeforeCreated(c)
 		if err != nil {
@@ -33,11 +38,11 @@ func CallBeforeCreatedIfCan(i interface{}) error {
 		}
 
 		if rerender {
-			c.RChildes = RenderTree(c)
+			e.RChildes = e.RenderTree()
 		}
 	}
 
-	for _, child := range c.RChildes {
+	for _, child := range e.RChildes {
 		err := CallBeforeCreatedIfCan(child)
 		if err != nil {
 			return err
@@ -49,11 +54,15 @@ func CallBeforeCreatedIfCan(i interface{}) error {
 
 // CallMountedIfCan call component and it's childes Mounted hook
 func CallMountedIfCan(i interface{}) error {
-	if !IsComponent(i) {
+	e, ok := i.(*Element)
+	if !ok {
 		return nil
 	}
 
-	c := I2C(i)
+	c := e.Component
+	if c == nil {
+		return nil
+	}
 
 	if c.Hooks.Mounted != nil {
 		err := c.Hooks.Mounted(c)
@@ -62,7 +71,7 @@ func CallMountedIfCan(i interface{}) error {
 		}
 	}
 
-	for _, child := range c.RChildes {
+	for _, child := range e.RChildes {
 		if !IsComponent(child) {
 			continue
 		}
@@ -78,11 +87,15 @@ func CallMountedIfCan(i interface{}) error {
 
 // CallBeforeDestroyIfCan call component and it's childes WillDestroy hook
 func CallBeforeDestroyIfCan(i interface{}) error {
-	if !IsComponent(i) {
+	e, ok := i.(*Element)
+	if !ok {
 		return nil
 	}
 
-	c := I2C(i)
+	c := e.Component
+	if c == nil {
+		return nil
+	}
 
 	if c.Hooks.BeforeDestroy != nil {
 		err := c.Hooks.BeforeDestroy(c)
@@ -91,7 +104,7 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 		}
 	}
 
-	for _, child := range c.RChildes {
+	for _, child := range e.RChildes {
 		if !IsComponent(child) {
 			continue
 		}
@@ -107,12 +120,13 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 
 // CallUpdatedIfCan call component parent (true component) Updated hook
 func CallUpdatedIfCan(i interface{}) error {
-	if !IsComponent(i) {
+	e, ok := i.(*Element)
+	if !ok {
 		return nil
 	}
 
-	// run Updated hook for component parent(!)
-	c := I2C(i).ParentComponent()
+	// run Updated hook for component parent
+	c := e.ParentComponent().Component
 
 	if c.Hooks.Updated != nil {
 		err := c.Hooks.Updated(c)
@@ -126,12 +140,15 @@ func CallUpdatedIfCan(i interface{}) error {
 
 // CallBeforeUpdateIfCan call component parent (true component) BeforeUpdate
 func CallBeforeUpdateIfCan(i interface{}) error {
-	if !IsComponent(i) {
+	e, ok := i.(*Element)
+	if !ok {
 		return nil
 	}
 
-	// run BeforeUpdate hook for component parent(!)
-	c := I2C(i).ParentComponent()
+	//fmt.Println(e)
+	// run Updated hook for component parent
+	c := e.ParentComponent().Component
+	//fmt.Println(c.Element)
 
 	if c.Hooks.BeforeUpdate != nil {
 		err := c.Hooks.BeforeUpdate(c)

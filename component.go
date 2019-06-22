@@ -1,200 +1,59 @@
 package gas
 
-import (
-	"fmt"
-	"strings"
+import "github.com/frankenbeanies/uuid4"
 
-	"reflect"
-	"errors"
-	"github.com/frankenbeanies/uuid4"
-)
-
-// Context - in context component send c.Data and c.Props to method
-type Context interface{}
-
-// Method - struct for Component methods
-type Method func(*Component, ...interface{}) (interface{}, error)
-
-// GetComponent returns component child
-type GetComponent func(*Component) interface{}
-
-// GetComponentChildes return component childes
-type GetComponentChildes func(*Component) []interface{}
-
-// GetChildes -- function returning component childes
-type GetChildes func(*Component) []interface{}
-
-// Bind - dynamic component attribute (analog for vue `v-bind:`).
-type Bind func() string
-
-// ModelDirective struct for Model directive
-type ModelDirective struct {
-	Data      string
-	Component *Component
-	Deep      []ModelDirectiveDeepData
-}
-
-// ModelDirectiveDeepData way to deep value of data field need to update by model directive
-type ModelDirectiveDeepData struct {
-	Data     interface{}
-	Brackets bool
-}
-
-// ForDirective struct for For Directive (needful because `for` want name and render function)
-type ForDirective struct {
-	isItem       bool
-	itemValueI   interface{}
-	itemValueVal interface{}
-}
-
-// HTMLDirective struct for HTML Directive - storing render function and pre rendered render
-type HTMLDirective struct {
-	Render func(*Component) string
-
-	Rendered string // here storing rendered html for ForceUpdate functions
-}
-
-// Handler -- handler exec function when event trigger
-type Handler func(*Component, Object)
-
-// Object 'united' dom.Event
-type Object interface {
-	String() string
-	Int() int
-	Float() float64
-
-	Get(string) Object
-	Set(string, interface{})
-	GetString(string) string
-	GetBool(string) bool
-	GetInt(string) int
-
-	Call(string, ...interface{}) Object
-
-	Raw() interface{}
-}
-
-// Watcher -- function triggering after component Data changed
-type Watcher func(this *Component, new interface{}, old interface{}) error
-
-// Component -- basic component struct
+// Component logic node
 type Component struct {
-	Data     map[string]interface{}
+	Root  interface {
+		Render() []interface{}
+	}
+
+	Element *Element
+
+	Hooks Hooks
+
+	RefsAllowed bool
+	Refs        map[string]*Element
+
 	Watchers map[string]Watcher
-	Methods  map[string]Method
-
-	Hooks Hooks // lifecycle hooks
-
-	Handlers      map[string]Handler // events handlers: onClick, onHover
-	Binds         map[string]Bind    // dynamic attributes
-	RenderedBinds map[string]string  // store binds for changed func
-
-	Tag   string
-	Attrs map[string]string
-
-	/* directives */
-	If   func(*Component) bool
-	Else bool
-	// ElseIf = (If != nil) + (Else)
-	Show  func(*Component) bool
-	For   ForDirective
-	Model ModelDirective
-	HTML  HTMLDirective
-
-	/* logic */
-
-	Childes  GetChildes
-	RChildes []interface{} // rendered childes
-
-	UUID string
-
-	isElement bool // childes don't have parent context
-	Parent    *Component
-
-	Ref         string
-	RefsAllowed bool                  // if true component can have Refs
-	Refs        map[string]*Component // childes have g-ref attribute. Only for Component.isElement == false
 
 	RC *RenderCore
 }
 
-// C alias for Component
-type C = Component
+// Watcher function called when input event triggering
+type Watcher func(val interface{}, e Object) (string, error)
 
-// G alias for Gas
-type G = Gas
-
-// NC alias for NewComponent
-var NC = NewComponent
-
-// NE alias for NewBasicComponent (NewElement)
-var NE = NewBasicComponent
-
-// NewComponent create new component
-func NewComponent(component *Component, getChildes GetComponentChildes) *Component {
-	if component.Tag == "" {
-		component.Tag = "div"
-	} else {
-		component.Tag = strings.ToLower(component.Tag)
+// Init initialize component: create element and other stuff
+func (c *Component) Init() *Element {
+	el := &Element{
+		Tag: "div",
+		UUID: uuid4.New().String(),
+		Component: c,
+		RC: c.RC,
 	}
-
-	if component.UUID == "" {
-		component.UUID = uuid4.New().String()
-	}
-
-	component.Childes = func(this *Component) []interface{} {
-		var lastIfValue, lastIfIsFresh bool
-		var compiled []interface{}
-		for _, child := range UnSpliceBody(getChildes(component)) {
-			if !IsComponent(child) {
+	
+	el.Childes = func() []interface{} {
+		return c.Root.Render()
+		/*var compiled []interface{}
+		for _, child := range UnSpliceBody(c.Root.Render()) {
+			childE, ok := child.(*Element)
+			if !ok {
 				compiled = append(compiled, child)
 				continue
 			}
 
-			childC := I2C(child)
-
-			childC.RC = component.RC
-			childC.Parent = component
-
-			if childC.Else {
-				if !lastIfIsFresh {
-					this.WarnError(errors.New("invalid else or else-if directive: no if (else-if) directive before"))
-					continue
-				}
-
-				if lastIfValue {
-					lastIfValue = false
-					lastIfIsFresh = childC.If != nil
-					continue
-				}
-			}
-
-			if childC.If != nil {
-				ifValue := childC.If(childC)
-
-				lastIfValue = ifValue
-				lastIfIsFresh = true
-
-				if !ifValue {
-					continue
-				}
-			}
+			childE.RC = c.RC
+			childE.Parent = el
 
 			compiled = append(compiled, child)
 		}
 
-		return compiled
+		return compiled */
 	}
 
-	return component
-}
+	c.Element = el
 
-// NewBasicComponent create new component without *this* context
-func NewBasicComponent(component *Component, childes ...interface{}) *Component {
-	component.isElement = true
-	return NewComponent(component, func(this *Component) []interface{} {
-		return childes
-	})
+	return el
 }
 
 // UnSpliceBody extract values fromm array to component childes
@@ -207,10 +66,17 @@ func UnSpliceBody(body []interface{}) []interface{} {
 				arr = append(arr, c)
 			}
 			continue
-		case []*C:
-			for _, c := range el.([]interface{}) {
-				arr = append(arr, c)
+		case []*E:
+			for _, e := range el.([]*E) {
+				arr = append(arr, e)
 			}
+			continue
+		case []*C:
+			for _, e := range el.([]*C) {
+				arr = append(arr, e)
+			}
+			continue
+		case nil:
 			continue
 		default:
 			arr = append(arr, el)
@@ -220,127 +86,25 @@ func UnSpliceBody(body []interface{}) []interface{} {
 	return arr
 }
 
-
-type forDirRenderer func(interface{}, interface{}) interface{}
-
-// NewFor create new FOR directive
-func NewFor(data string, this *Component, renderer forDirRenderer) []interface{} {
-	dataForList, ok := this.Data[data]
-	if !ok {
-		this.WarnError(fmt.Errorf("data for FOR directive is undefinded in component: %s", this.UUID))
-		return nil
-	}
-
-	if dataForList == nil {
-		this.WarnError(fmt.Errorf("data for FOR directive is nil: %s", this.UUID))
-		return nil
-	}
-
-	return NewForByData(dataForList, this, renderer)
-}
-
-// NewForByData create new FOR directive by []interface{}
-func NewForByData(dataForList interface{}, this *Component, renderer forDirRenderer) []interface{} {
-	var items []interface{}
-	
-	dv := reflect.ValueOf(dataForList)
-	switch dv.Kind() {
-	case reflect.Array, reflect.Slice:
-		// IsArray
-		for i := 0; i < dv.Len(); i++ {
-			items = append(items, renderForItem(i, dv.Index(i).Interface(), renderer))
-		}
-	case reflect.Map:
-		// IsMap
-		iter := dv.MapRange()
-		for iter.Next() {
-			items = append(items, renderForItem(iter.Key().Interface(), iter.Value().Interface(), renderer))
-		}
-	default:
-		// not array and not map
-		this.WarnError(fmt.Errorf("invalid data for FOR directive: %s", this.UUID))
-		return items
-	}
-
-	return items
-}
-
-func renderForItem(key, val interface{}, renderer forDirRenderer) interface{} {
-	item := renderer(key, val)
-
-	if IsComponent(item) {
-		itemC := I2C(item)
-		itemC.For = ForDirective{isItem: true, itemValueI: key, itemValueVal: val}
-
-		if itemC.Attrs == nil {
-			itemC.Attrs = make(map[string]string)
-		}
-
-		itemC.Attrs["Data-for-key"] = fmt.Sprintf("%v", key)
-	}
-
-	return item
-}
-
-// IsElement return Component.isElement.
-// isElement isn't public because it's useless for applications developing but for helpful libraries
-func (c *Component) IsElement() bool {
-	return c.isElement
-}
-
-// ForItemInfo return info about FOR directive
-func (c *Component) ForItemInfo() (isItem bool, i interface{}, val interface{}) {
-	if !c.For.isItem {
-		return false, 0, nil
-	}
-
-	return true, c.For.itemValueI, c.For.itemValueVal
-}
-
-// Element return *dom.Element by component
-func (c *Component) Element() interface{} {
-	_el := c.RC.BE.GetElement(c)
-	if _el == nil {
-		c.WarnError(fmt.Errorf("component Element: %s, returning nil", c.UUID))
-		return nil
-	}
-
-	return _el
-}
-
-// ParentComponent return first *true component* in component parents tree
-func (c *Component) ParentComponent() *Component {
-	// if c.Parent == nil => c - is the root (gas.App) component
-	if c.Parent == nil || !c.Parent.isElement {
-		return c.Parent
-	}
-
-	return c.Parent.ParentComponent()
-}
-
-// ParentWithAllowedRefs return first *true component* in component parents tree with allowed refs
-func (c *Component) ParentWithAllowedRefs() *Component {
-	// if c.Parent == nil => c - is the root (gas.App) component
-	if c.Parent == nil || (!c.Parent.isElement && c.Parent.RefsAllowed) {
-		return c.Parent
-	}
-
-	return c.Parent.ParentWithAllowedRefs()
-}
-
-// GetElementUnsafely return *dom.Element by component without warning
-func (c *Component) GetElementUnsafely() interface{} {
-	return c.RC.BE.GetElement(c)
-}
-
 // I2C - convert interface{} to *Component
 func I2C(a interface{}) *Component {
 	return a.(*Component)
 }
 
-// IsComponent return true if interface is *Component
+// I2E - convert interface{} to *Element
+func I2E(a interface{}) *E {
+	return a.(*Element)
+}
+
+// IsComponent return true if interface.(type) == *Component
 func IsComponent(c interface{}) bool {
 	_, ok := c.(*Component)
+	return ok
+}
+
+// IsElement return true if interface.(type) == *Element
+func IsElement(c interface{}) bool {
+	_, ok := c.(*Element)
 	return ok
 }
 

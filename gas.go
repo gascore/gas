@@ -1,44 +1,38 @@
 package gas
 
 import (
-	"container/heap"
 	"fmt"
 	"sync"
+	"github.com/eapache/queue"
 )
 
 // New create new gas application with custom backend
-func New(be BackEnd, startPoint string, c *Component, getChildes GetComponentChildes) (Gas, error) {
-	pq := make(PriorityQueue, 0)
-	heap.Init(&pq)
-
+func New(be BackEnd, startPoint string, c *Component) (Gas, error) {
+	q := queue.New()
 	c.RC = &RenderCore{
 		BE:    be,
 		WG:    &sync.WaitGroup{},
-		Queue: &pq,
+		Queue: q,
 	}
 
-	tagName, err := c.RC.BE.New(startPoint)
+	_, err := be.CanRender(startPoint)
 	if err != nil {
 		return Gas{}, err
 	}
 
-	c.Tag = tagName
-
-	if c.Attrs == nil {
-		c.Attrs = make(map[string]string)
-	}
-	c.Attrs["id"] = startPoint
-
-	mainComponent := NewComponent(c, getChildes)
-
-	gas := Gas{App: mainComponent, StartPoint: startPoint}
+	gas := Gas{App: c.Init(), StartPoint: startPoint}
 
 	return gas, nil
 }
 
 // Init initialize gas application
-func Init(gas Gas) error {
-	err := gas.App.RC.BE.Init(gas)
+func Init(be BackEnd, startPoint string, c *Component) error {
+	gas, err := New(be, startPoint, c)
+	if err != nil {
+		return err
+	}
+
+	err = be.Init(gas)
 	if err != nil {
 		return err
 	}

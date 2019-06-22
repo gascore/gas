@@ -1,4 +1,6 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/eapache/queue v1.1.0 h1:YOEu7KNc61ntiQlcEeUIoDTJ2o8mQznoNvUhiigpIqc=
+github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFPTqq+I=
 github.com/frankenbeanies/uuid4 v0.0.0-20180313125435-68b799ec299a h1:oxdqt7Y3J6/prhpMQ7msE7CanS51pzHb8NF44PCSoXY=
 github.com/frankenbeanies/uuid4 v0.0.0-20180313125435-68b799ec299a/go.mod h1:MmPmk1AfyaEzDM+9n93pi02xKEqUgZMj+AL/oX65TDE=
 github.com/gascore/dom v0.2.2-0.20190611062109-bf287aeb9be4 h1:bQzI/DSe846ip11PtKzJD1/M8vIg1rKJu8Z0P5vSwqg=

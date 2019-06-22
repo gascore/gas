@@ -149,6 +149,11 @@ func TestNewFor(t *testing.T) {
 				"bar",
 				"lol",
 			},
+			"map": map[string]string{
+				"foo": "bar",
+				"lol": "wow",
+				"x": "y",
+			},
 		},
 		Attrs: map[string]string{
 			"id": "list",
@@ -167,7 +172,7 @@ func TestNewFor(t *testing.T) {
 							"class": "list__item",
 						},
 					},
-					i, ": ", el,
+					i.(int), ": ", el.(string),
 				)
 			},
 			childesLength: 3,
@@ -182,7 +187,7 @@ func TestNewFor(t *testing.T) {
 							"class": "list__item",
 						},
 					},
-					i, ": ", el,
+					i.(int), ": ", el.(string),
 				)
 			},
 			childesLength: 0,
@@ -194,7 +199,19 @@ func TestNewFor(t *testing.T) {
 					&C{
 						Tag: "li",
 					},
-					i, ": ", el,
+					i.(int), ": ", el.(string),
+				)
+			},
+			childesLength: 3,
+		},
+		{
+			data: "map",
+			renderer: func(key, val interface{}) interface{} {
+				return NE(
+					&C{
+						Tag:"li",
+					},
+					key.(string), ": ", val.(string),
 				)
 			},
 			childesLength: 3,

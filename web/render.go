@@ -1,9 +1,6 @@
 package web
 
 import (
-	"fmt"
-	"reflect"
-
 	"errors"
 	"github.com/gascore/dom"
 	"github.com/gascore/gas"
@@ -18,7 +15,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return nil
 		}
 
-		_new, err := CreateComponent(node.New)
+		_new, err := CreateElement(node.New)
 		if err != nil {
 			return err
 		}
@@ -43,7 +40,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return nil
 		}
 
-		_new, err := CreateComponent(node.New)
+		_new, err := CreateElement(node.New)
 		if err != nil {
 			return err
 		}
@@ -76,48 +73,25 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		}
 
 		return nil
-	case gas.SyncType:
-		newC := node.New.(*gas.Component)
-		_el, ok := node.NodeNew.(*dom.Element)
-		if !ok {
-			return errors.New("invalid NodeNew type")
-		}
-
-		if newC.Model.Component != nil { // update input value
-			if len(newC.Model.Deep) == 0 {
-				_el.SetValue(newC.Model.Component.Get(newC.Model.Data))
-			} else {
-				dataValue := newC.Model.Component.Get(newC.Model.Data)
-				field, err := getField(reflect.ValueOf(dataValue), newC.Model.Deep)
-				if err != nil {
-					return err
-				}
-
-				_el.SetValue(field.Interface())
-			}
-		}
-
-		updateVisible(newC, _el)
-		return nil
 	case gas.RecreateType:
-		c := node.New.(*gas.Component)
-		_c, ok := c.Element().(*dom.Element)
+		e := node.New.(*gas.Element)
+		_e, ok := e.BEElement().(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeNew type")
 		}
 
-		err := gas.CallBeforeDestroyIfCan(c)
+		err := gas.CallBeforeDestroyIfCan(e)
 		if err != nil {
 			return err
 		}
 
-		for _, _e := range _c.ChildNodes() {
-			_c.RemoveChild(_e)
+		for _, _child := range _e.ChildNodes() {
+			_e.RemoveChild(_child)
 		}
 
-		c.RChildes = []interface{}{}
+		e.RChildes = []interface{}{}
 
-		return c.ForceUpdate()
+		return e.Update()
 	}
 
 	return nil
@@ -146,17 +120,9 @@ func replaceChild(_p, _new, _old dom.Node, new interface{}, old interface{}) err
 		return err
 	}
 
-	if gas.IsComponent(old) {
-		oldC := gas.I2C(old)
-		if len(oldC.Ref) != 0 {
-			p := oldC.ParentComponent()
-			if p.Refs == nil {
-				return errors.New("cannot remove component from parent refs because parent refs is nil")
-			}
-			if _, ok := p.Refs[oldC.Ref]; ok {
-				delete(p.Refs, oldC.Ref)
-			}
-		}
+	err = removeFromRefs(old)
+	if err != nil {
+		return err
 	}
 
 	_p.ReplaceChild(_new, _old)
@@ -206,17 +172,9 @@ func removeChild(_p, _e dom.Node, old interface{}) error {
 		return err
 	}
 
-	if gas.IsComponent(old) {
-		oldC := gas.I2C(old)
-		if len(oldC.Ref) != 0 {
-			p := oldC.ParentComponent()
-			if p.Refs == nil {
-				return errors.New("cannot remove component from parent refs because parent refs is nil")
-			}
-			if _, ok := p.Refs[oldC.Ref]; ok {
-				delete(p.Refs, oldC.Ref)
-			}
-		}
+	err = removeFromRefs(old)
+	if err != nil {
+		return err
 	}
 
 	_p.RemoveChild(_e)
@@ -229,69 +187,18 @@ func removeChild(_p, _e dom.Node, old interface{}) error {
 	return nil
 }
 
-func getField(data reflect.Value, arr []gas.ModelDirectiveDeepData) (reflect.Value, error) {
-	var nilValue reflect.Value
-	for i, deep := range arr {
-		if !data.IsValid() {
-			return nilValue, errors.New("data is not valid")
-		}
-
-		if data.Kind() == reflect.Ptr {
-			data = data.Elem()
-		}
-
-		var field reflect.Value
-		switch data.Kind() {
-		case reflect.Array, reflect.Slice:
-			if !deep.Brackets {
-				return nilValue, fmt.Errorf("no brackets for array (%d)", i)
+func removeFromRefs(old interface{}) error {
+	if gas.IsElement(old) {
+		oldE := gas.I2E(old)
+		if len(oldE.RefName) != 0 {
+			p := oldE.ParentComponent()
+			if p.Component.Refs == nil {
+				return errors.New("cannot remove element from parent refs because parent refs is nil")
 			}
-
-			switch deep.Data.(type) {
-			case int:
-				break
-			default:
-				return nilValue, fmt.Errorf("error deep data type. want number, got: %T", deep.Data)
+			if _, ok := p.Component.Refs[oldE.RefName]; ok {
+				delete(p.Component.Refs, oldE.RefName)
 			}
-
-			field = data.Index(deep.Data.(int))
-		case reflect.Map:
-			if !deep.Brackets {
-				return nilValue, fmt.Errorf("no brackets for map (%d)", i)
-			}
-			field = data.MapIndex(reflect.ValueOf(deep.Data))
-		case reflect.Struct:
-			if deep.Brackets {
-				return nilValue, fmt.Errorf("has brackets for struct (%d)", i)
-			}
-
-			switch deep.Data.(type) {
-			case string:
-				break
-			default:
-				return nilValue, errors.New("invalid structure field name")
-			}
-
-			field = data.FieldByName(deep.Data.(string))
-		default:
-			return nilValue, fmt.Errorf("invalid data type in deep %d", i)
-		}
-
-		if !field.IsValid() {
-			return nilValue, errors.New("invalid field")
-		}
-
-		data = field
-	}
-	return data, nil
-}
-
-func updateVisible(c *gas.Component, _el *dom.Element) {
-	if c.Show != nil {
-		if !c.Show(c) {
-			_el.Style().Set("display", "none")
-		} else {
-			_el.Style().Set("display", "")
 		}
 	}
+	return nil
 }

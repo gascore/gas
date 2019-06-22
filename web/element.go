@@ -3,7 +3,6 @@ package web
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -11,43 +10,47 @@ import (
 	"github.com/gascore/gas"
 )
 
-// CreateComponent render component. Returns _el, err
-func CreateComponent(component interface{}) (dom.Node, error) {
-	switch component := component.(type) {
+// CreateElement render element
+func CreateElement(el interface{}) (dom.Node, error) {
+	switch el := el.(type) {
+	case bool:
+		if el {
+			return createTextNode("true") 
+		}
+		return createTextNode("false")
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		return createTextNode(fmt.Sprintf("%d", component))
+		return createTextNode(fmt.Sprintf("%d", el))
 	case string:
-		return createTextNode(component)
-	case *gas.Component:
-		_node, err := CreateElement(component)
+		return createTextNode(el)
+	case *gas.Element:
+		_node, err := createHtmlElement(el)
 		if err != nil {
-			return nil, errors.New("cannot create component")
+			return nil, fmt.Errorf("cannot create component: %s", err.Error())
 		}
 
-		if component.Hooks.Created != nil {
-			err := component.Hooks.Created(component)
+		if el.Component != nil && el.Component.Hooks.Created != nil {
+			err := el.Component.Hooks.Created(el.Component)
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		component.UpdateHTMLDirective()
+		el.UpdateHTMLDirective()
 
-		if component.Ref != "" {
-			p := component.ParentWithAllowedRefs()
-			dom.ConsoleLog(p == nil)
-			if p == nil {
+		if el.RefName != "" {
+			p := el.ParentComponent()
+			if p == nil || !p.Component.RefsAllowed {
 				dom.ConsoleError("parent with allowed refs doesn't exist")
 			} else {
-				if p.Refs == nil {
-					p.Refs = make(map[string]*gas.C)
+				if p.Component.Refs == nil {
+					p.Component.Refs = make(map[string]*gas.E)
 				}
-				p.Refs[component.Ref] = component // append element to first true component refs
+				p.Component.Refs[el.RefName] = el // append element to first true component refs
 			}
 		}
 
-		for _, el := range component.RChildes {
-			_child, err := CreateComponent(el)
+		for _, child := range el.RChildes {
+			_child, err := CreateElement(child)
 			if err != nil {
 				return nil, err
 			}
@@ -57,31 +60,29 @@ func CreateComponent(component interface{}) (dom.Node, error) {
 
 		return _node, nil
 	default:
-		return nil, fmt.Errorf("invalid component type: %T", component)
+		return nil, fmt.Errorf("unsupported component type: %T", el)
 	}
 }
 
-// CreateElement create html element without childes
-func CreateElement(c *gas.Component) (*dom.Element, error) {
-	_node := dom.NewElement(c.Tag)
+// createHtmlElement create html element without childes
+func createHtmlElement(el *gas.Element) (*dom.Element, error) {
+	_node := dom.NewElement(el.Tag)
 	if _node == nil {
 		return nil, errors.New("cannot create component")
 	}
 
-	updateVisible(c, _node)
+	_node.SetAttribute("data-i", el.UUID) // set data-i for accept element from component methods
 
-	_node.SetAttribute("data-i", c.UUID) // set data-i for accept element from component methods
-
-	for attrName, attrBody := range c.Attrs {
+	for attrName, attrBody := range el.Attrs {
 		// if !attrIsValid(attrName, component.Tag) {continue} // check if attribute is valid for this tag
 		_node.SetAttribute(attrName, attrBody)
 	}
 
-	for attrName, bindBody := range c.Binds {
+	for attrName, bindBody := range el.Binds {
 		_node.SetAttribute(attrName, bindBody())
 	}
 
-	for handlerName, handlerBody := range c.Handlers {
+	for handlerName, handlerBody := range el.Handlers {
 		// if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
 
 		handlerNameParsed := strings.Split(handlerName, ".")
@@ -93,7 +94,7 @@ func CreateElement(c *gas.Component) (*dom.Element, error) {
 				_node.AddEventListener("keyup", func(e dom.Event) {
 					if handlerTarget == strings.ToLower(e.Key()) ||
 						handlerTarget == strings.ToLower(e.KeyCode()) {
-						handlerBody(c, ToUniteObject(e))
+						handlerBody(ToUniteObject(e))
 					}
 				})
 				continue
@@ -126,12 +127,12 @@ func CreateElement(c *gas.Component) (*dom.Element, error) {
 						}
 
 						if handlerTarget == parsedButtonClick {
-							handlerBody(c, ToUniteObject(e))
+							handlerBody(ToUniteObject(e))
 						}
 
 					} else {
 						if handlerTargetInt == buttonClick {
-							handlerBody(c, ToUniteObject(e))
+							handlerBody(ToUniteObject(e))
 						}
 					}
 				})
@@ -140,99 +141,63 @@ func CreateElement(c *gas.Component) (*dom.Element, error) {
 			}
 		} else {
 			_node.AddEventListener(handlerName, func(e dom.Event) {
-				handlerBody(c, ToUniteObject(e))
+				handlerBody(ToUniteObject(e))
 			})
 		}
 	}
 
-	if len(c.Model.Data) != 0 && (c.Tag == "input" || c.Tag == "textarea" || c.Tag == "select") { // model allowed only for input tags
-		this := c.Model.Component
-		dataS := c.Model.Data
-		deep := c.Model.Deep
-
-		if len(deep) == 0 {
-			_node.SetValue(this.Get(dataS))
-		} else {
-			dataValue := this.Get(dataS)
-			field, err := getField(reflect.ValueOf(dataValue), deep)
-			if err != nil {
-				return nil, err
-			}
-
-			_node.SetValue(field.Interface())
+	if len(el.Watcher) != 0 && (el.Tag == "input" || el.Tag == "textarea" || el.Tag == "select") { // model allowed only for input tags
+		p := el.ParentComponent()
+		c := p.Component
+		if c.Watchers == nil || len(c.Watchers) == 0 {
+			return nil, fmt.Errorf("invalid watcher for \"%s\" in component \"%s\"", el.Watcher, el.UUID)
 		}
 
+		watcher, ok := c.Watchers[el.Watcher]; 
+		if !ok {
+			return nil, fmt.Errorf("watcher \"%s\" is undefined in component \"%s\"", el.Watcher, p.UUID)
+		}
+
+		_node.SetValue(el.DefaultWatcherValue)
+		
 		_node.AddEventListener("input", func(e dom.Event) {
 			_target := e.Target()
 			inputValue := _target.Value()
 
 			var (
-				inputType       string
+				// inputType       string
 				inputValueTyped interface{}
 				err             error
 			)
 
-			switch c.Attrs["type"] {
+			switch el.Attrs["type"] {
 			case "range", "number":
-				inputType = "int"
+				// inputType = "int"
 				inputValueTyped, err = strconv.Atoi(inputValue)
 				if err != nil {
 					warnError(err)
 					return
 				}
 			case "checkbox":
-				inputType = "bool"
+				// inputType = "bool"
 				inputValueTyped = _target.JSValue().Get("checked").Bool()
 			default:
-				inputType = "string"
+				// inputType = "string"
 				inputValueTyped = inputValue
 			}
 
-			dataValue := this.Get(dataS)
-
-			if len(deep) != 0 {
-				err := (func() error {
-					field, err := getField(reflect.ValueOf(dataValue), deep)
-					if err != nil {
-						return err
-					}
-
-					switch inputValueTyped.(type) {
-					case int:
-						field.SetInt(int64(inputValueTyped.(int)))
-					case string:
-						field.SetString(inputValue)
-					case bool:
-						field.SetBool(inputValueTyped.(bool))
-					}
-
-					return nil
-				})()
-				if err != nil {
-					warnError(err)
-					return
-				}
-				inputValueTyped = dataValue
+			newVal, err := watcher(inputValueTyped, ToUniteObject(e))
+			if err != nil {
+				warnError(err)
 			} else {
-				if inputType != reflect.TypeOf(dataValue).String() {
-					warnError(errors.New("input type != data type"))
-					return
-				}
+				_node.SetValue(newVal)
+				go c.Update()
 			}
-
-			c.RC.Add(singleNode(&gas.RenderNode{
-				Type:     gas.DataType,
-				Priority: gas.InputPriority,
-				New:      this,
-				Data: map[string]interface{}{
-					dataS: inputValueTyped,
-				},
-			}))
 		})
 	}
 
-	if c.HTML.Render != nil {
-		htmlDirective := c.HTML.Render(c)
+	if el.HTML.Render != nil {
+		htmlDirective := el.HTML.Render()
 		_node.SetInnerHTML(fmt.Sprintf("%s\n%s", _node.InnerHTML(), htmlDirective))
 	}
 
@@ -251,4 +216,8 @@ func createTextNode(node string) (dom.Node, error) {
 
 func singleNode(node *gas.RenderNode) []*gas.RenderNode {
 	return []*gas.RenderNode{node}
+}
+
+func (w BackEnd) EditWatcherValue(el interface{}, newVal string) {
+	el.(*dom.Element).SetValue(newVal)
 }

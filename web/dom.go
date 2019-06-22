@@ -11,8 +11,8 @@ import (
 // BackEnd backend for core library
 type BackEnd struct{}
 
-// New check if root element exists
-func (w BackEnd) New(startPoint string) (string, error) {
+// CanRender check if root element exists
+func (w BackEnd) CanRender(startPoint string) (string, error) {
 	_el := dom.Doc.GetElementById(startPoint)
 	if _el == nil {
 		return "", errors.New("invalid startPoint")
@@ -28,7 +28,7 @@ func (w BackEnd) Init(gas gas.Gas) error {
 
 	_main.SetAttribute("data-i", app.UUID)
 
-	err := app.ForceUpdate()
+	err := app.Update()
 	if err != nil {
 		return err
 	}
@@ -38,8 +38,8 @@ func (w BackEnd) Init(gas gas.Gas) error {
 	return nil
 }
 
-// GetElement get dom.Element by component
-func (w BackEnd) GetElement(c *gas.Component) interface{} {
+// GetElement get dom.Element by element
+func (w BackEnd) GetElement(c *gas.Element) interface{} {
 	return dom.Doc.QuerySelector(fmt.Sprintf("[data-i='%s']", c.UUID))
 }
 

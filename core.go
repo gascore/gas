@@ -2,10 +2,8 @@ package gas
 
 // Gas - main application struct
 type Gas struct {
-	App        *Component
+	App        *Element
 	StartPoint string // html element id where application will store
-
-	// Other stuff
 }
 
 // GetElement return root element
@@ -15,14 +13,16 @@ func (g *Gas) GetElement() interface{} {
 
 // BackEnd interface for calling platform-specific code
 type BackEnd interface {
-	New(string) (string, error)
+	CanRender(string) (string, error)
 	Init(Gas) error
 
 	ExecNode(*RenderNode) error
 	ChildNodes(interface{}) []interface{}
 
-	GetElement(*Component) interface{}
+	GetElement(*Element) interface{}
 	GetGasEl(*Gas) interface{}
+
+	EditWatcherValue(interface{}, string)
 
 	ConsoleLog(...interface{})
 	ConsoleError(...interface{})

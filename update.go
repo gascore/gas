@@ -5,94 +5,103 @@ import (
 	"sync"
 )
 
-// htmlDirective return compiled component HTMLDirective
-func (c *Component) htmlDirective() string {
+// htmlDirective return compiled element HTMLDirective
+func (e *Element) htmlDirective() string {
 	var htmlDirective string
-	if c.HTML.Render != nil {
-		htmlDirective = c.HTML.Render(c)
+	if e.HTML.Render != nil {
+		htmlDirective = e.HTML.Render()
 	}
 
 	return htmlDirective
 }
 
-func (c *Component) update(oldHTMLDirective string) error {
-	newTree := RenderTree(c)
+func (e *Element) Update() error {
+	newTree := e.RenderTree()
 
-	if oldHTMLDirective != c.htmlDirective() {
-		c.ReCreate()
+	if e.HTML.Rendered != e.htmlDirective() {
+		e.ReCreate()
 		return nil
 	}
 
-	_el := c.Element()
+	_el := e.BEElement()
 	if _el == nil {
 		return errors.New("invalid '_el' in update function")
 	}
 
-	renderNodes, err := UpdateComponentChildes(c, _el, newTree, c.RChildes)
+	renderNodes, err := e.RC.UpdateElementChildes(_el, newTree, e.RChildes)
 	if err != nil {
 		return err
 	}
 
-	c.RChildes = newTree
-	c.UpdateHTMLDirective()
+	e.RChildes = newTree
+	e.UpdateHTMLDirective()
 
-	c.RC.Add(renderNodes)
+	e.RC.Add(renderNodes)
 
 	return nil
 }
 
-// UpdateHTMLDirective trying rerender component html directive
-func (c *Component) UpdateHTMLDirective() {
-	if c.HTML.Render != nil {
-		c.HTML.Rendered = c.HTML.Render(c)
+// UpdateHTMLDirective trying rerender element html directive
+func (e *Element) UpdateHTMLDirective() {
+	if e.HTML.Render != nil {
+		e.HTML.Rendered = e.HTML.Render()
 	}
 }
 
-// ForceUpdate force update component
-func (c *Component) ForceUpdate() error {
-	return c.update(c.HTML.Rendered)
+// UpdateWithError update component childes
+func (component *Component) UpdateWithError() error {
+	return component.Element.Update()
 }
 
-// ReCreate re create component
-func (c *Component) ReCreate() {
-	c.RC.Add(singleNode(&RenderNode{
-		Type:     RecreateType,
-		Priority: RenderPriority,
-		New:      c,
+// Update update component childes with error warning
+func (component *Component) Update() {
+	component.WarnError(component.UpdateWithError())
+}
+
+// ReCreate re create element
+func (e *Element) ReCreate() {
+	e.RC.Add(singleNode(&RenderNode{
+		Type: RecreateType,
+		New:  e,
 	}))
 }
 
-// RenderTree return full rendered childes tree of component
-func RenderTree(c *Component) []interface{} {
+// RenderTree return full rendered childes tree of element
+func (e *Element) RenderTree() []interface{} {
 	var childes []interface{}
-	for _, el := range c.Childes(c) {
-		if IsComponent(el) {
-			elC := I2C(el)
-
-			if elC.Binds != nil {
-				if elC.RenderedBinds == nil {
-					elC.RenderedBinds = make(map[string]string)
-				}
-
-				for bindKey, bindValue := range elC.Binds { // render binds
-					elC.RenderedBinds[bindKey] = bindValue()
-				}
-			}
-
-			elC.RChildes = RenderTree(elC)
-			elC.UpdateHTMLDirective()
-
-			el = elC
+	for _, child := range UnSpliceBody(e.Childes()) {
+		childE, ok := child.(*Element)
+		if !ok {
+			childes = append(childes, child)
+			continue
 		}
 
-		childes = append(childes, el)
+		childE.RC = e.RC
+		childE.Parent = e
+
+		if childE.Binds != nil {
+			if childE.RenderedBinds == nil {
+				childE.RenderedBinds = make(map[string]string)
+			}
+
+			// render binded attributes
+			for bindKey, bindValue := range childE.Binds {
+				childE.RenderedBinds[bindKey] = bindValue()
+			}
+		}
+
+		childE.RChildes = childE.RenderTree()
+		childE.UpdateHTMLDirective()
+
+		child = childE
+		childes = append(childes, child)
 	}
 
 	return childes
 }
 
-// UpdateComponentChildes compare new and old trees
-func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []interface{}) ([]*RenderNode, error) {
+// UpdateElementChildes compare new and old trees
+func (rc *RenderCore) UpdateElementChildes(_el interface{}, newTree, oldTree []interface{}) ([]*RenderNode, error) {
 	var nodes []*RenderNode
 
 	var m sync.Mutex
@@ -109,7 +118,7 @@ func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []in
 			oldEl = oldTree[i]
 		}
 
-		renderNodes, err := c.RC.updateComponent(_el, newEl, oldEl, i)
+		renderNodes, err := rc.updateElement(_el, newEl, oldEl, i)
 		if err != nil {
 			m.Lock()
 			errG = err
@@ -126,14 +135,14 @@ func UpdateComponentChildes(c *Component, _el interface{}, newTree, oldTree []in
 	return nodes, errG
 }
 
-// updateComponent trying to update component
-func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old interface{}, index int) ([]*RenderNode, error) {
+// updateElement trying to update element
+func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old interface{}, index int) ([]*RenderNode, error) {
 	var nodes []*RenderNode
-	// if component has created
+
+	// if element has created
 	if old == nil {
 		nodes = append(nodes, &RenderNode{
 			Type:       CreateType,
-			Priority:   RenderPriority,
 			New:        new,
 			NodeParent: _parent,
 		})
@@ -147,23 +156,22 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	}
 
 	var _el interface{}
-	if len(_childes) > index { // component was hided if childes length <= index
+	if len(_childes) > index { // element was hided if childes length <= index
 		_el = _childes[index]
 	} else {
 		return nodes, nil
 	}
 
-	newIsComponent := IsComponent(new)
-	newC := &Component{}
-	if newIsComponent {
-		newC = I2C(new)
+	newIsElement := IsElement(new)
+	newE := &Element{}
+	if newIsElement {
+		newE = I2E(new)
 	}
 
-	// if component has deleted
+	// if element has deleted
 	if new == nil {
 		nodes = append(nodes, &RenderNode{
 			Type:       DeleteType,
-			Priority:   RenderPriority,
 			NodeParent: _parent,
 			NodeOld:    _el,
 			Old:        old,
@@ -172,7 +180,7 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 		return nodes, nil
 	}
 
-	// if component has Changed
+	// if element has Changed
 	isChanged, err := Changed(new, old)
 	if err != nil {
 		return nil, err
@@ -180,7 +188,6 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	if isChanged {
 		nodes = append(nodes, &RenderNode{
 			Type:       ReplaceType,
-			Priority:   RenderPriority,
 			NodeParent: _parent,
 			NodeOld:    _el,
 			New:        new,
@@ -190,35 +197,26 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 		return nodes, nil
 	}
 
-	if !newIsComponent {
+	if !newIsElement {
 		return nodes, nil
 	}
 
-	oldC := I2C(old)
+	oldE := I2E(old)
 
-	if newC.UUID != oldC.UUID { // update *element context* in new
-		newC.UUID = oldC.UUID
+	if newE.UUID != oldE.UUID { // update *element context* in new
+		newE.UUID = oldE.UUID
 	}
 
-	// if old and new is equals and they have html directives => they are two commons components
-	if oldC.HTML.Render != nil && newC.HTML.Render != nil {
+	// if old and new is equals and they have html directives => they are two commons elements
+	if oldE.HTML.Render != nil && newE.HTML.Render != nil {
 		return nodes, nil
 	}
 
-	nodes = append(nodes, &RenderNode{
-		Type:     SyncType,
-		Priority: RenderPriority,
-		New:      newC,
-		NodeNew:  _el,
-	})
-
-	if !newC.isElement && !oldC.isElement {
-		/* Seems like it's very big pice of shit */
-		newC.Data = oldC.Data
-		newC.RChildes = RenderTree(newC)
+	if newE.Component != nil {
+		newE.RChildes = newE.RenderTree()
 	}
 
-	renderNodes, err := UpdateComponentChildes(newC, _el, newC.RChildes, oldC.RChildes)
+	renderNodes, err := rc.UpdateElementChildes(_el, newE.RChildes, oldE.RChildes)
 	if err != nil {
 		return nil, err
 	}
@@ -226,4 +224,26 @@ func (rc *RenderCore) updateComponent(_parent interface{}, new interface{}, old 
 	nodes = append(nodes, renderNodes...)
 
 	return nodes, nil
+}
+
+
+// UpdateWatchersValues update all elements WatcherValue where element.Watcher = watcher 
+func (component *Component) UpdateWatchersValues(watcher string, newVal string) {
+	component.Element.updateWatchersValues(watcher, newVal)
+}
+
+func (e *Element) updateWatchersValues(watcher string, newVal string) {
+	for _, child := range e.RChildes {
+		childE, ok := child.(*E)
+		if !ok {
+			continue
+		}
+
+		if childE.Watcher == watcher {
+			e.RC.BE.EditWatcherValue(childE.BEElement(), newVal)
+			continue
+		}
+
+		childE.updateWatchersValues(watcher, newVal)
+	}
 }

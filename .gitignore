@@ -1,3 +1,5 @@
+examples/
+
 # ignore cover files
 cover.html
 cover.out

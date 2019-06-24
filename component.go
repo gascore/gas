@@ -25,30 +25,27 @@ type Watcher func(val interface{}, e Object) (string, error)
 
 // Init initialize component: create element and other stuff
 func (c *Component) Init() *Element {
-	el := &Element{
-		Tag: "div",
-		UUID: uuid4.New().String(),
-		Component: c,
-		RC: c.RC,
+	var el *Element
+	if c.Element == nil {
+		el = &Element{
+			Tag: "div",
+			UUID: uuid4.New().String(),
+			Component: c,
+			RC: c.RC,
+		}
+	} else {
+		el 			 = c.Element
+		el.Component = c
+		el.RC 		 = c.RC
+		el.UUID 	 = uuid4.New().String()
+
+		if len(el.Tag) == 0 {
+			el.Tag = "div"
+		}
 	}
 	
 	el.Childes = func() []interface{} {
 		return c.Root.Render()
-		/*var compiled []interface{}
-		for _, child := range UnSpliceBody(c.Root.Render()) {
-			childE, ok := child.(*Element)
-			if !ok {
-				compiled = append(compiled, child)
-				continue
-			}
-
-			childE.RC = c.RC
-			childE.Parent = el
-
-			compiled = append(compiled, child)
-		}
-
-		return compiled */
 	}
 
 	c.Element = el

@@ -14,10 +14,10 @@ type Hooks struct {
 }
 
 // Hook - lifecycle hook
-type Hook func(*Component) error
+type Hook func() error
 
 // HookWithControl - lifecycle hook. Return true for rerender component childes
-type HookWithControl func(this *Component) (rerender bool, err error)
+type HookWithControl func() (rerender bool, err error)
 
 // CallBeforeCreatedIfCan call component and it's childes BeforeCreated hook
 func CallBeforeCreatedIfCan(i interface{}) error {
@@ -27,12 +27,8 @@ func CallBeforeCreatedIfCan(i interface{}) error {
 	}
 
 	c := e.Component
-	if c == nil {
-		return nil
-	}
-
-	if c.Hooks.BeforeCreated != nil {
-		rerender, err := c.Hooks.BeforeCreated(c)
+	if c != nil && c.Hooks.BeforeCreated != nil {
+		rerender, err := c.Hooks.BeforeCreated()
 		if err != nil {
 			return err
 		}
@@ -60,23 +56,15 @@ func CallMountedIfCan(i interface{}) error {
 	}
 
 	c := e.Component
-	if c == nil {
-		return nil
-	}
-
-	if c.Hooks.Mounted != nil {
-		err := c.Hooks.Mounted(c)
+	if c != nil && c.Hooks.Mounted != nil {
+		err := c.Hooks.Mounted()
 		if err != nil {
 			return err
 		}
 	}
 
 	for _, child := range e.RChildes {
-		if !IsComponent(child) {
-			continue
-		}
-
-		err := CallMountedIfCan(I2C(child))
+		err := CallMountedIfCan(child)
 		if err != nil {
 			return err
 		}
@@ -93,23 +81,15 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 	}
 
 	c := e.Component
-	if c == nil {
-		return nil
-	}
-
-	if c.Hooks.BeforeDestroy != nil {
-		err := c.Hooks.BeforeDestroy(c)
+	if c != nil && c.Hooks.Mounted != nil {
+		err := c.Hooks.BeforeDestroy()
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, child := range e.RChildes {
-		if !IsComponent(child) {
-			continue
-		}
-
-		err := CallBeforeDestroyIfCan(I2C(child))
+	for _, child := range e.RChildes {	
+		err := CallBeforeDestroyIfCan(child)
 		if err != nil {
 			return err
 		}
@@ -129,7 +109,7 @@ func CallUpdatedIfCan(i interface{}) error {
 	c := e.ParentComponent().Component
 
 	if c.Hooks.Updated != nil {
-		err := c.Hooks.Updated(c)
+		err := c.Hooks.Updated()
 		if err != nil {
 			return err
 		}
@@ -151,7 +131,7 @@ func CallBeforeUpdateIfCan(i interface{}) error {
 	//fmt.Println(c.Element)
 
 	if c.Hooks.BeforeUpdate != nil {
-		err := c.Hooks.BeforeUpdate(c)
+		err := c.Hooks.BeforeUpdate()
 		if err != nil {
 			return err
 		}

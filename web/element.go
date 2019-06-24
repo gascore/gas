@@ -29,7 +29,7 @@ func CreateElement(el interface{}) (dom.Node, error) {
 		}
 
 		if el.Component != nil && el.Component.Hooks.Created != nil {
-			err := el.Component.Hooks.Created(el.Component)
+			err := el.Component.Hooks.Created()
 			if err != nil {
 				return nil, err
 			}

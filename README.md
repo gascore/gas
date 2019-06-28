@@ -1,5 +1,7 @@
 # Gas - golang frontend framework
 
+## Gas now refactoring. Wait for the completion. [card in trello](https://trello.com/c/ylU0zx0l)
+
 ## More information in [gascore.github.io](https://gascore.github.io)
 
 ### Structure

@@ -124,11 +124,9 @@ func CallBeforeUpdateIfCan(i interface{}) error {
 	if !ok {
 		return nil
 	}
-
-	//fmt.Println(e)
+	
 	// run Updated hook for component parent
 	c := e.ParentComponent().Component
-	//fmt.Println(c.Element)
 
 	if c.Hooks.BeforeUpdate != nil {
 		err := c.Hooks.BeforeUpdate()

@@ -15,7 +15,7 @@ func CreateElement(el interface{}) (dom.Node, error) {
 	switch el := el.(type) {
 	case bool:
 		if el {
-			return createTextNode("true") 
+			return createTextNode("true")
 		}
 		return createTextNode("false")
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
@@ -153,13 +153,18 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 			return nil, fmt.Errorf("invalid watcher for \"%s\" in component \"%s\"", el.Watcher, el.UUID)
 		}
 
-		watcher, ok := c.Watchers[el.Watcher]; 
+		watcher, ok := c.Watchers[el.Watcher]
 		if !ok {
 			return nil, fmt.Errorf("watcher \"%s\" is undefined in component \"%s\"", el.Watcher, p.UUID)
 		}
 
-		_node.SetValue(el.DefaultWatcherValue)
-		
+		startVal, err := watcher(nil, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		_node.SetValue(startVal)
+
 		_node.AddEventListener("input", func(e dom.Event) {
 			_target := e.Target()
 			inputValue := _target.Value()

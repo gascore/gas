@@ -81,14 +81,14 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 	}
 
 	c := e.Component
-	if c != nil && c.Hooks.Mounted != nil {
+	if c != nil && c.Hooks.BeforeDestroy != nil {
 		err := c.Hooks.BeforeDestroy()
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, child := range e.RChildes {	
+	for _, child := range e.RChildes {
 		err := CallBeforeDestroyIfCan(child)
 		if err != nil {
 			return err
@@ -124,7 +124,7 @@ func CallBeforeUpdateIfCan(i interface{}) error {
 	if !ok {
 		return nil
 	}
-	
+
 	// run Updated hook for component parent
 	c := e.ParentComponent().Component
 

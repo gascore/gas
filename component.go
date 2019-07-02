@@ -4,11 +4,12 @@ import "github.com/frankenbeanies/uuid4"
 
 // Component logic node
 type Component struct {
-	Root  interface {
+	Root interface {
 		Render() []interface{}
 	}
 
-	Element *Element
+	Element            *Element
+	ElementIsImportant bool
 
 	Hooks Hooks
 
@@ -28,22 +29,25 @@ func (c *Component) Init() *Element {
 	var el *Element
 	if c.Element == nil {
 		el = &Element{
-			Tag: "div",
-			UUID: uuid4.New().String(),
+			Tag:       "div",
+			UUID:      uuid4.New().String(),
 			Component: c,
-			RC: c.RC,
+			RC:        c.RC,
 		}
 	} else {
-		el 			 = c.Element
+		el = c.Element
 		el.Component = c
-		el.RC 		 = c.RC
-		el.UUID 	 = uuid4.New().String()
+		el.RC = c.RC
+
+		if len(el.UUID) == 0 {
+			el.UUID = uuid4.New().String()
+		}
 
 		if len(el.Tag) == 0 {
 			el.Tag = "div"
 		}
 	}
-	
+
 	el.Childes = func() []interface{} {
 		return c.Root.Render()
 	}

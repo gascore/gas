@@ -3,6 +3,7 @@ package gas
 import (
 	"fmt"
 	"strings"
+
 	"github.com/frankenbeanies/uuid4"
 )
 
@@ -14,11 +15,9 @@ type Element struct {
 
 	Handlers      map[string]Handler // events handlers: onClick, onHover
 	Binds         map[string]Bind    // dynamic attributes
-	RenderedBinds map[string]string  // store binds for changed func	
-	
-	Watcher 		    string
-	DefaultWatcherValue string
+	RenderedBinds map[string]string  // store binds for changed func
 
+	Watcher string
 	HTML    HTMLDirective
 
 	Childes  GetChildes

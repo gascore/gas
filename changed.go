@@ -15,7 +15,7 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 	case *Component:
 		return !isComponentsEquals(I2C(newEl), I2C(oldEl)), nil
 	case *Element:
-		return !isElementsEquals(I2E(newEl), I2E(oldEl)), nil
+		return !isNodesEquals(I2E(newEl), I2E(oldEl)), nil
 	case bool, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return newEl != oldEl, nil
 	default:
@@ -24,12 +24,19 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 }
 
 func isComponentsEquals(newC, oldC *C) bool {
-	return newC.RefsAllowed == oldC.RefsAllowed &&
+	isEquals := newC.ElementIsImportant == oldC.ElementIsImportant && 
+		newC.RefsAllowed == oldC.RefsAllowed &&
 		compareHooks(newC.Hooks, oldC.Hooks) &&
 		compareWatchers(newC.Watchers, oldC.Watchers)
+
+	if isEquals && newC.ElementIsImportant {
+		return isElementsEquals(newC.Element, oldC.Element)
+	}
+
+	return isEquals
 }
 
-func isElementsEquals(newE, oldE *E) bool {
+func isNodesEquals(newE, oldE *E) bool {
 	if newE.Component != nil || oldE.Component != nil {
 		if oldE.Component == nil || newE.Component == nil {
 			return false
@@ -38,6 +45,10 @@ func isElementsEquals(newE, oldE *E) bool {
 		return isComponentsEquals(newE.Component, oldE.Component)
 	}
 
+	return isElementsEquals(newE, oldE)
+}
+
+func isElementsEquals(newE, oldE *E) bool {
 	return newE.Tag == oldE.Tag &&
 		newE.Watcher == oldE.Watcher &&
 		newE.HTML.Rendered == oldE.HTML.Rendered &&

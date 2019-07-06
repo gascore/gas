@@ -18,6 +18,8 @@ type Component struct {
 
 	Watchers map[string]Watcher
 
+	NotPointer bool // by default component is pointer
+
 	RC *RenderCore
 }
 
@@ -48,9 +50,10 @@ func (c *Component) Init() *Element {
 		}
 	}
 
-	el.Childes = func() []interface{} {
+	el.getChildes = func() []interface{} {
 		return c.Root.Render()
 	}
+	el.IsPointer = !c.NotPointer
 
 	c.Element = el
 

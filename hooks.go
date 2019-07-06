@@ -34,11 +34,11 @@ func CallBeforeCreatedIfCan(i interface{}) error {
 		}
 
 		if rerender {
-			e.RChildes = e.RenderTree()
+			e.UpdateChildes()
 		}
 	}
 
-	for _, child := range e.RChildes {
+	for _, child := range e.Childes {
 		err := CallBeforeCreatedIfCan(child)
 		if err != nil {
 			return err
@@ -63,7 +63,7 @@ func CallMountedIfCan(i interface{}) error {
 		}
 	}
 
-	for _, child := range e.RChildes {
+	for _, child := range e.Childes {
 		err := CallMountedIfCan(child)
 		if err != nil {
 			return err
@@ -88,7 +88,7 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 		}
 	}
 
-	for _, child := range e.RChildes {
+	for _, child := range e.Childes {
 		err := CallBeforeDestroyIfCan(child)
 		if err != nil {
 			return err

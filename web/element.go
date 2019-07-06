@@ -35,8 +35,6 @@ func CreateElement(el interface{}) (dom.Node, error) {
 			}
 		}
 
-		el.UpdateHTMLDirective()
-
 		if el.RefName != "" {
 			p := el.ParentComponent()
 			if p == nil || !p.Component.RefsAllowed {
@@ -49,7 +47,7 @@ func CreateElement(el interface{}) (dom.Node, error) {
 			}
 		}
 
-		for _, child := range el.RChildes {
+		for _, child := range el.Childes {
 			_child, err := CreateElement(child)
 			if err != nil {
 				return nil, err
@@ -217,10 +215,6 @@ func createTextNode(node string) (dom.Node, error) {
 	}
 
 	return _node, nil
-}
-
-func singleNode(node *gas.RenderNode) []*gas.RenderNode {
-	return []*gas.RenderNode{node}
 }
 
 func (w BackEnd) EditWatcherValue(el interface{}, newVal string) {

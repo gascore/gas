@@ -20,8 +20,11 @@ type Element struct {
 	Watcher string
 	HTML    HTMLDirective
 
-	Childes  GetChildes
-	RChildes []interface{} // rendered childes
+	IsPointer bool // by default element isn't pointer
+
+	getChildes GetChildes
+	Childes    []interface{}
+	OldChildes []interface{}
 
 	Parent  *Element // if element is root, parent is nil
 	RefName string
@@ -32,20 +35,22 @@ type Element struct {
 }
 
 // NewElement create new element
-func NewElement(element *Element, childes ...interface{}) *Element {
-	if element.Tag == "" {
-		element.Tag = "div"
+func NewElement(el *Element, childes ...interface{}) *Element {
+	if el.Tag == "" {
+		el.Tag = "div"
 	} else {
-		element.Tag = strings.ToLower(element.Tag)
+		el.Tag = strings.ToLower(el.Tag)
 	}
 
-	element.UUID = uuid4.New().String()
+	if len(el.UUID) == 0 {
+		el.UUID = uuid4.New().String()
+	}
 
-	element.Childes = func() []interface{} {
+	el.getChildes = func() []interface{} {
 		return childes
 	}
 
-	return element
+	return el
 }
 
 // GetChildes function returning component/element childes

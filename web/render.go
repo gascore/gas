@@ -2,6 +2,7 @@ package web
 
 import (
 	"errors"
+
 	"github.com/gascore/dom"
 	"github.com/gascore/gas"
 )
@@ -89,7 +90,8 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			_e.RemoveChild(_child)
 		}
 
-		e.RChildes = []interface{}{}
+		e.Childes = []interface{}{}
+		e.OldChildes = []interface{}{}
 
 		return e.Update()
 	}

@@ -2,18 +2,11 @@ package gas
 
 import (
 	"fmt"
-	"sync"
-	"github.com/eapache/queue"
 )
 
 // New create new gas application with custom backend
 func New(be BackEnd, startPoint string, c *Component) (Gas, error) {
-	q := queue.New()
-	c.RC = &RenderCore{
-		BE:    be,
-		WG:    &sync.WaitGroup{},
-		Queue: q,
-	}
+	c.RC = &RenderCore{be}
 
 	_, err := be.CanRender(startPoint)
 	if err != nil {

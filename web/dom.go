@@ -23,17 +23,9 @@ func (w BackEnd) CanRender(startPoint string) (string, error) {
 
 // Init initialize gas app
 func (w BackEnd) Init(gas gas.Gas) error {
-	app := gas.App
-	_main := dom.Doc.GetElementById(gas.StartPoint)
+	dom.Doc.GetElementById(gas.StartPoint).SetAttribute("data-i", gas.App.UUID)
 
-	_main.SetAttribute("data-i", app.UUID)
-
-	err := app.Update()
-	if err != nil {
-		return err
-	}
-
-	dom.Doc.GetElementsByTagName("body")[0].SetAttribute("data-ready", true)
+	gas.App.Update()
 
 	return nil
 }

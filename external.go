@@ -10,3 +10,5 @@ type External struct {
 	Templates map[string]Template
 	Attrs     map[string]string
 }
+
+type DynamicElement func(External) *Element

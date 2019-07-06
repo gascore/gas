@@ -1,9 +1,6 @@
 package gas
 
-import (
-	"errors"
-	"sync"
-)
+import "errors"
 
 // htmlDirective return compiled element HTMLDirective
 func (e *Element) htmlDirective() string {
@@ -16,27 +13,16 @@ func (e *Element) htmlDirective() string {
 }
 
 func (e *Element) Update() error {
-	newTree := e.RenderTree()
-
-	if e.HTML.Rendered != e.htmlDirective() {
-		e.ReCreate()
-		return nil
-	}
-
 	_el := e.BEElement()
 	if _el == nil {
 		return errors.New("invalid '_el' in update function")
 	}
 
-	renderNodes, err := e.RC.UpdateElementChildes(_el, newTree, e.RChildes)
+	e.UpdateChildes()
+	err := e.RC.UpdateElementChildes(_el, e.Childes, e.OldChildes)
 	if err != nil {
 		return err
 	}
-
-	e.RChildes = newTree
-	e.UpdateHTMLDirective()
-
-	e.RC.Add(renderNodes)
 
 	return nil
 }
@@ -60,19 +46,22 @@ func (component *Component) Update() {
 
 // ReCreate re create element
 func (e *Element) ReCreate() {
-	e.RC.Add(singleNode(&RenderNode{
+	go e.RC.Add(&RenderNode{
 		Type: RecreateType,
 		New:  e,
-	}))
+	})
 }
 
-// RenderTree return full rendered childes tree of element
-func (e *Element) RenderTree() []interface{} {
-	var childes []interface{}
-	for _, child := range UnSpliceBody(e.Childes()) {
+// UpdateChildes update element childes
+func (e *Element) UpdateChildes() {
+	e.OldChildes = e.Childes
+	e.Childes = []interface{}{}
+
+	for _, child := range UnSpliceBody(e.getChildes()) {
+		e.Childes = append(e.Childes, child)
+
 		childE, ok := child.(*Element)
 		if !ok {
-			childes = append(childes, child)
 			continue
 		}
 
@@ -90,64 +79,46 @@ func (e *Element) RenderTree() []interface{} {
 			}
 		}
 
-		childE.RChildes = childE.RenderTree()
+		childE.UpdateChildes()
 		childE.UpdateHTMLDirective()
-
-		child = childE
-		childes = append(childes, child)
 	}
 
-	return childes
+	return
 }
 
 // UpdateElementChildes compare new and old trees
-func (rc *RenderCore) UpdateElementChildes(_el interface{}, newTree, oldTree []interface{}) ([]*RenderNode, error) {
-	var nodes []*RenderNode
-
-	var m sync.Mutex
-	var errG error
-
-	for i := 0; i < len(newTree) || i < len(oldTree); i++ {
+func (rc *RenderCore) UpdateElementChildes(_el interface{}, new, old []interface{}) error {
+	for i := 0; i < len(new) || i < len(old); i++ {
 		var newEl interface{}
-		if len(newTree) > i {
-			newEl = newTree[i]
+		if len(new) > i {
+			newEl = new[i]
 		}
 
 		var oldEl interface{}
-		if len(oldTree) > i {
-			oldEl = oldTree[i]
+		if len(old) > i {
+			oldEl = old[i]
 		}
 
-		renderNodes, err := rc.updateElement(_el, newEl, oldEl, i)
+		err := rc.updateElement(_el, newEl, oldEl, i)
 		if err != nil {
-			m.Lock()
-			errG = err
-			m.Unlock()
-		}
-
-		if renderNodes != nil {
-			m.Lock()
-			nodes = append(nodes, renderNodes...)
-			m.Unlock()
+			return err
 		}
 	}
 
-	return nodes, errG
+	return nil
 }
 
 // updateElement trying to update element
-func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old interface{}, index int) ([]*RenderNode, error) {
-	var nodes []*RenderNode
-
+func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old interface{}, index int) error {
 	// if element has created
 	if old == nil {
-		nodes = append(nodes, &RenderNode{
+		rc.Add(&RenderNode{
 			Type:       CreateType,
 			New:        new,
 			NodeParent: _parent,
 		})
 
-		return nodes, nil
+		return nil
 	}
 
 	_childes := rc.BE.ChildNodes(_parent)
@@ -156,37 +127,32 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 	}
 
 	var _el interface{}
-	if len(_childes) > index { // element was hided if childes length <= index
+	if len(_childes) > index {
 		_el = _childes[index]
 	} else {
-		return nodes, nil
-	}
-
-	newIsElement := IsElement(new)
-	newE := &Element{}
-	if newIsElement {
-		newE = I2E(new)
+		return nil
 	}
 
 	// if element has deleted
 	if new == nil {
-		nodes = append(nodes, &RenderNode{
+		rc.Add(&RenderNode{
 			Type:       DeleteType,
 			NodeParent: _parent,
 			NodeOld:    _el,
 			Old:        old,
 		})
 
-		return nodes, nil
+		return nil
 	}
 
 	// if element has Changed
 	isChanged, err := Changed(new, old)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
 	if isChanged {
-		nodes = append(nodes, &RenderNode{
+		rc.Add(&RenderNode{
 			Type:       ReplaceType,
 			NodeParent: _parent,
 			NodeOld:    _el,
@@ -194,14 +160,15 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 			Old:        old,
 		})
 
-		return nodes, nil
+		return nil
 	}
 
+	newE, newIsElement := new.(*Element)
 	if !newIsElement {
-		return nodes, nil
+		return nil
 	}
 
-	oldE := I2E(old)
+	oldE := old.(*Element)
 
 	if newE.UUID != oldE.UUID { // update *element context* in new
 		newE.UUID = oldE.UUID
@@ -209,31 +176,28 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 
 	// if old and new is equals and they have html directives => they are two commons elements
 	if oldE.HTML.Render != nil && newE.HTML.Render != nil {
-		return nodes, nil
+		return nil
 	}
 
-	if newE.Component != nil {
-		newE.RChildes = newE.RenderTree()
+	if newE.IsPointer {
+		err = rc.UpdateElementChildes(_el, newE.Childes, newE.OldChildes)
+	} else {
+		err = rc.UpdateElementChildes(_el, newE.Childes, oldE.Childes)
 	}
-
-	renderNodes, err := rc.UpdateElementChildes(_el, newE.RChildes, oldE.RChildes)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	nodes = append(nodes, renderNodes...)
-
-	return nodes, nil
+	return nil
 }
 
-
-// UpdateWatchersValues update all elements WatcherValue where element.Watcher = watcher 
+// UpdateWatchersValues update all elements WatcherValue where element.Watcher = watcher
 func (component *Component) UpdateWatchersValues(watcher string, newVal string) {
 	component.Element.updateWatchersValues(watcher, newVal)
 }
 
 func (e *Element) updateWatchersValues(watcher string, newVal string) {
-	for _, child := range e.RChildes {
+	for _, child := range e.Childes {
 		childE, ok := child.(*E)
 		if !ok {
 			continue

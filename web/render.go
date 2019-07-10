@@ -103,7 +103,12 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 func (w BackEnd) ChildNodes(node interface{}) []interface{} {
 	var iNodes []interface{}
 
-	_childes := node.(*dom.Element).ChildNodes()
+	_node, ok := node.(*dom.Element)
+	if !ok {
+		return iNodes
+	}
+
+	_childes := _node.ChildNodes()
 	for _, _el := range _childes {
 		iNodes = append(iNodes, _el)
 	}

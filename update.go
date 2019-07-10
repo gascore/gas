@@ -130,10 +130,14 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 	if len(_childes) > index {
 		_el = _childes[index]
 	} else {
-		return nil
+		if IsElement(old) {
+			_el = I2E(old).BEElement()
+		} else {
+			return nil
+		}
 	}
 
-	// if element has deleted
+	// if element was deleted
 	if new == nil {
 		rc.Add(&RenderNode{
 			Type:       DeleteType,

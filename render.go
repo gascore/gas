@@ -3,6 +3,8 @@ package gas
 // RenderCore render station
 type RenderCore struct {
 	BE BackEnd
+
+	queue []*RenderNode
 }
 
 // RenderNode node storing changes
@@ -36,8 +38,19 @@ const (
 
 // Add push render nodes to render queue and trying to execute all queue
 func (rc *RenderCore) Add(node *RenderNode) {
-	err := rc.BE.ExecNode(node)
-	if err != nil {
-		rc.BE.ConsoleError(err.Error())
+	rc.queue = append(rc.queue, node)
+}
+
+// Exec run all render nodes in render core
+func (rc *RenderCore) Exec() error {
+	for _, node := range rc.queue {
+		err := rc.BE.ExecNode(node)
+		if err != nil {
+			return err
+		}
 	}
+
+	rc.queue = []*RenderNode{}
+
+	return nil
 }

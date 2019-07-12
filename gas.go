@@ -6,7 +6,7 @@ import (
 
 // New create new gas application with custom backend
 func New(be BackEnd, startPoint string, c *Component) (Gas, error) {
-	c.RC = &RenderCore{be}
+	c.RC = &RenderCore{BE: be}
 
 	_, err := be.CanRender(startPoint)
 	if err != nil {

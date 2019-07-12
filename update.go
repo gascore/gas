@@ -1,6 +1,8 @@
 package gas
 
-import "errors"
+import (
+	"errors"
+)
 
 // htmlDirective return compiled element HTMLDirective
 func (e *Element) htmlDirective() string {
@@ -24,7 +26,7 @@ func (e *Element) Update() error {
 		return err
 	}
 
-	return nil
+	return e.RC.Exec()
 }
 
 // UpdateHTMLDirective trying rerender element html directive
@@ -46,10 +48,11 @@ func (component *Component) Update() {
 
 // ReCreate re create element
 func (e *Element) ReCreate() {
-	go e.RC.Add(&RenderNode{
+	e.RC.Add(&RenderNode{
 		Type: RecreateType,
 		New:  e,
 	})
+	go e.RC.Exec()
 }
 
 // UpdateChildes update element childes

@@ -62,7 +62,7 @@ func CreateElement(el interface{}) (dom.Node, error) {
 	}
 }
 
-// createHtmlElement create html element without childes
+// createHtmlElement create html element without children
 func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 	_node := dom.NewElement(el.Tag)
 	if _node == nil {

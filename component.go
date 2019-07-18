@@ -129,3 +129,13 @@ func RemoveStrings(arr []interface{}) []interface{} {
 	}
 	return out
 }
+
+// EmptyRoot root for component only rendering one element
+type EmptyRoot struct {
+	C *C
+	Element *Element
+}
+
+func (root *EmptyRoot) Render() []interface{} {
+	return CL(root.Element)
+}

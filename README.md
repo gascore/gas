@@ -1,5 +1,7 @@
 # Gas - golang frontend framework
 
+![Logo](https://raw.githubusercontent.com/gascore/gas/master/logo.png)
+
 ## Example [gascore.github.io](https://gascore.github.io)
 
 ### Structure

@@ -1,245 +1,132 @@
 package gas
 
 import (
+	"reflect"
 	"testing"
 )
 
-type TestNewForData struct {
-	data          string
-	renderer      func(interface{}, interface{}) interface{}
-	childesLength int
-}
+func TestComponentInit(t *testing.T) {
+	f := func(c *C) {
+		c.Root = &exampleRoot{}
 
-func TestNewComponent(t *testing.T) {
-	data := []*Component{
-		NewComponent(
-			&C{
-				Tag: "h1",
-				Attrs: map[string]string{
-					"id": "foo",
-				},
-			},
-			func(this *Component) []interface{} {
-				return ToGetComponentList(
-					"Some ",
-					NE(&C{Tag: "b"}, "bold"),
-					"text")
-			},
-		),
-		NewComponent(
-			&C{
-				Attrs: map[string]string{
-					"id": "bar",
-				},
-			},
-			func(this *Component) []interface{} {
-				return ToGetComponentList(
-					"Some ",
-					NE(&C{Tag: "i"}, "italic"),
-					"text")
-			},
-		),
-		NewBasicComponent(
-			&C{
-				Attrs: map[string]string{
-					"id": "bar",
-				},
-			},
-			func(this *Component) []interface{} {
-				return ToGetComponentList(
-					"Some ",
-					NE(&C{Tag: "i"}, "italic"),
-					"text")
-			},
-		),
-		NewComponent(
-			&C{
-				Attrs: map[string]string{
-					"id": "hide",
-				},
-			},
-			func(this *Component) []interface{} {
-				return ToGetComponentList(
-					NE(
-						&C{
-							If: func(p *Component) bool {
-								return this.Attrs["id"] != "hide"
-							},
-						},
-						"wow"),
-					"another one")
-			},
-		),
+		el := c.Init()
+
+		if el.UUID == "" {
+			t.Errorf("empty element UUID")
+		}
+
+		if el.Tag == "" {
+			t.Errorf("empty element tag")
+		}
+
+		el.UpdateChildes()
+		if len(el.Childes) == 0 {
+			t.Error("element childes are null")
+		}
 	}
 
-	for _, c := range data {
-		if c.UUID == "" {
-			t.Errorf("invalid comoponent UUID: lenght < 0")
-		}
+	f(&C{Element: &E{Tag: "h1", Attrs: map[string]string{"id": "foo"}}})
+	f(&C{Element: &E{Attrs: map[string]string{"id": "foo"}}})
+	f(&C{Element: &E{UUID: "custom_id"}})
+}
 
-		if c.Tag == "" {
-			t.Errorf("invalid comoponent tag: lenght < 0")
+func TestUnSpliceBody(t *testing.T) {
+	f := func(in, out []interface{}) {
+		formatedIn := UnSpliceBody(in)
+		if !reflect.DeepEqual(formatedIn, out) {
+			t.Errorf("formatedIn and out are not the same: want - %v, but got - %v", out, formatedIn)
 		}
+	}
 
-		if c.isElement != c.IsElement() {
-			t.Errorf("wtf??!?!?")
-		}
+	f(CL(1, 2, 3),
+		CL(1, 2, 3))
 
-		childes := c.Childes(c)
-		if len(childes) == 0 {
-			t.Errorf("components childes are null")
+	f(CL(1, nil, 3),
+		CL(1, 3))
+
+	f(CL(1, CL(1, 2), 3),
+		CL(1, 1, 2, 3))
+
+	f(CL(1, 2, 3, []*E{&E{Tag: "h1"}, &E{Tag: "h2"}}),
+		CL(1, 2, 3, &E{Tag: "h1"}, &E{Tag: "h2"}))
+
+	f(CL(1, 2, 3, []*C{&C{Root: &exampleRoot{}}}),
+		CL(1, 2, 3, &C{Root: &exampleRoot{}}))
+}
+
+func TestRemoveStrings(t *testing.T) {
+	f := func(in, out []interface{}) {
+		formatedIn := RemoveStrings(in)
+		if !reflect.DeepEqual(formatedIn, out) {
+			t.Errorf("formatedIn and out are not the same: want - %v, but got - %v", out, formatedIn)
 		}
+	}
+
+	f(CL(1, 2, "3"),
+		CL(1, 2))
+
+	f(CL(1, "2", "3"),
+		CL(1))
+
+	f(CL(1, 2, 3, "4", 5),
+		CL(1, 2, 3, 5))
+
+	f(CL(1, 2, 3, 4, 5),
+		CL(1, 2, 3, 4, 5))
+}
+
+func TestEmptyRoot(t *testing.T) {
+	e := &E{Tag: "h1"}
+	root := &EmptyRoot{Element: e}
+	if !reflect.DeepEqual(root.Render(), CL(e)) {
+		t.Errorf("invalid EmptyRoot.Render() result")
 	}
 }
 
-type TestGetElementData struct {
-	c     *Component
-	isNil bool
-}
-
-func TestGetElement(t *testing.T) {
-	data := []TestGetElementData{
-		{
-			c: NC(
-				&C{
-					Tag: "div",
-				},
-				func(this *Component) []interface{} {
-					return []interface{}{"nil"}
-				},
-			),
-			isNil: true,
-		},
-		{
-			c: NC(
-				&C{
-					Tag: "div",
-					Attrs: map[string]string{
-						"need-component": "true",
-					},
-				},
-				func(this *Component) []interface{} {
-					return []interface{}{"nil"}
-				},
-			),
-			isNil: false,
-		},
+func TestLittleUtils(t *testing.T) {
+	// IsComponent
+	if !IsComponent(&C{}) {
+		t.Error("invalid IsComponent result #1")
+	}
+	if IsComponent(&E{}) {
+		t.Error("invalid IsComponent result #2")
 	}
 
-	for _, el := range data {
-		el.c.RC = GetEmptyRenderCore()
-		_c := el.c.Element()
-		if _c == nil && !el.isNil {
-			t.Error("meh, I just want 100% coverage")
-			continue
-		}
+	// IsElement
+	if !IsElement(&E{}) {
+		t.Error("invalid IsElement result #1")
+	}
+	if IsElement(&C{}) {
+		t.Error("invalid IsElement result #2")
+	}
 
-		_c = el.c.GetElementUnsafely()
-		if _c == nil && !el.isNil {
-			t.Error("meh, I just want 100% coverage")
-		}
+	var cI interface{} = &C{}
+	if !IsComponent(I2C(cI)) {
+		t.Error("invalid I2C result")
+	}
+
+	var eI interface{} = &E{}
+	if !IsElement(I2E(eI)) {
+		t.Error("invalid I2E result")
 	}
 }
 
-func TestNewFor(t *testing.T) {
-	this := &C{
-		Data: map[string]interface{}{
-			"arr": []interface{}{
-				"foo",
-				"bar",
-				"lol",
-			},
-			"map": map[string]string{
-				"foo": "bar",
-				"lol": "wow",
-				"x": "y",
-			},
-		},
-		Attrs: map[string]string{
-			"id": "list",
-		},
-		RC: GetEmptyRenderCore(),
-	}
-
-	data := []TestNewForData{
-		{
-			data: "arr",
-			renderer: func(i interface{}, el interface{}) interface{} {
-				return NE(
-					&C{
-						Tag: "li",
-						Attrs: map[string]string{
-							"class": "list__item",
-						},
-					},
-					i.(int), ": ", el.(string),
-				)
-			},
-			childesLength: 3,
-		},
-		{
-			data: "anotherarr", // error here
-			renderer: func(i interface{}, el interface{}) interface{} {
-				return NE(
-					&C{
-						Tag: "li",
-						Attrs: map[string]string{
-							"class": "list__item",
-						},
-					},
-					i.(int), ": ", el.(string),
-				)
-			},
-			childesLength: 0,
-		},
-		{
-			data: "arr",
-			renderer: func(i interface{}, el interface{}) interface{} {
-				return NE(
-					&C{
-						Tag: "li",
-					},
-					i.(int), ": ", el.(string),
-				)
-			},
-			childesLength: 3,
-		},
-		{
-			data: "map",
-			renderer: func(key, val interface{}) interface{} {
-				return NE(
-					&C{
-						Tag:"li",
-					},
-					key.(string), ": ", val.(string),
-				)
-			},
-			childesLength: 3,
-		},
-	}
-
-	for _, el := range data {
-		childesRenderer := func(this *Component) []interface{} {
-			return ToGetComponentList(NE(&C{Tag: "ul"}, NewFor(el.data, this, el.renderer)))
+func TestElementParentComponent(t *testing.T) {
+	f := func(e *E, haveParent bool) {
+		p := e.ParentComponent()
+		if (p == nil || p.Component == nil) && haveParent {
+			t.Errorf("element parent is nil: %v", e)
 		}
-
-		c := NC(this, childesRenderer)
-		c.RC = GetEmptyRenderCore()
-
-		elementC := I2C(c.Childes(c)[0])
-		elementC.RC = GetEmptyRenderCore()
-
-		childes := elementC.Childes(elementC)
-
-		if len(childes) != el.childesLength {
-			t.Errorf("invalid childes list length got: %d, want: %d", len(childes), el.childesLength)
+		if p != nil && p.Component != nil && !haveParent {
+			t.Errorf("element parent isn't nil: %v", e)
 		}
 	}
-}
 
-func TestIsString(t *testing.T) {
-	s := "string"
-	if !IsString(s) {
-		t.Errorf("wtf?!?!: this string not string: %s", s)
-	}
+	e1 := NE(&E{})
+	e2 := NE(&E{Component: &C{}}, e1)
+	p := NE(&E{}, e2)
+	p.UpdateChildes()
+
+	f(e1, true)
+	f(e2, false)
 }

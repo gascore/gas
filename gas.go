@@ -1,8 +1,6 @@
 package gas
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // New create new gas application with custom backend
 func New(be BackEnd, startPoint string, c *Component) (Gas, error) {

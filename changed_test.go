@@ -1,293 +1,81 @@
 package gas
 
-// import (
-// 	"fmt"
-// 	"log"
-// 	"testing"
-// )
+import "testing"
 
-// type TestChangedData struct {
-// 	x         interface{}
-// 	y         interface{}
-// 	answer    bool
-// 	haveError bool
-// 	notGopherjs bool
-// }
+func TestChanged(t *testing.T) {
+	f := func(a, b interface{}, isChanged bool, haveError bool) {
+		ic, err := Changed(a, b)
 
-// func TestChanged(t *testing.T) {
-// 	c1 := &C{
-// 		Data: map[string]interface{}{
-// 			"1": 2,
-// 		},
-// 		Hooks: Hooks{
-// 			Mounted: func(this *Component) error {
-// 				fmt.Println("it is interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Tag: "h1",
-// 	}
-// 	c2 := &C{
-// 		Data: map[string]interface{}{
-// 			"1": 2,
-// 		},
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Methods: map[string]Method{
-// 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("method 1")
-// 				return nil, nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c3 := &C{
-// 		Data: map[string]interface{}{
-// 			"1":    2,
-// 			"such": "empty",
-// 		},
-// 		Hooks: Hooks{
-// 			Mounted: func(this *Component) error {
-// 				fmt.Println("it is interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Tag: "h1",
-// 	}
-// 	c4 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Methods: map[string]Method{
-// 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("method 1")
-// 				return nil, nil
-// 			},
-// 			"2": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("method 2")
-// 				return nil, nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c5 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Methods: map[string]Method{
-// 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("method 1")
-// 				return nil, nil
-// 			},
-// 			"2": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("method 31231231231231231313131")
-// 				return nil, nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c6 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Watchers: map[string]Watcher{
-// 			"1": func(this *Component, new, old interface{}) error {
-// 				log.Println("watcher 1")
-// 				return nil
-// 			},
-// 			"2": func(this *Component, new, old interface{}) error {
-// 				log.Println("watcher2 2")
-// 				return nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c7 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Watchers: map[string]Watcher{
-// 			"1": func(this *Component, new, old interface{}) error {
-// 				log.Println("watcher 1")
-// 				return nil
-// 			},
-// 			"2": func(this *Component, new, old interface{}) error {
-// 				log.Println("watcher 31231231231231231313131")
-// 				return nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c8 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Methods: map[string]Method{
-// 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("computed 1")
-// 				return 1, nil
-// 			},
-// 			"2": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("computed 2")
-// 				return 2, nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c9 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Methods: map[string]Method{
-// 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("watcher 1")
-// 				return 1, nil
-// 			},
-// 			"2": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("watcher 31231231231231231313131")
-// 				return 33243242, nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c10 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Methods: map[string]Method{
-// 			"1": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("watcher 1")
-// 				return 1, nil
-// 			},
-// 			"2": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("watcher 231231231231231313131")
-// 				return 243242, nil
-// 			},
-// 			"3": func(this *Component, values ...interface{}) (interface{}, error) {
-// 				log.Println("watcher 3")
-// 				return 3, nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
-// 	c11 := &C{
-// 		Hooks: Hooks{
-// 			Created: func(this *Component) error {
-// 				fmt.Println("it is not interesting")
-// 				return nil
-// 			},
-// 		},
-// 		Tag: "h2",
-// 	}
+		if err == nil {
+			if haveError {
+				t.Error("except error, but don't got it")
+			}
 
-// 	e1 := &C{
-// 		Tag:       "h1",
-// 		isElement: true,
-// 	}
-// 	e2 := &C{
-// 		Attrs: map[string]string{
-// 			"class": "mega class",
-// 		},
-// 		Tag:       "h2",
-// 		isElement: true,
-// 	}
-// 	e3 := &C{
-// 		Tag:       "h1",
-// 		isElement: false,
-// 	}
-// 	e4 := &C{
-// 		Tag:       "li",
-// 		isElement: true,
-// 		For: ForDirective{
-// 			isItem:       true,
-// 			itemValueI:   0,
-// 			itemValueVal: "some",
-// 		},
-// 	}
-// 	e5 := &C{
-// 		Tag:       "li",
-// 		isElement: true,
-// 	}
-// 	e6 := &C{
-// 		Tag:       "li",
-// 		isElement: true,
-// 		For: ForDirective{
-// 			isItem:       true,
-// 			itemValueI:   1,
-// 			itemValueVal: "some",
-// 		},
-// 	}
+			if ic != isChanged {
+				t.Errorf("invalid Changed result except: %t, got: %t", isChanged, ic)
+			}
+		} else if !haveError {
+			t.Errorf("error from Changed: %s", err.Error())
+		}
+	}
 
-// 	data := []TestChangedData{
-// 		{x: 0, y: 1, answer: true},
-// 		{x: 1, y: 1, answer: false},
-// 		{x: "test", y: "test1", answer: true},
-// 		{x: "test", y: "test", answer: false},
+	e1 := &E{
+		Tag: "h1",
+	}
 
-// 		{x: c1, y: c2, answer: true},
-// 		{x: c1, y: c1, answer: false},
-// 		{x: c3, y: c2, answer: true},
-// 		{x: c1, y: c3, answer: true}, // c1 and c3 not same because CompareHooks check hooks pointers, not what they are doing. But not in gopherjs
-// 		{x: c2, y: c4, answer: true, notGopherjs: true}, // methods
-// 		{x: c4, y: c5, answer: true, notGopherjs: true}, // methods
-// 		{x: c6, y: c7, answer: true, notGopherjs: true}, // watchers
-// 		{x: c8, y: c9, answer: true, notGopherjs: true}, // computeds
-// 		{x: c9, y: c10, answer: true}, // computeds
-// 		{x: c11, y: &C{Tag: "h2"}, answer: true}, // hooks
+	e2 := &E{
+		Tag: "h2",
+	}
 
-// 		{x: e1, y: e2, answer:true},
-// 		{x: e1, y: e1, answer: false},
-// 		{x: e3, y: e2, answer: true},
-// 		{x: e1, y: e3, answer: true},
-// 		{x: e4, y: e5, answer: true},
-// 		{x: e4, y: e6, answer: true},
+	c1 := &C{
+		ElementIsImportant: true,
+		Element:            e1,
+	}
 
-// 		{x: 0, y: "1",  answer:true},
-// 		{x: []int{1, 2}, y: []int{3, 4}, answer: false, haveError: true},
-// 	}
+	c2 := &C{
+		ElementIsImportant: true,
+		Element:            e2,
+	}
 
-// 	for i, el := range data {
-// 		isChanged, err := Changed(el.x, el.y)
-// 		if err != nil {
-// 			if el.haveError {
-// 				continue
-// 			}
+	// atomic types
+	f("1", "1", false, false)
 
-// 			t.Errorf("error while testing Changed: %s", err.Error())
-// 			return
-// 		}
+	// various types
+	f("1", 1, true, false)
+	f(&C{}, &E{}, true, false)
 
-// 		if el.notGopherjs {
-// 			continue
-// 		}
+	// not supported type
+	f(Gas{}, Gas{}, true, true)
 
-// 		if isChanged != el.answer {
-// 			t.Errorf("Compare %d was incorrect, got: %t, want: %t", i, isChanged, el.answer)
-// 		}
-// 	}
-// }
+	// empty stucts
+	f(&E{}, &E{}, false, false)
+	f(&C{}, &C{}, false, false)
+
+	// Component.Element
+	f(c1, c2, true, false)
+	f(c1, c1, false, false)
+
+	// Element.Component
+	f(&E{Component: c1}, &E{Component: c2}, true, false)
+	f(&E{Component: c1}, &E{Component: c1}, false, false)
+	f(&E{Component: c1}, &E{}, true, false)
+
+	// attrs
+	f(&E{Attrs: map[string]string{"id": "wow"}}, &E{Attrs: map[string]string{"id": "wow"}}, false, false)
+	f(&E{Attrs: map[string]string{"id": "wow"}}, &E{Attrs: map[string]string{"id": "wow", "class": "lol"}}, true, false)
+	f(&E{Attrs: map[string]string{"id": "wow"}}, &E{Attrs: map[string]string{"id": "lol"}}, true, false)
+
+	// watchers
+	f(&C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, &C{}, true, false)
+	f(&C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, &C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, true, false)
+
+	// hooks
+	m1 := func() error { return nil }
+	m2 := func() (bool, error) { return false, nil }
+
+	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{Created: m1}}, false, false)
+	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{}}, true, false)
+
+	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{BeforeCreated: m2}}, false, false) // with control
+	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{}}, true, false)                   // with control
+}

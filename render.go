@@ -41,6 +41,11 @@ func (rc *RenderCore) Add(node *RenderNode) {
 	rc.queue = append(rc.queue, node)
 }
 
+// GetAll return render nodes from queue
+func (rc *RenderCore) GetAll() []*RenderNode {
+	return rc.queue
+}
+
 // Exec run all render nodes in render core
 func (rc *RenderCore) Exec() error {
 	for _, node := range rc.queue {

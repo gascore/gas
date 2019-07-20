@@ -11,3 +11,9 @@ type G = Gas
 
 // NE alias for NewElement
 var NE = NewElement
+
+// FC alias for FunctionalComponent
+type FC = FunctionalComponent
+
+// NFC alias for NewFunctionalComponent
+var NFC = NewFunctionalComponent

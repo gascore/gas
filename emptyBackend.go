@@ -1,7 +1,9 @@
 package gas
 
 // emptyBackEnd empty backend for testing backend calling methods
-type emptyBackEnd struct{}
+type emptyBackEnd struct {
+	logger func(*RenderNode)
+}
 
 // GetEmptyRenderCore return epmty render core
 func GetEmptyRenderCore() *RenderCore {
@@ -15,6 +17,10 @@ func GetEmptyBackend() BackEnd {
 
 // ExecNode return nil
 func (e emptyBackEnd) ExecNode(node *RenderNode) error {
+	if e.logger != nil {
+		e.logger(node)
+	}
+
 	return nil
 }
 

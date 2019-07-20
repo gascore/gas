@@ -4,32 +4,32 @@ import "testing"
 
 func TestUpdateChildes(t *testing.T) {
 	tree := NE(
-		&E{Tag:"main",RC:GetEmptyRenderCore()},
+		&E{Tag: "main", RC: GetEmptyRenderCore()},
 		NE(
-			&E{Tag:"div"},
+			&E{Tag: "div"},
 			"wow",
 		),
 		NE(
-			&E{Tag:"h1",Binds:map[string]Bind{"id": func()string {return "wow"}}},
+			&E{Tag: "h1", Binds: map[string]Bind{"id": func() string { return "wow" }}},
 			"Title",
 		),
 		NE(
-			&E{Tag:"p"},
+			&E{Tag: "p"},
 			"Lorem ipsum dolore",
 			" ",
 			NE(
-				&E{Tag: "i",Binds:map[string]Bind{"id": func()string {return "lol"},"class": func()string {return "some"}}},
+				&E{Tag: "i", Binds: map[string]Bind{"id": func() string { return "lol" }, "class": func() string { return "some" }}},
 				"opsum",
 			),
 			NE(
 				&E{Tag: "b"},
 				"fote",
 				NE(
-					&E{Tag:"i"},
+					&E{Tag: "i"},
 					"wate",
 				),
 				NE(
-					&E{HTML:HTMLDirective{Render:func()string{return "<h2>some</h2>"}}},
+					&E{HTML: HTMLDirective{Render: func() string { return "<h2>some</h2>" }}},
 				),
 			),
 		),
@@ -53,8 +53,8 @@ func TestUpdateChildes(t *testing.T) {
 				if val() != e.RenderedBinds[key] {
 					t.Errorf("invalid child RBinds value key: %v, val: %v", key, e.RenderedBinds[key])
 				}
-			} 
-		} 
+			}
+		}
 	}
 
 	isChildValid(tree.Childes[0])
@@ -64,8 +64,59 @@ func TestUpdateChildes(t *testing.T) {
 	isChildValid(tree.Childes[2].(*E).Childes[3])
 	isChildValid(tree.Childes[2].(*E).Childes[3].(*E).Childes[1])
 	isChildValid(tree.Childes[2].(*E).Childes[3].(*E).Childes[2])
-	
+
 	if tree.Childes[2].(*E).Childes[3].(*E).Childes[2].(*E).HTML.Rendered == "" {
 		t.Error("invalid html directive")
 	}
+}
+
+func TestUpdateElementChildes(t *testing.T) {
+	var nodes []*RenderNode
+
+	root := &exampleRoot{
+		msg:     "no",
+		counter: 5,
+	}
+	c := &C{
+		RC: &RenderCore{
+			BE: emptyBackEnd{
+				logger: func(node *RenderNode) {
+					// fmt.Println("NODE", node)
+					nodes = append(nodes, node)
+				},
+			},
+		},
+		Root: root,
+	}
+	root.c = c
+
+	el := root.c.Init()
+	el.Update()
+
+	// fmt.Println(el.Childes[2].(*E).Childes)
+	// fmt.Println(el.Childes[3].(*E).Childes)
+	if len(nodes) != 4 {
+		t.Errorf("not enough render nodes, want: 4, but got: %d, nodes: %v", len(nodes), nodes)
+	}
+	// fmt.Println(el.Childes[3].(*E).Childes)
+	// fmt.Println(el.Childes)
+	nodes = []*RenderNode{}
+
+	root.counter = 6
+	root.msg = "wow"
+
+	root.c.Update()
+	// fmt.Println(el.Childes[2].(*E).Childes[0])
+	if len(nodes) != 1 {
+		// fmt.Println(nodes[0])
+		t.Errorf("not enough render nodes, want: 1, but got: %d, nodes: %v", len(nodes), nodes)
+	}
+	nodes = []*RenderNode{}
+
+	// fmt.Println(nodes)
+	// fmt.Println(nodes[0])
+	// fmt.Println(nodes[1])
+
+	// 	fmt.Println(el.Childes[2].(*E).Childes)
+	// 	fmt.Println(el.Childes[3].(*E).Childes)
 }

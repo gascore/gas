@@ -9,8 +9,6 @@ type RenderCore struct {
 
 // RenderNode node storing changes
 type RenderNode struct {
-	index int // The index of the item in the heap.
-
 	Type RenderType
 
 	New, Old                     interface{} // *Component, string, int, etc

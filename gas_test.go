@@ -1,6 +1,8 @@
 package gas
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNew(t *testing.T) {
 	c := &C{Root: &exampleRoot{}}
@@ -26,7 +28,12 @@ func TestNew(t *testing.T) {
 	}
 }
 
-type exampleRoot struct{}
+type exampleRoot struct {
+	c *C
+
+	msg     string
+	counter int
+}
 
 func (root *exampleRoot) Render() []interface{} {
 	return CL(
@@ -36,13 +43,34 @@ func (root *exampleRoot) Render() []interface{} {
 					"class": "wow",
 				},
 			},
-			"text",
+			root.msg,
+			func() interface{} {
+				if root.msg == "wow" {
+					return "Message is wow"
+				}
+				return nil
+			},
 		),
 		NE(
 			&E{
 				Tag: "h1",
 			},
-			"header",
+			root.counter,
+		),
+		func() interface{} {
+			if root.counter == 5 {
+				return "Number is 5!"
+			}
+			return nil
+		}(),
+		NE(
+			&E{},
+			func() interface{} {
+				if root.counter == 6 {
+					return NE(&E{Tag: "i"}, "Counter is 6")
+				}
+				return NE(&E{Tag: "b"}, "Counter isn't 6")
+			}(),
 		),
 	)
 }

@@ -24,7 +24,7 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 }
 
 func isComponentsEquals(newC, oldC *C) bool {
-	isEquals := newC.ElementIsImportant == oldC.ElementIsImportant && 
+	isEquals := newC.ElementIsImportant == oldC.ElementIsImportant &&
 		newC.RefsAllowed == oldC.RefsAllowed &&
 		compareHooks(newC.Hooks, oldC.Hooks) &&
 		compareWatchers(newC.Watchers, oldC.Watchers)

@@ -3,32 +3,59 @@ package gas
 type FunctionalComponent struct {
 	c *C
 
-	counter int
-	states  []interface{}
+	notPointer bool
+	statesCounter    int
+	states     []interface{}
+	
+	effects []func()
 
-	childes []interface{}
+	childes func()[]interface{}
 }
 
-func (root *FunctionalComponent) UseState(defaultVal interface{}) (interface{}, func(interface{})) {
-	i := root.counter
-	root.counter++
-
-	setVal := func(newVal interface{}) {
-		root.states[i] = newVal
-		go root.c.Update()
-	}
+func (root *FunctionalComponent) UseState(defaultVal interface{}) (func()interface{}, func(interface{})) {
+	i := root.statesCounter
+	root.statesCounter++
 
 	if len(root.states)-1 < i {
 		root.states = append(root.states, defaultVal)
 	}
 
-	return root.states[i], setVal
+	getVal := func()interface{}{
+		return root.states[i]
+	}
+	setVal := func(newVal interface{}) {
+		root.states[i] = newVal
+		go root.c.Update()
+	}
+
+	return getVal, setVal
 }
 
-func (root *FunctionalComponent) Init(childes ...interface{}) *E {
+func (root *FunctionalComponent) UseEffect(f func()) {
+	root.effects = append(root.effects, f)
+}
+
+func (root *FunctionalComponent) Init(childes func()[]interface{}) *E {
 	root.childes = childes
+
+	runEffects := func() error {
+		for _, effect := range root.effects {
+			err := effect()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	c := &C{
-		Root: root,
+		NotPointer: root.notPointer,
+		Root:       root,
+		Hooks: gas.Hooks{
+			Created: runEffects,
+			Mounted: runEffects,
+			Updated: runEffects,
+		},
 	}
 	root.c = c
 
@@ -36,30 +63,29 @@ func (root *FunctionalComponent) Init(childes ...interface{}) *E {
 }
 
 func (root *FunctionalComponent) Render() []interface{} {
-	root.counter = 0
-	return root.childes
+	root.statesCounter = 0
+	return root.childes()
 }
 
-func NewFunctionalComponent() *FunctionalComponent {
+func NewFunctionalComponent(notPointer bool) *FunctionalComponent {
 	/*
 		Example:
-		function SomeComponent() *gas.E {
-			f := gas.NFC()
+		func FunctionalExample() *gas.E {
+			f := gas.NFC(true)
 
-			msg, setMsg := f.UseState("empty message")
-			msg = msg.(string)
+			getCounter, setCounter := f.UseState(0)
 
-			return f.Init(
-				gas.NE(
-					&E{Tag: "h1"},
-					msg,
-				),
-			)
+			return f.Init(func()[]interface{} {return gas.CL(
+				gas.NE(&gas.E{Tag: "button", Handlers: map[string]gas.Handler{"click": func(e gas.Object) { setCounter(getCounter().(int) + 1) }}}, "+"),
+				getCounter(),
+				gas.NE(&gas.E{Tag: "button", Handlers: map[string]gas.Handler{"click": func(e gas.Object) { setCounter(getCounter().(int) - 1) }}}, "-"),
+			)})
 		}
 	*/
 
 	return &FunctionalComponent{
-		counter: 0,
-		states:  []interface{}{},
+		counter:    0,
+		states:     []interface{}{},
+		notPointer: notPointer,
 	}
 }

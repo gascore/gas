@@ -4,7 +4,7 @@ type FunctionalComponent struct {
 	c *C
 
 	counter int
-	states  map[int]interface{}
+	states  []interface{}
 
 	childes []interface{}
 }
@@ -60,6 +60,6 @@ func NewFunctionalComponent() *FunctionalComponent {
 
 	return &FunctionalComponent{
 		counter: 0,
-		states:  make(map[int]interface{}),
+		states:  []interface{}{},
 	}
 }

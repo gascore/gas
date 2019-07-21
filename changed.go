@@ -16,7 +16,7 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 		return !isComponentsEquals(I2C(newEl), I2C(oldEl)), nil
 	case *Element:
 		return !isNodesEquals(I2E(newEl), I2E(oldEl)), nil
-	case bool, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+	case bool, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
 		return newEl != oldEl, nil
 	default:
 		return false, fmt.Errorf("changed: invalid `newEl` or `oldEl`. types: %T, %T", newEl, oldEl)

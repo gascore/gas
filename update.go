@@ -21,7 +21,7 @@ func (e *Element) Update() error {
 	}
 
 	e.UpdateChildes()
-	err := e.RC.UpdateElementChildes(_el, e.Childes, e.OldChildes)
+	err := e.RC.UpdateElementChildes(_el, e, e.Childes, e.OldChildes)
 	if err != nil {
 		return err
 	}
@@ -51,6 +51,7 @@ func (e *Element) ReCreate() {
 	e.RC.Add(&RenderNode{
 		Type: RecreateType,
 		New:  e,
+		Parent: e.Parent,
 	})
 	go e.RC.Exec()
 }
@@ -90,7 +91,7 @@ func (e *Element) UpdateChildes() {
 }
 
 // UpdateElementChildes compare new and old trees
-func (rc *RenderCore) UpdateElementChildes(_el interface{}, new, old []interface{}) error {
+func (rc *RenderCore) UpdateElementChildes(_el interface{}, el *Element, new, old []interface{}) error {
 	for i := 0; i < len(new) || i < len(old); i++ {
 		var newEl interface{}
 		if len(new) > i {
@@ -102,7 +103,7 @@ func (rc *RenderCore) UpdateElementChildes(_el interface{}, new, old []interface
 			oldEl = old[i]
 		}
 
-		err := rc.updateElement(_el, newEl, oldEl, i)
+		err := rc.updateElement(_el, el, newEl, oldEl, i)
 		if err != nil {
 			return err
 		}
@@ -112,12 +113,13 @@ func (rc *RenderCore) UpdateElementChildes(_el interface{}, new, old []interface
 }
 
 // updateElement trying to update element
-func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old interface{}, index int) error {
+func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, old interface{}, index int) error {
 	// if element has created
 	if old == nil {
 		rc.Add(&RenderNode{
 			Type:       CreateType,
 			New:        new,
+			Parent: 	parent,
 			NodeParent: _parent,
 		})
 
@@ -145,6 +147,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 		rc.Add(&RenderNode{
 			Type:       DeleteType,
 			NodeParent: _parent,
+			Parent: 	parent,
 			NodeOld:    _el,
 			Old:        old,
 		})
@@ -163,6 +166,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 			Type:       ReplaceType,
 			NodeParent: _parent,
 			NodeOld:    _el,
+			Parent: 	parent,
 			New:        new,
 			Old:        old,
 		})
@@ -187,9 +191,9 @@ func (rc *RenderCore) updateElement(_parent interface{}, new interface{}, old in
 	}
 
 	if newE.IsPointer {
-		err = rc.UpdateElementChildes(_el, newE.Childes, newE.OldChildes)
+		err = rc.UpdateElementChildes(_el, newE, newE.Childes, newE.OldChildes)
 	} else {
-		err = rc.UpdateElementChildes(_el, newE.Childes, oldE.Childes)
+		err = rc.UpdateElementChildes(_el, oldE, newE.Childes, oldE.Childes)
 	}
 	if err != nil {
 		return err

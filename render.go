@@ -11,10 +11,10 @@ type RenderCore struct {
 type RenderNode struct {
 	Type RenderType
 
-	New, Old                     interface{} // *Component, string, int, etc
-	NodeParent, NodeNew, NodeOld interface{} // *dom.Element, etc
-
-	Data map[string]interface{} // using only for Type == DataType
+	Parent *Element
+	
+	New, Old			 		 interface{} // *Element, string, int, ...
+	NodeParent, NodeNew, NodeOld interface{} // *dom.Element
 }
 
 // RenderType renderNode type

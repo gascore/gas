@@ -8,7 +8,7 @@ Example: [gascore.github.io](https://gascore.github.io)
 
 0. [gascore/gas](https://github.com/gascore/gas) - gas framework core
 1. [gascore/gas/web](https://github.com/gascore/gas/blob/master/web) - wasm/gopherjs backend
-2. [gascore/gasx](https://github.com/gascore/gasx) - projects manager for gas applications
+2. [gascore/gas-cli](https://github.com/gascore/gas-cli) - projects manager for gas applications
 3. [gascore/std](https://github.com/gascore/std) - standard library for gas framework
 
 ### Roadmap

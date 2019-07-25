@@ -99,14 +99,17 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 }
 
 // CallUpdatedIfCan call component parent (true component) Updated hook
-func CallUpdatedIfCan(i interface{}) error {
+func CallUpdatedIfCan(i interface{}, p *Element) error {
+	var c *Component
 	e, ok := i.(*Element)
-	if !ok {
-		return nil
+	if ok {
+		c = e.ParentComponent().Component
+	} else {
+		c = p.Component
+		if c == nil {
+			c = p.ParentComponent().Component
+		}
 	}
-
-	// run Updated hook for component parent
-	c := e.ParentComponent().Component
 
 	if c.Hooks.Updated != nil {
 		err := c.Hooks.Updated()
@@ -119,14 +122,17 @@ func CallUpdatedIfCan(i interface{}) error {
 }
 
 // CallBeforeUpdateIfCan call component parent (true component) BeforeUpdate
-func CallBeforeUpdateIfCan(i interface{}) error {
+func CallBeforeUpdateIfCan(i interface{}, p *Element) error {
+	var c *Component
 	e, ok := i.(*Element)
-	if !ok {
-		return nil
+	if ok {
+		c = e.ParentComponent().Component
+	} else {
+		c = p.Component
+		if c == nil {
+			c = p.ParentComponent().Component
+		}
 	}
-
-	// run Updated hook for component parent
-	c := e.ParentComponent().Component
 
 	if c.Hooks.BeforeUpdate != nil {
 		err := c.Hooks.BeforeUpdate()

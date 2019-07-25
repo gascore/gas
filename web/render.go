@@ -31,7 +31,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeOld type")
 		}
 
-		err = replaceChild(_parent, _new, _old, node.New, node.Old)
+		err = replaceChild(_parent, _new, _old, node.New, node.Old, node.Parent)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeParent type")
 		}
 
-		err = appendChild(_parent, _new, node.New)
+		err = appendChild(_parent, _new, node.New, node.Parent)
 		if err != nil {
 			return err
 		}
@@ -68,7 +68,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeOld")
 		}
 
-		err := removeChild(_parent, _old, node.Old)
+		err := removeChild(_parent, _old, node.Old, node.Parent)
 		if err != nil {
 			return err
 		}
@@ -116,13 +116,13 @@ func (w BackEnd) ChildNodes(node interface{}) []interface{} {
 	return iNodes
 }
 
-func replaceChild(_p, _new, _old dom.Node, new interface{}, old interface{}) error {
+func replaceChild(_p, _new, _old dom.Node, new interface{}, old interface{}, p *gas.E) error {
 	err := gas.CallBeforeDestroyIfCan(old)
 	if err != nil {
 		return err
 	}
 
-	err = gas.CallBeforeUpdateIfCan(new)
+	err = gas.CallBeforeUpdateIfCan(new, p)
 	if err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func replaceChild(_p, _new, _old dom.Node, new interface{}, old interface{}) err
 
 	_p.ReplaceChild(_new, _old)
 
-	err = gas.CallUpdatedIfCan(new)
+	err = gas.CallUpdatedIfCan(new, p)
 	if err != nil {
 		return err
 	}
@@ -147,15 +147,15 @@ func replaceChild(_p, _new, _old dom.Node, new interface{}, old interface{}) err
 	return nil
 }
 
-func appendChild(_p, _c dom.Node, new interface{}) error {
-	err := gas.CallBeforeUpdateIfCan(new)
+func appendChild(_p, _c dom.Node, new interface{}, p *gas.E) error {
+	err := gas.CallBeforeUpdateIfCan(new, p)
 	if err != nil {
 		return err
 	}
 
 	_p.AppendChild(_c)
 
-	err = gas.CallUpdatedIfCan(new)
+	err = gas.CallUpdatedIfCan(new, p)
 	if err != nil {
 		return err
 	}
@@ -168,8 +168,8 @@ func appendChild(_p, _c dom.Node, new interface{}) error {
 	return nil
 }
 
-func removeChild(_p, _e dom.Node, old interface{}) error {
-	err := gas.CallBeforeUpdateIfCan(old)
+func removeChild(_p, _e dom.Node, old interface{}, p *gas.E) error {
+	err := gas.CallBeforeUpdateIfCan(old, p)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func removeChild(_p, _e dom.Node, old interface{}) error {
 
 	_p.RemoveChild(_e)
 
-	err = gas.CallUpdatedIfCan(old)
+	err = gas.CallUpdatedIfCan(old, p)
 	if err != nil {
 		return err
 	}

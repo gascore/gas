@@ -14,6 +14,3 @@ var NE = NewElement
 
 // F alias for FunctionalComponent
 type F = FunctionalComponent
-
-// NF alias for NewFunctionalComponent
-var NF = NewFunctionalComponent

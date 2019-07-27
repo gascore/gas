@@ -2,24 +2,19 @@ package gas
 
 // FunctionalComponent wrapper for Component with react hooks (in gas maner)
 type FunctionalComponent struct {
-	c *C
+	C *C
 
 	statesCounter  int
 	states         []interface{}
 	effectsCounter int
 	effects        []Hook
 
-	renderer FCRenderer
+	renderer func() []interface{}
 }
 
-// FCRenderer functional component body
-type FCRenderer func(*FunctionalComponent) []interface{}
-
-// NewFunctionalComponent create new FunctionalComponent
-func NewFunctionalComponent(r FCRenderer, notPointer bool) *E {
-	f := &FunctionalComponent{
-		renderer: r,
-	}
+// Init create *C from *F
+func (f *FunctionalComponent) Init(notPointer bool, renderer func() []interface{}) *E {
+	f.renderer = renderer
 
 	c := &C{
 		NotPointer: notPointer,
@@ -29,7 +24,7 @@ func NewFunctionalComponent(r FCRenderer, notPointer bool) *E {
 			Mounted: f.runEffects,
 		},
 	}
-	f.c = c
+	f.C = c
 
 	return c.Init()
 }
@@ -49,7 +44,7 @@ func (root *FunctionalComponent) UseState(defaultVal interface{}) (func() interf
 
 	setVal := func(newVal interface{}) {
 		root.states[i] = newVal
-		root.c.Update()
+		go root.C.Update()
 	}
 
 	return getVal, setVal
@@ -69,7 +64,7 @@ func (root *FunctionalComponent) UseEffect(f Hook) {
 func (root *FunctionalComponent) Render() []interface{} {
 	root.statesCounter = 0
 	root.effectsCounter = 0
-	return root.renderer(root)
+	return root.renderer()
 }
 
 func (root *FunctionalComponent) runEffects() error {

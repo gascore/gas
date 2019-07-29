@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gascore/dom"
+	"github.com/gascore/dom/js"
 	"github.com/gascore/gas"
 )
 
@@ -62,9 +63,18 @@ func CreateElement(el interface{}) (dom.Node, error) {
 	}
 }
 
+func newNodeEl(tag string) (*dom.Element) {
+	switch tag {
+	case "animate", "animatemotion", "animatetransform", "circle", "clippath", "color-profile", "defs", "desc", "discard", "ellipse", "feblend", "fecolormatrix", "fecomponenttransfer", "fecomposite", "feconvolvematrix", "fediffuselighting", "fedisplacementmap", "fedistantlight", "fedropshadow", "feflood", "fefunca", "fefuncb", "fefuncg", "fefuncr", "fegaussianblur", "feimage", "femerge", "femergenode", "femorphology", "feoffset", "fepointlight", "fespecularlighting", "fespotlight", "fetile", "feturbulence", "filter", "foreignobject", "g", "hatch", "hatchpath", "image", "line", "lineargradient", "marker", "mask", "mesh", "meshgradient", "meshpatch", "meshrow", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialgradient", "rect", "set", "solidcolor", "stop", "svg", "switch", "symbol", "text", "textpath", "title", "tspan", "unknown", "use", "view":
+		return dom.AsElement(js.Value{dom.Doc.JSValue().Call("createElementNS", "http://www.w3.org/2000/svg", tag)})
+	default:
+		return dom.NewElement(tag) 
+	}
+}
+
 // createHtmlElement create html element without childes
 func createHtmlElement(el *gas.Element) (*dom.Element, error) {
-	_node := dom.NewElement(el.Tag)
+	_node := newNodeEl(el.Tag)
 	if _node == nil {
 		return nil, errors.New("cannot create component")
 	}

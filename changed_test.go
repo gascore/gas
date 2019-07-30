@@ -61,9 +61,9 @@ func TestChanged(t *testing.T) {
 	f(&E{Component: c1}, &E{}, true, false)
 
 	// attrs
-	f(&E{Attrs: map[string]string{"id": "wow"}}, &E{Attrs: map[string]string{"id": "wow"}}, false, false)
-	f(&E{Attrs: map[string]string{"id": "wow"}}, &E{Attrs: map[string]string{"id": "wow", "class": "lol"}}, true, false)
-	f(&E{Attrs: map[string]string{"id": "wow"}}, &E{Attrs: map[string]string{"id": "lol"}}, true, false)
+	f(&E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, &E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, false, false)
+	f(&E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, &E{Attrs: func() map[string]string { return map[string]string{"id": "wow", "class": "lol"} }}, true, false)
+	f(&E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, &E{Attrs: func() map[string]string { return map[string]string{"id": "lol"} }}, true, false)
 
 	// watchers
 	f(&C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, &C{}, true, false)

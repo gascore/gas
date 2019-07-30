@@ -72,15 +72,8 @@ func (e *Element) UpdateChildes() {
 		childE.RC = e.RC
 		childE.Parent = e
 
-		if childE.Binds != nil {
-			if childE.RenderedBinds == nil {
-				childE.RenderedBinds = make(map[string]string)
-			}
-
-			// render binded attributes
-			for bindKey, bindValue := range childE.Binds {
-				childE.RenderedBinds[bindKey] = bindValue()
-			}
+		if childE.Attrs != nil {
+			childE.RAttrs = childE.Attrs()
 		}
 
 		childE.UpdateChildes()
@@ -200,25 +193,4 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 
 	return nil
-}
-
-// UpdateWatchersValues update all elements WatcherValue where element.Watcher = watcher
-func (component *Component) UpdateWatchersValues(watcher string, newVal string) {
-	component.Element.updateWatchersValues(watcher, newVal)
-}
-
-func (e *Element) updateWatchersValues(watcher string, newVal string) {
-	for _, child := range e.Childes {
-		childE, ok := child.(*E)
-		if !ok {
-			continue
-		}
-
-		if childE.Watcher == watcher {
-			e.RC.BE.EditWatcherValue(childE.BEElement(), newVal)
-			continue
-		}
-
-		childE.updateWatchersValues(watcher, newVal)
-	}
 }

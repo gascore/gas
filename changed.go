@@ -18,6 +18,8 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 		return !isNodesEquals(I2E(newEl), I2E(oldEl)), nil
 	case bool, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
 		return newEl != oldEl, nil
+	case fmt.Stringer:
+		return newEl.(fmt.Stringer).String() != oldEl.(fmt.Stringer).String(), nil
 	default:
 		return false, fmt.Errorf("changed: invalid `newEl` or `oldEl`. types: %T, %T", newEl, oldEl)
 	}
@@ -26,8 +28,7 @@ func Changed(newEl, oldEl interface{}) (bool, error) {
 func isComponentsEquals(newC, oldC *C) bool {
 	isEquals := newC.ElementIsImportant == oldC.ElementIsImportant &&
 		newC.RefsAllowed == oldC.RefsAllowed &&
-		compareHooks(newC.Hooks, oldC.Hooks) &&
-		compareWatchers(newC.Watchers, oldC.Watchers)
+		compareHooks(newC.Hooks, oldC.Hooks)
 
 	if isEquals && newC.ElementIsImportant {
 		return isElementsEquals(newC.Element, oldC.Element)
@@ -49,13 +50,12 @@ func isNodesEquals(newE, oldE *E) bool {
 }
 
 func isElementsEquals(newE, oldE *E) bool {
-	return newE.Tag == oldE.Tag &&
-		newE.Watcher == oldE.Watcher &&
-		newE.HTML.Rendered == oldE.HTML.Rendered &&
+	return ElementsCanBeUpdated(newE, oldE) && compareAttributes(newE.RAttrs, oldE.RAttrs)
+}
 
-		compareAttributes(newE.Attrs, oldE.Attrs) &&
-		compareAttributes(newE.RenderedBinds, oldE.RenderedBinds) &&
-
+func ElementsCanBeUpdated(newE, oldE *E) bool {
+	return newE.Tag == oldE.Tag && 
+		newE.HTML.Rendered == oldE.HTML.Rendered && 
 		reflect.ValueOf(newE.HTML.Render).Pointer() == reflect.ValueOf(oldE.HTML.Render).Pointer()
 }
 
@@ -66,20 +66,6 @@ func compareAttributes(newMap, oldMap map[string]string) bool {
 
 	for i, el := range newMap {
 		if el != oldMap[i] {
-			return false
-		}
-	}
-
-	return true
-}
-
-func compareWatchers(new, old map[string]Watcher) bool {
-	if len(new) != len(old) {
-		return false
-	}
-
-	for i, el := range new {
-		if reflect.ValueOf(el).Pointer() != reflect.ValueOf(old[i]).Pointer() {
 			return false
 		}
 	}
@@ -118,4 +104,33 @@ func compareHook(newHook, oldHook Hook) bool {
 	}
 
 	return reflect.ValueOf(newHook).Pointer() == reflect.ValueOf(oldHook).Pointer()
+}
+
+func DiffAttrs(newA, oldA map[string]string) map[string]string {
+	diffMap := make(map[string]string)
+	for key, val := range oldA {
+		if _, ok := diffMap[key]; ok {
+			continue
+		}
+
+		if newA[key] != val {
+			if _, ok := newA[key]; ok {
+				diffMap[key] = newA[key]
+				continue	
+			}
+			
+			diffMap[key] = ""
+		}
+	}
+
+	for key, val := range newA {
+		if _, ok := diffMap[key]; ok {
+			continue
+		}
+
+		if oldA[key] != val {
+			diffMap[key] = val
+		}
+	}
+	return diffMap
 }

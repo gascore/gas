@@ -59,9 +59,6 @@ func (e emptyBackEnd) GetGasEl(g *Gas) interface{} {
 	return "not nil!"
 }
 
-// EditWatcherValue is empty
-func (e emptyBackEnd) EditWatcherValue(el interface{}, newVal string) {}
-
 // ConsoleLog return nil
 func (e emptyBackEnd) ConsoleLog(values ...interface{}) {}
 

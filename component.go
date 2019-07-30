@@ -16,15 +16,10 @@ type Component struct {
 	RefsAllowed bool
 	Refs        map[string]*Element
 
-	Watchers map[string]Watcher
-
 	NotPointer bool // by default component is pointer
 
 	RC *RenderCore
 }
-
-// Watcher function called when input event triggering
-type Watcher func(val interface{}, e Object) (string, error)
 
 // Init initialize component: create element and other stuff
 func (c *Component) Init() *Element {

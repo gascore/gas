@@ -9,18 +9,15 @@ import (
 
 // Element stucture for basic strucutre nodes (html elements, etc)
 type Element struct {
-	UUID  string
-	Tag   string
-	Attrs map[string]string
-
-	Handlers      map[string]Handler // events handlers: onClick, onHover
-	Binds         map[string]Bind    // dynamic attributes
-	RenderedBinds map[string]string  // store binds for changed func
-
-	Watcher string
-	HTML    HTMLDirective
-
+	UUID      string
 	IsPointer bool // by default element isn't pointer
+
+	Tag      string
+	Attrs    func() map[string]string
+	RAttrs   map[string]string  // last rendered Attrs
+	Handlers map[string]Handler // events handlers: onClick, onHover
+
+	HTML HTMLDirective
 
 	getChildes GetChildes
 	Childes    []interface{}
@@ -66,10 +63,10 @@ type HTMLDirective struct {
 	Rendered string // here storing rendered html for Update functions
 }
 
-// Handler -- handler exec function when event trigger
-type Handler func(Object)
+// Handler function for triggering event
+type Handler func(Event)
 
-// Object 'united' dom.Event
+// Object wrapper for js.Value
 type Object interface {
 	String() string
 	Int() int
@@ -84,6 +81,12 @@ type Object interface {
 	Call(string, ...interface{}) Object
 
 	Raw() interface{}
+}
+
+// Event wrapper for dom.Event
+type Event interface {
+	Object
+	Value() string
 }
 
 // BEElement return element in backend implementation

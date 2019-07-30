@@ -37,3 +37,17 @@ func (o object) Call(name string, args ...interface{}) gas.Object {
 
 // ToUniteObject convert dom.Value to gas.Object
 func ToUniteObject(e dom.Value) gas.Object { return object{o: e.JSValue()} }
+
+type event struct{ 
+	gas.Object
+	event dom.Event
+}
+
+func (e event) Value() string {
+	return e.event.Target().Value()
+}
+
+func ToGasEvent(domEvent dom.Event) gas.Event { 
+	e := event{ToUniteObject(domEvent), domEvent}
+	return e
+}

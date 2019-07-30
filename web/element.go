@@ -14,15 +14,17 @@ import (
 // CreateElement render element
 func CreateElement(el interface{}) (dom.Node, error) {
 	switch el := el.(type) {
+	case string:
+		return createTextNode(el)
+	case fmt.Stringer:
+		return createTextNode(el.String())
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+		return createTextNode(fmt.Sprintf("%v", el))
 	case bool:
 		if el {
 			return createTextNode("true")
 		}
 		return createTextNode("false")
-	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		return createTextNode(fmt.Sprintf("%d", el))
-	case string:
-		return createTextNode(el)
 	case *gas.Element:
 		_node, err := createHtmlElement(el)
 		if err != nil {
@@ -63,12 +65,12 @@ func CreateElement(el interface{}) (dom.Node, error) {
 	}
 }
 
-func newNodeEl(tag string) (*dom.Element) {
+func newNodeEl(tag string) *dom.Element {
 	switch tag {
-	case "animate", "animatemotion", "animatetransform", "circle", "clippath", "color-profile", "defs", "desc", "discard", "ellipse", "feblend", "fecolormatrix", "fecomponenttransfer", "fecomposite", "feconvolvematrix", "fediffuselighting", "fedisplacementmap", "fedistantlight", "fedropshadow", "feflood", "fefunca", "fefuncb", "fefuncg", "fefuncr", "fegaussianblur", "feimage", "femerge", "femergenode", "femorphology", "feoffset", "fepointlight", "fespecularlighting", "fespotlight", "fetile", "feturbulence", "filter", "foreignobject", "g", "hatch", "hatchpath", "image", "line", "lineargradient", "marker", "mask", "mesh", "meshgradient", "meshpatch", "meshrow", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialgradient", "rect", "set", "solidcolor", "stop", "svg", "switch", "symbol", "text", "textpath", "title", "tspan", "unknown", "use", "view":
-		return dom.AsElement(js.Value{dom.Doc.JSValue().Call("createElementNS", "http://www.w3.org/2000/svg", tag)})
+	case "animate", "animatemotion", "animatetransform", "circle", "clippath", "color-profile", "defs", "desc", "discard", "ellipse", "feblend", "fecolormatrix", "fecomponenttransfer", "fecomposite", "feconvolvematrix", "fediffuselighting", "fedisplacementmap", "fedistantlight", "fedropshadow", "feflood", "fefunca", "fefuncb", "fefuncg", "fefuncr", "fegaussianblur", "feimage", "femerge", "femergenode", "femorphology", "feoffset", "fepointlight", "fespecularlighting", "fespotlight", "fetile", "feturbulence", "filter", "foreignobject", "g", "hatch", "hatchpath", "image", "line", "lineargradient", "marker", "mask", "mesh", "meshgradient", "meshpatch", "meshrow", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialgradient", "rect", "set", "solidcolor", "stop", "svg", "switch", "symbol", "text", "textpath", "title", "tspan", "unknown", "use", "view", "svg-style", "svg-script", "svg-a":
+		return dom.AsElement(js.Value{dom.Doc.JSValue().Call("createElementNS", "http://www.w3.org/2000/svg", strings.TrimPrefix(tag, "svg-"))})
 	default:
-		return dom.NewElement(tag) 
+		return dom.NewElement(tag)
 	}
 }
 
@@ -81,38 +83,32 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 
 	_node.SetAttribute("data-i", el.UUID) // set data-i for accept element from component methods
 
-	for attrName, attrBody := range el.Attrs {
-		// if !attrIsValid(attrName, component.Tag) {continue} // check if attribute is valid for this tag
+	for attrName, attrBody := range el.RAttrs {
 		_node.SetAttribute(attrName, attrBody)
 	}
 
-	for attrName, bindBody := range el.Binds {
-		_node.SetAttribute(attrName, bindBody())
-	}
-
-	for handlerName, handlerBody := range el.Handlers {
-		// if handlerIsValid(handlerName, component.Tag) {} // check if handler is valid for this tag
-
+	for handlerName, handlerBodyG := range el.Handlers {
+		handlerBody := handlerBodyG
 		handlerNameParsed := strings.Split(handlerName, ".")
 		if len(handlerNameParsed) == 2 {
 			handlerType := handlerNameParsed[0]
-			handlerTarget := handlerNameParsed[1]
+			handlerTarget := strings.ToLower(handlerNameParsed[1])
+			
+			var handlerTargetIsInt bool
+			handlerTargetInt, err := strconv.Atoi(handlerTarget)
+			handlerTargetIsInt = err == nil
+			
 			switch handlerType {
 			case "keyup":
 				_node.AddEventListener("keyup", func(e dom.Event) {
-					if handlerTarget == strings.ToLower(e.Key()) ||
-						handlerTarget == strings.ToLower(e.KeyCode()) {
-						handlerBody(ToUniteObject(e))
+					keyCode, _ := strconv.Atoi(e.KeyCode())
+					if handlerTarget == strings.ToLower(e.Key()) || (handlerTargetIsInt && handlerTargetInt == keyCode) {
+						fmt.Println("key ok", handlerBody)
+						handlerBody(ToGasEvent(e))
 					}
 				})
 				continue
 			case "click":
-				var useTr = false
-				handlerTargetInt, err := strconv.Atoi(handlerTarget)
-				if err != nil {
-					useTr = true
-				}
-
 				_node.AddEventListener("click", func(e dom.Event) {
 					e.PreventDefault() // Because i don't want trigger <a>
 
@@ -121,7 +117,10 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 						return
 					}
 
-					if useTr {
+					var correctKey bool
+					if handlerTargetIsInt {
+						correctKey = handlerTargetInt == buttonClick
+					} else {
 						var parsedButtonClick string
 						switch buttonClick {
 						case 0:
@@ -134,78 +133,20 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 							parsedButtonClick = "unknown"
 						}
 
-						if handlerTarget == parsedButtonClick {
-							handlerBody(ToUniteObject(e))
-						}
+						correctKey = handlerTarget == parsedButtonClick
+					}
 
-					} else {
-						if handlerTargetInt == buttonClick {
-							handlerBody(ToUniteObject(e))
-						}
+					if correctKey {
+						handlerBody(ToGasEvent(e))
 					}
 				})
 
 				continue
 			}
-		} else {
-			_node.AddEventListener(handlerName, func(e dom.Event) {
-				handlerBody(ToUniteObject(e))
-			})
-		}
-	}
-
-	if len(el.Watcher) != 0 && (el.Tag == "input" || el.Tag == "textarea" || el.Tag == "select") { // model allowed only for input tags
-		p := el.ParentComponent()
-		c := p.Component
-		if c.Watchers == nil || len(c.Watchers) == 0 {
-			return nil, fmt.Errorf("invalid watcher for \"%s\" in component \"%s\"", el.Watcher, el.UUID)
 		}
 
-		watcher, ok := c.Watchers[el.Watcher]
-		if !ok {
-			return nil, fmt.Errorf("watcher \"%s\" is undefined in component \"%s\"", el.Watcher, p.UUID)
-		}
-
-		startVal, err := watcher(nil, nil)
-		if err != nil {
-			return nil, err
-		}
-
-		_node.SetValue(startVal)
-
-		_node.AddEventListener("input", func(e dom.Event) {
-			_target := e.Target()
-			inputValue := _target.Value()
-
-			var (
-				// inputType       string
-				inputValueTyped interface{}
-				err             error
-			)
-
-			switch el.Attrs["type"] {
-			case "range", "number":
-				// inputType = "int"
-				inputValueTyped, err = strconv.Atoi(inputValue)
-				if err != nil {
-					warnError(err)
-					return
-				}
-			case "checkbox":
-				// inputType = "bool"
-				inputValueTyped = _target.JSValue().Get("checked").Bool()
-			default:
-				// inputType = "string"
-				inputValueTyped = inputValue
-			}
-
-			newVal, err := watcher(inputValueTyped, ToUniteObject(e))
-			if err != nil {
-				warnError(err)
-			} else {
-				_node.SetValue(newVal)
-				go c.Update()
-			}
+		_node.AddEventListener(handlerName, func(e dom.Event) {
+			handlerBody(ToGasEvent(e))
 		})
 	}
 
@@ -225,8 +166,4 @@ func createTextNode(node string) (dom.Node, error) {
 	}
 
 	return _node, nil
-}
-
-func (w BackEnd) EditWatcherValue(el interface{}, newVal string) {
-	el.(*dom.Element).SetValue(newVal)
 }

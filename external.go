@@ -8,7 +8,7 @@ type External struct {
 	Body      []interface{}
 	Slots     map[string]interface{}
 	Templates map[string]Template
-	Attrs     map[string]string
+	Attrs     func() map[string]string
 }
 
 type DynamicElement func(External) *Element

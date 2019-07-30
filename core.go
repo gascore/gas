@@ -22,8 +22,6 @@ type BackEnd interface {
 	GetElement(*Element) interface{}
 	GetGasEl(*Gas) interface{}
 
-	EditWatcherValue(interface{}, string)
-
 	ConsoleLog(...interface{})
 	ConsoleError(...interface{})
 }

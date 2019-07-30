@@ -39,8 +39,10 @@ func (root *exampleRoot) Render() []interface{} {
 	return CL(
 		NE(
 			&E{
-				Attrs: map[string]string{
-					"class": "wow",
+				Attrs: func() map[string]string {
+					return map[string]string{
+						"class": "wow",
+					}
 				},
 			},
 			root.msg,

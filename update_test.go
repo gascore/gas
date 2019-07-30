@@ -10,7 +10,7 @@ func TestUpdateChildes(t *testing.T) {
 			"wow",
 		),
 		NE(
-			&E{Tag: "h1", Binds: map[string]Bind{"id": func() string { return "wow" }}},
+			&E{Tag: "h1", func() map[string]string {return map[string]string{"id": "wow"}}},
 			"Title",
 		),
 		NE(
@@ -18,7 +18,7 @@ func TestUpdateChildes(t *testing.T) {
 			"Lorem ipsum dolore",
 			" ",
 			NE(
-				&E{Tag: "i", Binds: map[string]Bind{"id": func() string { return "lol" }, "class": func() string { return "some" }}},
+				&E{Tag: "i", Attrs: func() map[string]string {return map[string]string{"id": "lol", "class": "some"}},
 				"opsum",
 			),
 			NE(
@@ -43,17 +43,6 @@ func TestUpdateChildes(t *testing.T) {
 		}
 		if len(e.Tag) == 0 || len(e.UUID) == 0 || e.RC == nil || e.Parent == nil {
 			t.Errorf("invalid child *Element: %v", e)
-		}
-		if len(e.Binds) != 0 {
-			if len(e.RenderedBinds) == 0 {
-				t.Errorf("invalid child RBinds: %v", e)
-			}
-
-			for key, val := range e.Binds {
-				if val() != e.RenderedBinds[key] {
-					t.Errorf("invalid child RBinds value key: %v, val: %v", key, e.RenderedBinds[key])
-				}
-			}
 		}
 	}
 

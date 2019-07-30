@@ -11,6 +11,22 @@ import (
 func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 	switch node.Type {
 	case gas.ReplaceType:
+		if differOnlyInAttributes(node.New, node.Old) {
+			newE := node.New.(*gas.E)
+			_old := node.NodeOld.(*dom.Element)
+			
+			for attrKey, attrVal := range gas.DiffAttrs(newE.RAttrs, node.Old.(*gas.E).RAttrs) {
+				_old.SetAttribute(attrKey, attrVal)
+				if attrKey == "value" {
+					_old.SetValue(attrVal)
+				}
+			}
+
+			_old.SetAttribute("data-i", newE.UUID)
+			
+			return nil
+		}
+
 		err := gas.CallBeforeCreatedIfCan(node.New)
 		if err != nil {
 			return nil
@@ -35,6 +51,8 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		if err != nil {
 			return err
 		}
+
+		return nil
 	case gas.CreateType:
 		err := gas.CallBeforeCreatedIfCan(node.New)
 		if err != nil {
@@ -97,6 +115,25 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 	}
 
 	return nil
+}
+
+// differOnlyInAttributes return true if only defference between elements is Attrs
+func differOnlyInAttributes(new, old interface{}) bool {
+	newE, ok := new.(*gas.Element)
+	if !ok {
+		return false
+	}
+
+	oldE, ok := old.(*gas.Element)
+	if !ok {
+		return false
+	}
+
+	if len(newE.Childes) != 0 || len(newE.OldChildes) != 0 {
+		return false
+	}
+
+	return gas.ElementsCanBeUpdated(newE, oldE)
 }
 
 // ChildNodes return *dom.Element child nodes

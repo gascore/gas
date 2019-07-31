@@ -23,7 +23,7 @@ func TestNew(t *testing.T) {
 		t.Error("invalid app first child type")
 	}
 
-	if child.Attrs["class"] != "wow" {
+	if child.Attrs()["class"] != "wow" {
 		t.Error("app has wrong start point")
 	}
 }

@@ -5,27 +5,29 @@ import (
 	"reflect"
 )
 
-// Changed return true if node Changed
-func Changed(newEl, oldEl interface{}) (bool, error) {
-	if fmt.Sprintf("%T", newEl) != fmt.Sprintf("%T", oldEl) {
-		return true, nil
+// Changed return isChanged? and canGoDeeper?
+func Changed(newEl, oldEl interface{}) (bool, bool, error) {
+	if reflect.TypeOf(newEl) != reflect.TypeOf(oldEl) {
+		return true, false, nil
 	}
 
 	switch newEl.(type) {
 	case *Component:
-		return !isComponentsEquals(I2C(newEl), I2C(oldEl)), nil
+		isEquals, canGoDeeper := isComponentsEquals(I2C(newEl), I2C(oldEl))
+		return !isEquals, canGoDeeper, nil
 	case *Element:
-		return !isNodesEquals(I2E(newEl), I2E(oldEl)), nil
+		isEquals, canGoDeeper := isNodesEquals(I2E(newEl), I2E(oldEl))
+		return !isEquals, canGoDeeper, nil
 	case bool, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
-		return newEl != oldEl, nil
+		return newEl != oldEl, false, nil
 	case fmt.Stringer:
-		return newEl.(fmt.Stringer).String() != oldEl.(fmt.Stringer).String(), nil
+		return newEl.(fmt.Stringer).String() != oldEl.(fmt.Stringer).String(), false, nil
 	default:
-		return false, fmt.Errorf("changed: invalid `newEl` or `oldEl`. types: %T, %T", newEl, oldEl)
+		return false, false, fmt.Errorf("changed: invalid `newEl` or `oldEl`. types: %T, %T", newEl, oldEl)
 	}
 }
 
-func isComponentsEquals(newC, oldC *C) bool {
+func isComponentsEquals(newC, oldC *C) (bool, bool) {
 	isEquals := newC.ElementIsImportant == oldC.ElementIsImportant &&
 		newC.RefsAllowed == oldC.RefsAllowed &&
 		compareHooks(newC.Hooks, oldC.Hooks)
@@ -34,13 +36,13 @@ func isComponentsEquals(newC, oldC *C) bool {
 		return isElementsEquals(newC.Element, oldC.Element)
 	}
 
-	return isEquals
+	return isEquals, true
 }
 
-func isNodesEquals(newE, oldE *E) bool {
+func isNodesEquals(newE, oldE *E) (bool, bool) {
 	if newE.Component != nil || oldE.Component != nil {
 		if oldE.Component == nil || newE.Component == nil {
-			return false
+			return false, false
 		}
 
 		return isComponentsEquals(newE.Component, oldE.Component)
@@ -49,14 +51,9 @@ func isNodesEquals(newE, oldE *E) bool {
 	return isElementsEquals(newE, oldE)
 }
 
-func isElementsEquals(newE, oldE *E) bool {
-	return ElementsCanBeUpdated(newE, oldE) && compareAttributes(newE.RAttrs, oldE.RAttrs)
-}
-
-func ElementsCanBeUpdated(newE, oldE *E) bool {
-	return newE.Tag == oldE.Tag && 
-		newE.HTML.Rendered == oldE.HTML.Rendered && 
-		reflect.ValueOf(newE.HTML.Render).Pointer() == reflect.ValueOf(oldE.HTML.Render).Pointer()
+func isElementsEquals(newE, oldE *E) (bool, bool) {
+	canBeUpdated := newE.Tag == oldE.Tag && newE.HTML.Rendered == oldE.HTML.Rendered && reflect.ValueOf(newE.HTML.Render).Pointer() == reflect.ValueOf(oldE.HTML.Render).Pointer()
+	return canBeUpdated && compareAttributes(newE.RAttrs, oldE.RAttrs), canBeUpdated
 }
 
 func compareAttributes(newMap, oldMap map[string]string) bool {
@@ -116,9 +113,9 @@ func DiffAttrs(newA, oldA map[string]string) map[string]string {
 		if newA[key] != val {
 			if _, ok := newA[key]; ok {
 				diffMap[key] = newA[key]
-				continue	
+				continue
 			}
-			
+
 			diffMap[key] = ""
 		}
 	}

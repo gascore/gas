@@ -10,7 +10,7 @@ func TestUpdateChildes(t *testing.T) {
 			"wow",
 		),
 		NE(
-			&E{Tag: "h1", func() map[string]string {return map[string]string{"id": "wow"}}},
+			&E{Tag: "h1", Attrs: func() map[string]string { return map[string]string{"id": "wow"} }},
 			"Title",
 		),
 		NE(
@@ -18,7 +18,7 @@ func TestUpdateChildes(t *testing.T) {
 			"Lorem ipsum dolore",
 			" ",
 			NE(
-				&E{Tag: "i", Attrs: func() map[string]string {return map[string]string{"id": "lol", "class": "some"}},
+				&E{Tag: "i", Attrs: func() map[string]string { return map[string]string{"id": "lol", "class": "some"} }},
 				"opsum",
 			),
 			NE(

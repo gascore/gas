@@ -93,17 +93,16 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 		if len(handlerNameParsed) == 2 {
 			handlerType := handlerNameParsed[0]
 			handlerTarget := strings.ToLower(handlerNameParsed[1])
-			
+
 			var handlerTargetIsInt bool
 			handlerTargetInt, err := strconv.Atoi(handlerTarget)
 			handlerTargetIsInt = err == nil
-			
+
 			switch handlerType {
 			case "keyup":
 				_node.AddEventListener("keyup", func(e dom.Event) {
 					keyCode, _ := strconv.Atoi(e.KeyCode())
 					if handlerTarget == strings.ToLower(e.Key()) || (handlerTargetIsInt && handlerTargetInt == keyCode) {
-						fmt.Println("key ok", handlerBody)
 						handlerBody(ToGasEvent(e))
 					}
 				})
@@ -152,7 +151,7 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 
 	if el.HTML.Render != nil {
 		htmlDirective := el.HTML.Render()
-		_node.SetInnerHTML(fmt.Sprintf("%s\n%s", _node.InnerHTML(), htmlDirective))
+		_node.SetInnerHTML(_node.InnerHTML() + "\n" + htmlDirective)
 	}
 
 	return _node, nil

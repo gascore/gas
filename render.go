@@ -12,9 +12,11 @@ type RenderNode struct {
 	Type RenderType
 
 	Parent *Element
-	
-	New, Old			 		 interface{} // *Element, string, int, ...
+
+	New, Old                     interface{} // *Element, string, int, ...
 	NodeParent, NodeNew, NodeOld interface{} // *dom.Element
+
+	ReplaceCanGoDeeper bool
 }
 
 // RenderType renderNode type

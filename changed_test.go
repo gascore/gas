@@ -1,21 +1,29 @@
 package gas
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestChanged(t *testing.T) {
-	f := func(a, b interface{}, isChanged bool, haveError bool) {
-		ic, err := Changed(a, b)
+	var counter int
+	f := func(a, b interface{}, isChanged, canGoDeeper bool, haveError bool) {
+		counter++
+		ic, cgd, err := Changed(a, b)
 
 		if err == nil {
 			if haveError {
-				t.Error("except error, but don't got it")
+				t.Errorf("%d: except error, but don't got it", counter)
 			}
 
 			if ic != isChanged {
-				t.Errorf("invalid Changed result except: %t, got: %t", isChanged, ic)
+				t.Errorf("%d: invalid Changed isChanged result except: %t, got: %t", counter, isChanged, ic)
+			}
+
+			if cgd != canGoDeeper {
+				t.Errorf("%d: invalid Changed canGoDeeper resul except: %t, got: %t", counter, canGoDeeper, cgd)
 			}
 		} else if !haveError {
-			t.Errorf("error from Changed: %s", err.Error())
+			t.Errorf("%d: error from Changed: %s", counter, err.Error())
 		}
 	}
 
@@ -38,44 +46,49 @@ func TestChanged(t *testing.T) {
 	}
 
 	// atomic types
-	f("1", "1", false, false)
+	f("1", "1", false, false, false)
+	f(1, 1, false, false, false)
+	f(1.228, 1.228, false, false, false)
 
 	// various types
-	f("1", 1, true, false)
-	f(&C{}, &E{}, true, false)
+	f("1", 1, true, false, false)
+	f(&C{}, &E{}, true, false, false)
 
 	// not supported type
-	f(Gas{}, Gas{}, true, true)
+	f(Gas{}, Gas{}, true, false, true)
 
 	// empty stucts
-	f(&E{}, &E{}, false, false)
-	f(&C{}, &C{}, false, false)
+	f(&E{}, &E{}, false, true, false)
+	f(&C{}, &C{}, false, false, false)
 
 	// Component.Element
-	f(c1, c2, true, false)
-	f(c1, c1, false, false)
+	f(c1, c2, true, false, false)
+	f(c1, c1, false, true, false)
 
 	// Element.Component
-	f(&E{Component: c1}, &E{Component: c2}, true, false)
-	f(&E{Component: c1}, &E{Component: c1}, false, false)
-	f(&E{Component: c1}, &E{}, true, false)
+	f(&E{Component: c1}, &E{Component: c2}, true, false, false)
+	f(&E{Component: c1}, &E{Component: c1}, false, true, false)
+	f(&E{Component: c1}, &E{}, true, false, false)
+
+	eA1 := &E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}
+	eA1.RAttrs = eA1.Attrs()
+	eA2 := &E{Attrs: func() map[string]string { return map[string]string{"id": "wow", "class": "lol"} }}
+	eA2.RAttrs = eA2.Attrs()
+	eA3 := &E{Attrs: func() map[string]string { return map[string]string{"id": "lol"} }}
+	eA3.RAttrs = eA3.Attrs()
 
 	// attrs
-	f(&E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, &E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, false, false)
-	f(&E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, &E{Attrs: func() map[string]string { return map[string]string{"id": "wow", "class": "lol"} }}, true, false)
-	f(&E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}, &E{Attrs: func() map[string]string { return map[string]string{"id": "lol"} }}, true, false)
-
-	// watchers
-	f(&C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, &C{}, true, false)
-	f(&C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, &C{Watchers: map[string]Watcher{"wow": func(a interface{}, e Object) (string, error) { return "wow", nil }}}, true, false)
+	f(eA1, eA1, false, true, false)
+	f(eA1, eA2, true, true, false)
+	f(eA1, eA3, true, true, false)
 
 	// hooks
 	m1 := func() error { return nil }
 	m2 := func() (bool, error) { return false, nil }
 
-	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{Created: m1}}, false, false)
-	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{}}, true, false)
+	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{Created: m1}}, false, false, false)
+	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{}}, true, false, false)
 
-	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{BeforeCreated: m2}}, false, false) // with control
-	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{}}, true, false)                   // with control
+	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{BeforeCreated: m2}}, false, false, false) // with control
+	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{}}, true, false, false)                   // with control
 }

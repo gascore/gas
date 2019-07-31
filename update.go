@@ -1,8 +1,6 @@
 package gas
 
-import (
-	"errors"
-)
+import "errors"
 
 // htmlDirective return compiled element HTMLDirective
 func (e *Element) htmlDirective() string {
@@ -49,8 +47,8 @@ func (component *Component) Update() {
 // ReCreate re create element
 func (e *Element) ReCreate() {
 	e.RC.Add(&RenderNode{
-		Type: RecreateType,
-		New:  e,
+		Type:   RecreateType,
+		New:    e,
 		Parent: e.Parent,
 	})
 	go e.RC.Exec()
@@ -112,7 +110,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 		rc.Add(&RenderNode{
 			Type:       CreateType,
 			New:        new,
-			Parent: 	parent,
+			Parent:     parent,
 			NodeParent: _parent,
 		})
 
@@ -140,7 +138,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 		rc.Add(&RenderNode{
 			Type:       DeleteType,
 			NodeParent: _parent,
-			Parent: 	parent,
+			Parent:     parent,
 			NodeOld:    _el,
 			Old:        old,
 		})
@@ -149,33 +147,32 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 
 	// if element has Changed
-	isChanged, err := Changed(new, old)
+	isChanged, canGoDeeper, err := Changed(new, old)
 	if err != nil {
 		return err
 	}
 
 	if isChanged {
 		rc.Add(&RenderNode{
-			Type:       ReplaceType,
-			NodeParent: _parent,
-			NodeOld:    _el,
-			Parent: 	parent,
-			New:        new,
-			Old:        old,
+			Type:               ReplaceType,
+			NodeParent:         _parent,
+			NodeOld:            _el,
+			Parent:             parent,
+			New:                new,
+			Old:                old,
+			ReplaceCanGoDeeper: canGoDeeper,
 		})
-
-		return nil
 	}
 
 	newE, newIsElement := new.(*Element)
-	if !newIsElement {
-		return nil
+	oldE, oldIsElement := old.(*Element)
+	if newIsElement && oldIsElement && newE.UUID != oldE.UUID {
+		// little hack
+		newE.UUID = oldE.UUID
 	}
 
-	oldE := old.(*Element)
-
-	if newE.UUID != oldE.UUID { // update *element context* in new
-		newE.UUID = oldE.UUID
+	if !canGoDeeper {
+		return nil
 	}
 
 	// if old and new is equals and they have html directives => they are two commons elements
@@ -183,11 +180,14 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 		return nil
 	}
 
+	var oldChildes []interface{}
 	if newE.IsPointer {
-		err = rc.UpdateElementChildes(_el, newE, newE.Childes, newE.OldChildes)
+		oldChildes = newE.OldChildes
 	} else {
-		err = rc.UpdateElementChildes(_el, oldE, newE.Childes, oldE.Childes)
+		oldChildes = oldE.Childes
 	}
+
+	err = rc.UpdateElementChildes(_el, newE, newE.Childes, oldChildes)
 	if err != nil {
 		return err
 	}

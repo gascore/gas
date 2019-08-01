@@ -36,7 +36,7 @@ func isComponentsEquals(newC, oldC *C) (bool, bool) {
 		return isElementsEquals(newC.Element, oldC.Element)
 	}
 
-	return isEquals, true
+	return isEquals, isEquals
 }
 
 func isNodesEquals(newE, oldE *E) (bool, bool) {

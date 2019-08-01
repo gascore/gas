@@ -118,10 +118,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 
 	_childes := rc.BE.ChildNodes(_parent)
-	if _childes == nil {
-		_childes = []interface{}{}
-	}
-
+	
 	var _el interface{}
 	if len(_childes) > index {
 		_el = _childes[index]
@@ -167,8 +164,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	newE, newIsElement := new.(*Element)
 	oldE, oldIsElement := old.(*Element)
 	if newIsElement && oldIsElement && newE.UUID != oldE.UUID {
-		// little hack
-		newE.UUID = oldE.UUID
+		newE.UUID = oldE.UUID // little hack
 	}
 
 	if !canGoDeeper {

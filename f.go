@@ -4,14 +4,18 @@ package gas
 type FunctionalComponent struct {
 	C *Component
 
-	statesCounter   int
-	states          []interface{}
-	effectsCounter  int
-	effects         []Effect
-	cleanersCounter int
-	cleaners        []func()
+	statesCounter  int
+	states         []interface{}
+	effectsCounter int
+	effects        []effectItem
+	cleaners       map[int]func()
 
 	renderer func() []interface{}
+}
+
+type effectItem struct {
+	effect Effect
+	i      int
 }
 
 // Effect functional components effect
@@ -62,28 +66,23 @@ func (root *FunctionalComponent) UseEffect(effect Effect) {
 	root.effectsCounter++
 
 	if len(root.effects)-1 < i {
-		root.effects = append(root.effects, effect)
-	}
-}
-
-func (root *FunctionalComponent) addCleaner(cleaner func()) {
-	i := root.cleanersCounter
-	root.cleanersCounter++
-
-	if len(root.cleaners)-1 < i {
-		root.cleaners = append(root.cleaners, cleaner)
+		root.effects = append(root.effects, effectItem{effect: effect, i: i})
 	}
 }
 
 func (root *FunctionalComponent) runEffects() error {
 	for _, effect := range root.effects {
-		cleaner, err := effect()
+		cleaner, err := effect.effect()
 		if err != nil {
 			return err
 		}
 
 		if cleaner != nil {
-			root.addCleaner(cleaner)
+			if root.cleaners == nil {
+				root.cleaners = make(map[int]func())
+			}
+
+			root.cleaners[effect.i] = cleaner
 		}
 	}
 
@@ -91,7 +90,10 @@ func (root *FunctionalComponent) runEffects() error {
 }
 
 func (root *FunctionalComponent) runCleaners() error {
-	println("CLEAR THIS")
+	if len(root.cleaners) == 0 {
+		return nil
+	}
+
 	for _, cleaner := range root.cleaners {
 		cleaner()
 	}
@@ -103,6 +105,5 @@ func (root *FunctionalComponent) runCleaners() error {
 func (root *FunctionalComponent) Render() []interface{} {
 	root.statesCounter = 0
 	root.effectsCounter = 0
-	root.cleanersCounter = 0
 	return root.renderer()
 }

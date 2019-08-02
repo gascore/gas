@@ -127,7 +127,7 @@ func RemoveStrings(arr []interface{}) []interface{} {
 
 // EmptyRoot root for component only rendering one element
 type EmptyRoot struct {
-	C *C
+	C       *Component
 	Element *Element
 }
 

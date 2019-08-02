@@ -19,8 +19,8 @@ type Hook func() error
 // HookWithControl - lifecycle hook. Return true for rerender component childes
 type HookWithControl func() (rerender bool, err error)
 
-// CallBeforeCreatedIfCan call component and it's childes BeforeCreated hook
-func CallBeforeCreatedIfCan(i interface{}) error {
+// CallBeforeCreated call component and it's childes BeforeCreated hook
+func CallBeforeCreated(i interface{}) error {
 	e, ok := i.(*Element)
 	if !ok {
 		return nil
@@ -39,7 +39,7 @@ func CallBeforeCreatedIfCan(i interface{}) error {
 	}
 
 	for _, child := range e.Childes {
-		err := CallBeforeCreatedIfCan(child)
+		err := CallBeforeCreated(child)
 		if err != nil {
 			return err
 		}
@@ -48,8 +48,8 @@ func CallBeforeCreatedIfCan(i interface{}) error {
 	return nil
 }
 
-// CallMountedIfCan call component and it's childes Mounted hook
-func CallMountedIfCan(i interface{}) error {
+// CallMounted call component and it's childes Mounted hook
+func CallMounted(i interface{}) error {
 	e, ok := i.(*Element)
 	if !ok {
 		return nil
@@ -64,7 +64,7 @@ func CallMountedIfCan(i interface{}) error {
 	}
 
 	for _, child := range e.Childes {
-		err := CallMountedIfCan(child)
+		err := CallMounted(child)
 		if err != nil {
 			return err
 		}
@@ -73,8 +73,8 @@ func CallMountedIfCan(i interface{}) error {
 	return nil
 }
 
-// CallBeforeDestroyIfCan call component and it's childes WillDestroy hook
-func CallBeforeDestroyIfCan(i interface{}) error {
+// CallBeforeDestroy call component and it's childes WillDestroy hook
+func CallBeforeDestroy(i interface{}) error {
 	e, ok := i.(*Element)
 	if !ok {
 		return nil
@@ -89,7 +89,7 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 	}
 
 	for _, child := range e.Childes {
-		err := CallBeforeDestroyIfCan(child)
+		err := CallBeforeDestroy(child)
 		if err != nil {
 			return err
 		}
@@ -98,17 +98,11 @@ func CallBeforeDestroyIfCan(i interface{}) error {
 	return nil
 }
 
-// CallUpdatedIfCan call component parent (true component) Updated hook
-func CallUpdatedIfCan(i interface{}, p *Element) error {
-	var c *Component
-	e, ok := i.(*Element)
-	if ok {
-		c = e.ParentComponent().Component
-	} else {
-		c = p.Component
-		if c == nil {
-			c = p.ParentComponent().Component
-		}
+// CallUpdated call Updated hook
+func CallUpdated(p *Element) error {
+	c := p.Component
+	if c == nil {
+		c = p.ParentComponent().Component
 	}
 
 	if c.Hooks.Updated != nil {
@@ -121,17 +115,11 @@ func CallUpdatedIfCan(i interface{}, p *Element) error {
 	return nil
 }
 
-// CallBeforeUpdateIfCan call component parent (true component) BeforeUpdate
-func CallBeforeUpdateIfCan(i interface{}, p *Element) error {
-	var c *Component
-	e, ok := i.(*Element)
-	if ok {
-		c = e.ParentComponent().Component
-	} else {
-		c = p.Component
-		if c == nil {
-			c = p.ParentComponent().Component
-		}
+// CallBeforeUpdate call BeforeUpdate hook
+func CallBeforeUpdate(element *Element) error {
+	c := element.Component
+	if c == nil {
+		c = element.ParentComponent().Component
 	}
 
 	if c.Hooks.BeforeUpdate != nil {

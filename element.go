@@ -53,7 +53,7 @@ func NewElement(el *Element, childes ...interface{}) *Element {
 // GetChildes function returning component/element childes
 type GetChildes func() []interface{}
 
-// Bind dynamic component attribute (analog for vue `v-bind:`).
+// Bind dynamic component attribute
 type Bind func() string
 
 // HTMLDirective struct for HTML Directive - storing render function and pre rendered render

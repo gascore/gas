@@ -9,16 +9,28 @@ import (
 
 // ExecNode execute render node
 func (w BackEnd) ExecNode(node *gas.RenderNode) error {
+	err := gas.CallBeforeUpdate(node.Parent)
+	if err != nil {
+		return err
+	}
+
 	switch node.Type {
 	case gas.ReplaceType:
+		err := gas.CallBeforeCreated(node.New)
+		if err != nil {
+			return nil
+		}
+
+		err = gas.CallBeforeDestroy(node.Old)
+		if err != nil {
+			return err
+		}
+
+		// custom logic
 		if node.ReplaceCanGoDeeper {
+			// Update old element attributes
 			newE := node.New.(*gas.E)
 			_old := node.NodeOld.(*dom.Element)
-
-			err := gas.CallBeforeUpdateIfCan(newE, node.Parent)
-			if err != nil {
-				return err
-			}
 
 			for attrKey, attrVal := range gas.DiffAttrs(newE.RAttrs, node.Old.(*gas.E).RAttrs) {
 				_old.SetAttribute(attrKey, attrVal)
@@ -28,43 +40,37 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			}
 
 			_old.SetAttribute("data-i", newE.UUID)
-
-			err = gas.CallUpdatedIfCan(newE, node.Parent)
+		} else {
+			// Create new element and replace with old
+			_new, err := CreateElement(node.New)
 			if err != nil {
 				return err
 			}
 
-			return nil
+			_parent, ok := node.NodeParent.(*dom.Element)
+			if !ok {
+				return errors.New("invalid NodeParent type")
+			}
+
+			_old, ok := node.NodeOld.(*dom.Element)
+			if !ok {
+				return errors.New("invalid NodeOld type")
+			}
+
+			_parent.ReplaceChild(_new, _old)
 		}
 
-		err := gas.CallBeforeCreatedIfCan(node.New)
-		if err != nil {
-			return nil
-		}
-
-		_new, err := CreateElement(node.New)
-		if err != nil {
-			return err
-		}
-
-		_parent, ok := node.NodeParent.(*dom.Element)
-		if !ok {
-			return errors.New("invalid NodeParent type")
-		}
-
-		_old, ok := node.NodeOld.(*dom.Element)
-		if !ok {
-			return errors.New("invalid NodeOld type")
-		}
-
-		err = replaceChild(_parent, _new, _old, node.New, node.Old, node.Parent)
+		err = gas.CallMounted(node.New)
 		if err != nil {
 			return err
 		}
-
-		return nil
 	case gas.CreateType:
-		err := gas.CallBeforeCreatedIfCan(node.New)
+		_parent, ok := node.NodeParent.(*dom.Element)
+		if !ok {
+			return errors.New("invalid NodeParent type")
+		}
+
+		err := gas.CallBeforeCreated(node.New)
 		if err != nil {
 			return nil
 		}
@@ -74,17 +80,12 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return err
 		}
 
-		_parent, ok := node.NodeParent.(*dom.Element)
-		if !ok {
-			return errors.New("invalid NodeParent type")
-		}
+		_parent.AppendChild(_new)
 
-		err = appendChild(_parent, _new, node.New, node.Parent)
+		err = gas.CallMounted(node.New)
 		if err != nil {
 			return err
 		}
-
-		return nil
 	case gas.DeleteType:
 		_parent, ok := node.NodeParent.(*dom.Element)
 		if !ok {
@@ -96,12 +97,12 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeOld")
 		}
 
-		err := removeChild(_parent, _old, node.Old, node.Parent)
+		err = gas.CallBeforeDestroy(node.Old)
 		if err != nil {
 			return err
 		}
 
-		return nil
+		_parent.RemoveChild(_old)
 	case gas.RecreateType:
 		e := node.New.(*gas.Element)
 		_e, ok := e.BEElement().(*dom.Element)
@@ -109,7 +110,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeNew type")
 		}
 
-		err := gas.CallBeforeDestroyIfCan(e)
+		err := gas.CallBeforeDestroy(e)
 		if err != nil {
 			return err
 		}
@@ -121,73 +122,13 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		e.Childes = []interface{}{}
 		e.OldChildes = []interface{}{}
 
-		return e.Update()
+		err = e.Update()
+		if err != nil {
+			return err
+		}
 	}
 
-	return nil
-}
-
-func replaceChild(_p, _new, _old dom.Node, new, old interface{}, p *gas.E) error {
-	err := gas.CallBeforeDestroyIfCan(old)
-	if err != nil {
-		return err
-	}
-
-	err = gas.CallBeforeUpdateIfCan(new, p)
-	if err != nil {
-		return err
-	}
-
-	_p.ReplaceChild(_new, _old)
-
-	err = gas.CallUpdatedIfCan(new, p)
-	if err != nil {
-		return err
-	}
-
-	err = gas.CallMountedIfCan(new)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func appendChild(_p, _c dom.Node, new interface{}, p *gas.E) error {
-	err := gas.CallBeforeUpdateIfCan(new, p)
-	if err != nil {
-		return err
-	}
-
-	_p.AppendChild(_c)
-
-	err = gas.CallUpdatedIfCan(new, p)
-	if err != nil {
-		return err
-	}
-
-	err = gas.CallMountedIfCan(new)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func removeChild(_p, _e dom.Node, old interface{}, p *gas.E) error {
-	err := gas.CallBeforeUpdateIfCan(old, p)
-	if err != nil {
-		return err
-	}
-
-	err = gas.CallBeforeDestroyIfCan(old)
-	if err != nil {
-		return err
-	}
-
-	_p.RemoveChild(_e)
-
-	err = gas.CallUpdatedIfCan(old, p)
+	err = gas.CallUpdated(node.Parent)
 	if err != nil {
 		return err
 	}

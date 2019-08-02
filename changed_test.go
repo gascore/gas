@@ -59,7 +59,7 @@ func TestChanged(t *testing.T) {
 
 	// empty stucts
 	f(&E{}, &E{}, false, true, false)
-	f(&C{}, &C{}, false, false, false)
+	f(&C{}, &C{}, false, true, false)
 
 	// Component.Element
 	f(c1, c2, true, false, false)
@@ -86,9 +86,9 @@ func TestChanged(t *testing.T) {
 	m1 := func() error { return nil }
 	m2 := func() (bool, error) { return false, nil }
 
-	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{Created: m1}}, false, false, false)
+	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{Created: m1}}, false, true, false)
 	f(&C{Hooks: Hooks{Created: m1}}, &C{Hooks: Hooks{}}, true, false, false)
 
-	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{BeforeCreated: m2}}, false, false, false) // with control
-	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{}}, true, false, false)                   // with control
+	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{BeforeCreated: m2}}, false, true, false) // with control
+	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{}}, true, false, false)                  // with control
 }

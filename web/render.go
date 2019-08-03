@@ -9,26 +9,29 @@ import (
 
 // ExecNode execute render node
 func (w BackEnd) ExecNode(node *gas.RenderNode) error {
-	err := gas.CallBeforeUpdate(node.Parent)
-	if err != nil {
-		return err
+	hook := func(f func(interface{}) error, el interface{}) {
+		if !node.IgnoreHooks {
+			err := f(el)
+			if err != nil {
+				dom.ConsoleError(err.Error())
+			}
+		}
+	}
+
+	if !node.IgnoreHooks {
+		err := gas.CallBeforeUpdate(node.Parent)
+		if err != nil {
+			dom.ConsoleError(err.Error())
+		}
 	}
 
 	switch node.Type {
 	case gas.ReplaceType:
-		err := gas.CallBeforeCreated(node.New)
-		if err != nil {
-			return nil
-		}
-
-		err = gas.CallBeforeDestroy(node.Old)
-		if err != nil {
-			return err
-		}
+		hook(gas.CallBeforeCreated, node.New)
+		hook(gas.CallBeforeDestroy, node.Old)
 
 		// custom logic
-		if node.ReplaceCanGoDeeper {
-			// Update old element attributes
+		if node.ReplaceCanGoDeeper { // Update old element attributes
 			newE := node.New.(*gas.E)
 			_old := node.NodeOld.(*dom.Element)
 
@@ -40,40 +43,37 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			}
 
 			_old.SetAttribute("data-i", newE.UUID)
-		} else {
-			// Create new element and replace with old
-			_new, err := CreateElement(node.New)
-			if err != nil {
-				return err
-			}
-
-			_parent, ok := node.NodeParent.(*dom.Element)
-			if !ok {
-				return errors.New("invalid NodeParent type")
-			}
-
-			_old, ok := node.NodeOld.(*dom.Element)
-			if !ok {
-				return errors.New("invalid NodeOld type")
-			}
-
-			_parent.ReplaceChild(_new, _old)
+			return nil
 		}
 
-		err = gas.CallMounted(node.New)
+		// Create new element and replace with old
+		_new, err := CreateElement(node.New)
 		if err != nil {
 			return err
 		}
+
+		_parent, ok := node.NodeParent.(*dom.Element)
+		if !ok {
+			return errors.New("invalid NodeParent type")
+		}
+
+		_old, ok := node.NodeOld.(*dom.Element)
+		if !ok {
+			return errors.New("invalid NodeOld type")
+		}
+
+		_parent.ReplaceChild(_new, _old)
+
+		hook(gas.CallMounted, node.New)
+	case gas.ReplaceHooks:
+		hook(gas.CallMounted, node.New)
 	case gas.CreateType:
 		_parent, ok := node.NodeParent.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeParent type")
 		}
 
-		err := gas.CallBeforeCreated(node.New)
-		if err != nil {
-			return nil
-		}
+		hook(gas.CallBeforeCreated, node.New)
 
 		_new, err := CreateElement(node.New)
 		if err != nil {
@@ -82,10 +82,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 
 		_parent.AppendChild(_new)
 
-		err = gas.CallMounted(node.New)
-		if err != nil {
-			return err
-		}
+		hook(gas.CallMounted, node.New)
 	case gas.DeleteType:
 		_parent, ok := node.NodeParent.(*dom.Element)
 		if !ok {
@@ -97,10 +94,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeOld")
 		}
 
-		err = gas.CallBeforeDestroy(node.Old)
-		if err != nil {
-			return err
-		}
+		hook(gas.CallBeforeDestroy, node.Old)
 
 		_parent.RemoveChild(_old)
 	case gas.RecreateType:
@@ -110,10 +104,7 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 			return errors.New("invalid NodeNew type")
 		}
 
-		err := gas.CallBeforeDestroy(e)
-		if err != nil {
-			return err
-		}
+		hook(gas.CallBeforeDestroy, e)
 
 		for _, _child := range _e.ChildNodes() {
 			_e.RemoveChild(_child)
@@ -122,15 +113,17 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		e.Childes = []interface{}{}
 		e.OldChildes = []interface{}{}
 
-		err = e.Update()
+		err := e.Update()
 		if err != nil {
 			return err
 		}
 	}
 
-	err = gas.CallUpdated(node.Parent)
-	if err != nil {
-		return err
+	if !node.IgnoreHooks {
+		err := gas.CallUpdated(node.Parent)
+		if err != nil {
+			dom.ConsoleError(err.Error())
+		}
 	}
 
 	return nil

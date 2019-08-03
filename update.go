@@ -19,7 +19,7 @@ func (e *Element) Update() error {
 	}
 
 	e.UpdateChildes()
-	err := e.RC.UpdateElementChildes(_el, e, e.Childes, e.OldChildes)
+	err := e.RC.UpdateElementChildes(_el, e, e.Childes, e.OldChildes, false)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (e *Element) UpdateChildes() {
 }
 
 // UpdateElementChildes compare new and old trees
-func (rc *RenderCore) UpdateElementChildes(_el interface{}, el *Element, new, old []interface{}) error {
+func (rc *RenderCore) UpdateElementChildes(_el interface{}, el *Element, new, old []interface{}, inReplaced bool) error {
 	for i := 0; i < len(new) || i < len(old); i++ {
 		var newEl interface{}
 		if len(new) > i {
@@ -94,7 +94,7 @@ func (rc *RenderCore) UpdateElementChildes(_el interface{}, el *Element, new, ol
 			oldEl = old[i]
 		}
 
-		err := rc.updateElement(_el, el, newEl, oldEl, i)
+		err := rc.updateElement(_el, el, newEl, oldEl, i, inReplaced)
 		if err != nil {
 			return err
 		}
@@ -104,21 +104,22 @@ func (rc *RenderCore) UpdateElementChildes(_el interface{}, el *Element, new, ol
 }
 
 // updateElement trying to update element
-func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, old interface{}, index int) error {
+func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, old interface{}, index int, inReplaced bool) error {
 	// if element has created
 	if old == nil {
 		rc.Add(&RenderNode{
-			Type:       CreateType,
-			New:        new,
-			Parent:     parent,
-			NodeParent: _parent,
+			Type:        CreateType,
+			New:         new,
+			Parent:      parent,
+			NodeParent:  _parent,
+			IgnoreHooks: inReplaced,
 		})
 
 		return nil
 	}
 
 	_childes := rc.BE.ChildNodes(_parent)
-	
+
 	var _el interface{}
 	if len(_childes) > index {
 		_el = _childes[index]
@@ -133,11 +134,12 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	// if element was deleted
 	if new == nil {
 		rc.Add(&RenderNode{
-			Type:       DeleteType,
-			NodeParent: _parent,
-			Parent:     parent,
-			NodeOld:    _el,
-			Old:        old,
+			Type:        DeleteType,
+			NodeParent:  _parent,
+			Parent:      parent,
+			NodeOld:     _el,
+			Old:         old,
+			IgnoreHooks: inReplaced,
 		})
 
 		return nil
@@ -148,7 +150,6 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	if err != nil {
 		return err
 	}
-
 	if isChanged {
 		rc.Add(&RenderNode{
 			Type:               ReplaceType,
@@ -158,17 +159,17 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 			New:                new,
 			Old:                old,
 			ReplaceCanGoDeeper: canGoDeeper,
+			IgnoreHooks:        inReplaced,
 		})
 	}
-
-	newE, newIsElement := new.(*Element)
-	oldE, oldIsElement := old.(*Element)
-	if newIsElement && oldIsElement && newE.UUID != oldE.UUID {
-		newE.UUID = oldE.UUID // little hack
-	}
-
 	if !canGoDeeper {
 		return nil
+	}
+
+	newE := new.(*Element)
+	oldE := old.(*Element)
+	if newE.UUID != oldE.UUID {
+		newE.UUID = oldE.UUID // little hack
 	}
 
 	// if old and new is equals and they have html directives => they are two commons elements
@@ -183,9 +184,20 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 		oldChildes = oldE.Childes
 	}
 
-	err = rc.UpdateElementChildes(_el, newE, newE.Childes, oldChildes)
+	err = rc.UpdateElementChildes(_el, newE, newE.Childes, oldChildes, isChanged)
 	if err != nil {
 		return err
+	}
+
+	if isChanged && !inReplaced {
+		rc.Add(&RenderNode{
+			Type:       ReplaceHooks,
+			NodeParent: _parent,
+			NodeOld:    _el,
+			Parent:     parent,
+			New:        new,
+			Old:        old,
+		})
 	}
 
 	return nil

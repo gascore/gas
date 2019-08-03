@@ -17,6 +17,7 @@ type RenderNode struct {
 	NodeParent, NodeNew, NodeOld interface{} // *dom.Element
 
 	ReplaceCanGoDeeper bool
+	IgnoreHooks        bool // don't exec elements hooks
 }
 
 // RenderType renderNode type
@@ -25,6 +26,9 @@ type RenderType int
 const (
 	// ReplaceType type for replace node
 	ReplaceType RenderType = iota
+
+	// ReplaceHooks type for run after replace hooks
+	ReplaceHooks
 
 	// CreateType type for create nodes
 	CreateType

@@ -1,6 +1,8 @@
 package gas
 
-import "errors"
+import (
+	"errors"
+)
 
 // htmlDirective return compiled element HTMLDirective
 func (e *Element) htmlDirective() string {

@@ -7,18 +7,15 @@ import (
 func TestNew(t *testing.T) {
 	c := &C{Root: &exampleRoot{}}
 
-	gas, err := New(GetEmptyBackend(), "app", c)
-	if err != nil {
-		t.Error("error in gas.New()")
-	}
+	gas := New(c, GetEmptyBackend())
 
-	gas.App.UpdateChildes()
+	gas.UpdateChildes()
 
-	if len(gas.App.Childes) == 0 {
+	if len(gas.Childes) == 0 {
 		t.Error("app has no childes")
 	}
 
-	child, ok := gas.App.Childes[0].(*E)
+	child, ok := gas.Childes[0].(*E)
 	if !ok {
 		t.Error("invalid app first child type")
 	}

@@ -3,32 +3,9 @@ package gas
 import "fmt"
 
 // New create new gas application with custom backend
-func New(be BackEnd, startPoint string, c *Component) (Gas, error) {
+func New(c *Component, be BackEnd) Gas {
 	c.RC = &RenderCore{BE: be}
-
-	_, err := be.CanRender(startPoint)
-	if err != nil {
-		return Gas{}, err
-	}
-
-	gas := Gas{App: c.Init(), StartPoint: startPoint}
-
-	return gas, nil
-}
-
-// Init initialize gas application
-func Init(be BackEnd, startPoint string, c *Component) error {
-	gas, err := New(be, startPoint, c)
-	if err != nil {
-		return err
-	}
-
-	err = be.Init(gas)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return Gas{c.Init()}
 }
 
 // ToGetComponentList return array by many parameters, because it's pretty

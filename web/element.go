@@ -74,7 +74,7 @@ func newNodeEl(tag string) *dom.Element {
 	}
 }
 
-// createHtmlElement create html element without childes
+// createHtmlElement create html element without children
 func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 	_node := newNodeEl(el.Tag)
 	if _node == nil {

@@ -26,7 +26,9 @@ func (e *Element) Update() error {
 		return err
 	}
 
-	return e.RC.Exec()
+	e.RC.Exec()
+
+	return nil
 }
 
 // UpdateHTMLDirective trying rerender element html directive
@@ -48,7 +50,7 @@ func (component *Component) Update() {
 
 // ReCreate re create element
 func (e *Element) ReCreate() {
-	e.RC.Add(&RenderNode{
+	e.RC.Add(&RenderTask{
 		Type:   RecreateType,
 		New:    e,
 		Parent: e.Parent,
@@ -109,7 +111,7 @@ func (rc *RenderCore) UpdateElementChildes(_el interface{}, el *Element, new, ol
 func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, old interface{}, index int, inReplaced bool) error {
 	// if element has created
 	if old == nil {
-		rc.Add(&RenderNode{
+		rc.Add(&RenderTask{
 			Type:        CreateType,
 			New:         new,
 			Parent:      parent,
@@ -135,7 +137,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 
 	// if element was deleted
 	if new == nil {
-		rc.Add(&RenderNode{
+		rc.Add(&RenderTask{
 			Type:        DeleteType,
 			NodeParent:  _parent,
 			Parent:      parent,
@@ -153,7 +155,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 		return err
 	}
 	if isChanged {
-		rc.Add(&RenderNode{
+		rc.Add(&RenderTask{
 			Type:               ReplaceType,
 			NodeParent:         _parent,
 			NodeOld:            _el,
@@ -192,7 +194,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 
 	if isChanged && !inReplaced {
-		rc.Add(&RenderNode{
+		rc.Add(&RenderTask{
 			Type:       ReplaceHooks,
 			NodeParent: _parent,
 			NodeOld:    _el,

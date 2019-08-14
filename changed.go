@@ -56,7 +56,7 @@ func isElementsEquals(newE, oldE *E) (bool, bool) {
 	return canBeUpdated && compareAttributes(newE.RAttrs, oldE.RAttrs), canBeUpdated
 }
 
-func compareAttributes(newMap, oldMap map[string]string) bool {
+func compareAttributes(newMap, oldMap Map) bool {
 	if len(newMap) != len(oldMap) {
 		return false
 	}
@@ -103,8 +103,8 @@ func compareHook(newHook, oldHook Hook) bool {
 	return reflect.ValueOf(newHook).Pointer() == reflect.ValueOf(oldHook).Pointer()
 }
 
-func DiffAttrs(newA, oldA map[string]string) map[string]string {
-	diffMap := make(map[string]string)
+func DiffAttrs(newA, oldA Map) Map {
+	diffMap := make(Map)
 	for key, val := range oldA {
 		if _, ok := diffMap[key]; ok {
 			continue

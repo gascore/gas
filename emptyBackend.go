@@ -2,7 +2,7 @@ package gas
 
 // emptyBackEnd empty backend for testing backend calling methods
 type emptyBackEnd struct {
-	logger func(*RenderNode)
+	logger func([]*RenderTask)
 }
 
 // GetEmptyRenderCore return epmty render core
@@ -16,12 +16,10 @@ func GetEmptyBackend() BackEnd {
 }
 
 // ExecNode return nil
-func (e emptyBackEnd) ExecNode(node *RenderNode) error {
+func (e emptyBackEnd) ExecTasks(tasks []*RenderTask) {
 	if e.logger != nil {
-		e.logger(node)
+		e.logger(tasks)
 	}
-
-	return nil
 }
 
 // ChildNodes return nil

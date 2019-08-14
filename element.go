@@ -13,8 +13,8 @@ type Element struct {
 	IsPointer bool // by default element isn't pointer
 
 	Tag      string
-	Attrs    func() map[string]string
-	RAttrs   map[string]string  // last rendered Attrs
+	Attrs    func() Map
+	RAttrs   Map  // last rendered Attrs
 	Handlers map[string]Handler // events handlers: onClick, onHover
 
 	HTML HTMLDirective

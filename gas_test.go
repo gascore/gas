@@ -36,8 +36,8 @@ func (root *exampleRoot) Render() []interface{} {
 	return CL(
 		NE(
 			&E{
-				Attrs: func() map[string]string {
-					return map[string]string{
+				Attrs: func() Map {
+					return Map{
 						"class": "wow",
 					}
 				},

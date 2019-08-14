@@ -7,10 +7,39 @@ import (
 	"github.com/gascore/gas"
 )
 
-// ExecNode execute render node
-func (w BackEnd) ExecNode(node *gas.RenderNode) error {
+func (w *BackEnd) Executor() {
+	for {
+		select {
+		case task := <- w.queue:
+			err := w.ExecTask(task)
+			if err != nil {
+				dom.ConsoleError(err.Error())
+			}
+		}
+	}
+}
+
+// ExecTasks execute render tasks
+func (w *BackEnd) ExecTasks(tasks []*gas.RenderTask) {
+	if w.newRenderer {
+		for _, task := range tasks {
+			w.queue <- task
+		}
+		return
+	}
+
+	for _, task := range tasks {
+		err := w.ExecTask(task)
+		if err != nil {
+			dom.ConsoleError(err.Error())
+		}
+	}
+}
+
+// ExecTask execute render task
+func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 	hook := func(f func(interface{}) error, el interface{}) {
-		if !node.IgnoreHooks {
+		if !task.IgnoreHooks {
 			err := f(el)
 			if err != nil {
 				dom.ConsoleError(err.Error())
@@ -18,24 +47,24 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		}
 	}
 
-	if !node.IgnoreHooks {
-		err := gas.CallBeforeUpdate(node.Parent)
+	if !task.IgnoreHooks {
+		err := gas.CallBeforeUpdate(task.Parent)
 		if err != nil {
 			dom.ConsoleError(err.Error())
 		}
 	}
 
-	switch node.Type {
+	switch task.Type {
 	case gas.ReplaceType:
-		hook(gas.CallBeforeCreated, node.New)
-		hook(gas.CallBeforeDestroy, node.Old)
+		hook(gas.CallBeforeCreated, task.New)
+		hook(gas.CallBeforeDestroy, task.Old)
 
 		// custom logic
-		if node.ReplaceCanGoDeeper { // Update old element attributes
-			newE := node.New.(*gas.E)
-			_old := node.NodeOld.(*dom.Element)
+		if task.ReplaceCanGoDeeper { // Update old element attributes
+			newE := task.New.(*gas.E)
+			_old := task.NodeOld.(*dom.Element)
 
-			for attrKey, attrVal := range gas.DiffAttrs(newE.RAttrs, node.Old.(*gas.E).RAttrs) {
+			for attrKey, attrVal := range gas.DiffAttrs(newE.RAttrs, task.Old.(*gas.E).RAttrs) {
 				_old.SetAttribute(attrKey, attrVal)
 				if attrKey == "value" {
 					_old.SetValue(attrVal)
@@ -47,58 +76,58 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		}
 
 		// Create new element and replace with old
-		_new, err := CreateElement(node.New)
+		_new, err := CreateElement(task.New)
 		if err != nil {
 			return err
 		}
 
-		_parent, ok := node.NodeParent.(*dom.Element)
+		_parent, ok := task.NodeParent.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeParent type")
 		}
 
-		_old, ok := node.NodeOld.(*dom.Element)
+		_old, ok := task.NodeOld.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeOld type")
 		}
 
 		_parent.ReplaceChild(_new, _old)
 
-		hook(gas.CallMounted, node.New)
+		hook(gas.CallMounted, task.New)
 	case gas.ReplaceHooks:
-		hook(gas.CallMounted, node.New)
+		hook(gas.CallMounted, task.New)
 	case gas.CreateType:
-		_parent, ok := node.NodeParent.(*dom.Element)
+		_parent, ok := task.NodeParent.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeParent type")
 		}
 
-		hook(gas.CallBeforeCreated, node.New)
+		hook(gas.CallBeforeCreated, task.New)
 
-		_new, err := CreateElement(node.New)
+		_new, err := CreateElement(task.New)
 		if err != nil {
 			return err
 		}
 
 		_parent.AppendChild(_new)
 
-		hook(gas.CallMounted, node.New)
+		hook(gas.CallMounted, task.New)
 	case gas.DeleteType:
-		_parent, ok := node.NodeParent.(*dom.Element)
+		_parent, ok := task.NodeParent.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeParent")
 		}
 
-		_old, ok := node.NodeOld.(*dom.Element)
+		_old, ok := task.NodeOld.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeOld")
 		}
 
-		hook(gas.CallBeforeDestroy, node.Old)
+		hook(gas.CallBeforeDestroy, task.Old)
 
 		_parent.RemoveChild(_old)
 	case gas.RecreateType:
-		e := node.New.(*gas.Element)
+		e := task.New.(*gas.Element)
 		_e, ok := e.BEElement().(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeNew type")
@@ -119,8 +148,8 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 		}
 	}
 
-	if !node.IgnoreHooks {
-		err := gas.CallUpdated(node.Parent)
+	if !task.IgnoreHooks {
+		err := gas.CallUpdated(task.Parent)
 		if err != nil {
 			dom.ConsoleError(err.Error())
 		}
@@ -130,18 +159,17 @@ func (w BackEnd) ExecNode(node *gas.RenderNode) error {
 }
 
 // ChildNodes return *dom.Element child nodes
-func (w BackEnd) ChildNodes(node interface{}) []interface{} {
-	var iNodes []interface{}
-
-	_node, ok := node.(*dom.Element)
+func (w *BackEnd) ChildNodes(el interface{}) []interface{} {
+	var iChildes []interface{}
+	_el, ok := el.(*dom.Element)
 	if !ok {
-		return iNodes
+		return iChildes
 	}
 
-	_childes := _node.ChildNodes()
+	_childes := _el.ChildNodes()
 	for _, _el := range _childes {
-		iNodes = append(iNodes, _el)
+		iChildes = append(iChildes, _el)
 	}
 
-	return iNodes
+	return iChildes
 }

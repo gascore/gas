@@ -14,3 +14,8 @@ var NE = NewElement
 
 // F alias for FunctionalComponent
 type F = FunctionalComponent
+
+// CL alias for ToGetComponentList
+var CL = ToGetComponentList
+
+type Map map[string]string

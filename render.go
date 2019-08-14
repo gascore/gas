@@ -4,11 +4,11 @@ package gas
 type RenderCore struct {
 	BE BackEnd
 
-	queue []*RenderNode
+	queue []*RenderTask
 }
 
-// RenderNode node storing changes
-type RenderNode struct {
+// RenderTask node storing changes
+type RenderTask struct {
 	Type RenderType
 
 	Parent *Element
@@ -20,7 +20,7 @@ type RenderNode struct {
 	IgnoreHooks        bool // don't exec elements hooks
 }
 
-// RenderType renderNode type
+// RenderType RenderTask type
 type RenderType int
 
 const (
@@ -41,25 +41,17 @@ const (
 )
 
 // Add push render nodes to render queue and trying to execute all queue
-func (rc *RenderCore) Add(node *RenderNode) {
+func (rc *RenderCore) Add(node *RenderTask) {
 	rc.queue = append(rc.queue, node)
 }
 
 // GetAll return render nodes from queue
-func (rc *RenderCore) GetAll() []*RenderNode {
+func (rc *RenderCore) GetAll() []*RenderTask {
 	return rc.queue
 }
 
 // Exec run all render nodes in render core
-func (rc *RenderCore) Exec() error {
-	for _, node := range rc.queue {
-		err := rc.BE.ExecNode(node)
-		if err != nil {
-			return err
-		}
-	}
-
-	rc.queue = []*RenderNode{}
-
-	return nil
+func (rc *RenderCore) Exec() {
+	rc.BE.ExecTasks(rc.queue)
+	rc.queue = []*RenderTask{}
 }

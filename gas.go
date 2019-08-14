@@ -2,6 +2,21 @@ package gas
 
 import "fmt"
 
+// Gas - main application struct
+type Gas struct {
+	*Element
+}
+
+// BackEnd interface for calling platform-specific code
+type BackEnd interface {
+	ExecTasks([]*RenderTask)
+	GetElement(*Element) interface{}
+	ChildNodes(interface{}) []interface{}
+
+	ConsoleLog(...interface{})
+	ConsoleError(...interface{})
+}
+
 // New create new gas application with custom backend
 func New(c *Component, be BackEnd) Gas {
 	c.RC = &RenderCore{BE: be}
@@ -12,9 +27,6 @@ func New(c *Component, be BackEnd) Gas {
 func ToGetComponentList(childes ...interface{}) []interface{} {
 	return childes
 }
-
-// CL alias for ToGetComponentList
-var CL = ToGetComponentList
 
 // WarnError log error
 func (c *Component) WarnError(err error) {

@@ -10,7 +10,7 @@ func TestUpdateChildes(t *testing.T) {
 			"wow",
 		),
 		NE(
-			&E{Tag: "h1", Attrs: func() map[string]string { return map[string]string{"id": "wow"} }},
+			&E{Tag: "h1", Attrs: func() Map { return Map{"id": "wow"} }},
 			"Title",
 		),
 		NE(
@@ -18,7 +18,7 @@ func TestUpdateChildes(t *testing.T) {
 			"Lorem ipsum dolore",
 			" ",
 			NE(
-				&E{Tag: "i", Attrs: func() map[string]string { return map[string]string{"id": "lol", "class": "some"} }},
+				&E{Tag: "i", Attrs: func() Map { return Map{"id": "lol", "class": "some"} }},
 				"opsum",
 			),
 			NE(
@@ -60,7 +60,7 @@ func TestUpdateChildes(t *testing.T) {
 }
 
 func TestUpdateElementChildes(t *testing.T) {
-	var nodes []*RenderNode
+	var nodes []*RenderTask
 
 	root := &exampleRoot{
 		msg:     "no",
@@ -69,9 +69,8 @@ func TestUpdateElementChildes(t *testing.T) {
 	c := &C{
 		RC: &RenderCore{
 			BE: emptyBackEnd{
-				logger: func(node *RenderNode) {
-					// fmt.Println("NODE", node)
-					nodes = append(nodes, node)
+				logger: func(newNodes []*RenderTask) {
+					nodes = append(nodes, newNodes...)
 				},
 			},
 		},
@@ -79,33 +78,19 @@ func TestUpdateElementChildes(t *testing.T) {
 	}
 	root.c = c
 
+	f := func(i int) {
+		if len(nodes) != i {
+			t.Errorf("not enough render nodes, want: 1, but got: %d, nodes: %v", len(nodes), nodes)
+		}
+		nodes = []*RenderTask{}
+	}
+
 	el := root.c.Init()
 	el.Update()
-
-	// fmt.Println(el.Childes[2].(*E).Childes)
-	// fmt.Println(el.Childes[3].(*E).Childes)
-	if len(nodes) != 4 {
-		t.Errorf("not enough render nodes, want: 4, but got: %d, nodes: %v", len(nodes), nodes)
-	}
-	// fmt.Println(el.Childes[3].(*E).Childes)
-	// fmt.Println(el.Childes)
-	nodes = []*RenderNode{}
+	f(4)
 
 	root.counter = 6
 	root.msg = "wow"
-
 	root.c.Update()
-	// fmt.Println(el.Childes[2].(*E).Childes[0])
-	if len(nodes) != 1 {
-		// fmt.Println(nodes[0])
-		t.Errorf("not enough render nodes, want: 1, but got: %d, nodes: %v", len(nodes), nodes)
-	}
-	nodes = []*RenderNode{}
-
-	// fmt.Println(nodes)
-	// fmt.Println(nodes[0])
-	// fmt.Println(nodes[1])
-
-	// 	fmt.Println(el.Childes[2].(*E).Childes)
-	// 	fmt.Println(el.Childes[3].(*E).Childes)
+	f(1)
 }

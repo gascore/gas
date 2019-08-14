@@ -70,11 +70,11 @@ func TestChanged(t *testing.T) {
 	f(&E{Component: c1}, &E{Component: c1}, false, true, false)
 	f(&E{Component: c1}, &E{}, true, false, false)
 
-	eA1 := &E{Attrs: func() map[string]string { return map[string]string{"id": "wow"} }}
+	eA1 := &E{Attrs: func() Map { return Map{"id": "wow"} }}
 	eA1.RAttrs = eA1.Attrs()
-	eA2 := &E{Attrs: func() map[string]string { return map[string]string{"id": "wow", "class": "lol"} }}
+	eA2 := &E{Attrs: func() Map { return Map{"id": "wow", "class": "lol"} }}
 	eA2.RAttrs = eA2.Attrs()
-	eA3 := &E{Attrs: func() map[string]string { return map[string]string{"id": "lol"} }}
+	eA3 := &E{Attrs: func() Map { return Map{"id": "lol"} }}
 	eA3.RAttrs = eA3.Attrs()
 
 	// attrs

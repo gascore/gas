@@ -25,8 +25,8 @@ func TestComponentInit(t *testing.T) {
 		}
 	}
 
-	f(&C{Element: &E{Tag: "h1", Attrs: func() map[string]string { return map[string]string{"id": "foo"} }}})
-	f(&C{Element: &E{Attrs: func() map[string]string { return map[string]string{"id": "foo"} }}})
+	f(&C{Element: &E{Tag: "h1", Attrs: func() Map { return Map{"id": "foo"} }}})
+	f(&C{Element: &E{Attrs: func() Map { return Map{"id": "foo"} }}})
 	f(&C{Element: &E{UUID: "custom_id"}})
 }
 

@@ -29,7 +29,7 @@ func TestUpdateChildes(t *testing.T) {
 					"wate",
 				),
 				NE(
-					&E{HTML: HTMLDirective{Render: func() string { return "<h2>some</h2>" }}},
+					&E{HTML: func() string { return "<h2>some</h2>" }},
 				),
 			),
 		),
@@ -54,7 +54,7 @@ func TestUpdateChildes(t *testing.T) {
 	isChildValid(tree.Childes[2].(*E).Childes[3].(*E).Childes[1])
 	isChildValid(tree.Childes[2].(*E).Childes[3].(*E).Childes[2])
 
-	if tree.Childes[2].(*E).Childes[3].(*E).Childes[2].(*E).HTML.Rendered == "" {
+	if tree.Childes[2].(*E).Childes[3].(*E).Childes[2].(*E).RHTML == "" {
 		t.Error("invalid html directive")
 	}
 }

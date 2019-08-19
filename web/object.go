@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gascore/dom"
@@ -41,13 +42,50 @@ func ToUniteObject(e dom.Value) gas.Object { return object{o: e.JSValue()} }
 type event struct{ 
 	gas.Object
 	event dom.Event
+	isCheckbox bool
 }
 
+// Value reurn event value
 func (e event) Value() string {
+	if e.isCheckbox {
+		if e.ValueBool() {
+			return "true"
+		}
+		return "false"
+	}
+
 	return e.event.Target().Value()
 }
 
-func ToGasEvent(domEvent dom.Event) gas.Event { 
-	e := event{ToUniteObject(domEvent), domEvent}
+// Value reurn event value and convert it to int
+func (e event) ValueInt() int {
+	val := e.Value()
+	n, err := strconv.Atoi(val)
+	if err != nil {
+		dom.ConsoleError(fmt.Sprintf("cannot convert event value to int: \"%s\"", val))
+	}
+
+	return n
+}
+
+// Value reurn event value and convert it to boolean
+func (e event) ValueBool() bool {
+	if e.isCheckbox {
+		return e.event.Target().JSValue().Get("checked").Bool()
+	}
+
+	val := e.Value()
+	if val == "true" {
+		return true
+	} else if val != "false" {
+		dom.ConsoleError(fmt.Sprintf("cannot convert event value to bool: \"%s\"", val))
+	}
+
+	return false
+}
+
+// ToGasEvent convert dom.Event to gas.Event
+func ToGasEvent(domEvent dom.Event, isCheckbox bool) gas.Event { 
+	e := event{ToUniteObject(domEvent), domEvent, isCheckbox}
 	return e
 }

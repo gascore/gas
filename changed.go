@@ -52,7 +52,7 @@ func isNodesEquals(newE, oldE *E) (bool, bool) {
 }
 
 func isElementsEquals(newE, oldE *E) (bool, bool) {
-	canBeUpdated := newE.Tag == oldE.Tag && newE.HTML.Rendered == oldE.HTML.Rendered && reflect.ValueOf(newE.HTML.Render).Pointer() == reflect.ValueOf(oldE.HTML.Render).Pointer()
+	canBeUpdated := newE.Tag == oldE.Tag && newE.RHTML == oldE.RHTML && reflect.ValueOf(newE.HTML).Pointer() == reflect.ValueOf(oldE.HTML).Pointer()
 	return canBeUpdated && compareAttributes(newE.RAttrs, oldE.RAttrs), canBeUpdated
 }
 

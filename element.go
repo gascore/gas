@@ -14,10 +14,11 @@ type Element struct {
 
 	Tag      string
 	Attrs    func() Map
-	RAttrs   Map  // last rendered Attrs
+	RAttrs   Map                // last rendered Attrs
 	Handlers map[string]Handler // events handlers: onClick, onHover
 
-	HTML HTMLDirective
+	HTML  func() string
+	RHTML string
 
 	getChildes GetChildes
 	Childes    []interface{}
@@ -87,6 +88,8 @@ type Object interface {
 type Event interface {
 	Object
 	Value() string
+	ValueInt() int
+	ValueBool() bool
 }
 
 // BEElement return element in backend implementation

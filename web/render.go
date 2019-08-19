@@ -64,12 +64,7 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 			newE := task.New.(*gas.E)
 			_old := task.NodeOld.(*dom.Element)
 
-			for attrKey, attrVal := range gas.DiffAttrs(newE.RAttrs, task.Old.(*gas.E).RAttrs) {
-				_old.SetAttribute(attrKey, attrVal)
-				if attrKey == "value" {
-					_old.SetValue(attrVal)
-				}
-			}
+			setAttributes(_old, gas.DiffAttrs(newE.RAttrs, task.Old.(*gas.E).RAttrs))
 
 			_old.SetAttribute("data-i", newE.UUID)
 			return nil

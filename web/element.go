@@ -83,9 +83,7 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 
 	_node.SetAttribute("data-i", el.UUID) // set data-i for accept element from component methods
 
-	for attrName, attrBody := range el.RAttrs {
-		_node.SetAttribute(attrName, attrBody)
-	}
+	setAttributes(_node, el.RAttrs)
 
 	for handlerName, handlerBodyG := range el.Handlers {
 		handlerBody := handlerBodyG
@@ -103,7 +101,7 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 				_node.AddEventListener("keyup", func(e dom.Event) {
 					keyCode, _ := strconv.Atoi(e.KeyCode())
 					if handlerTarget == strings.ToLower(e.Key()) || (handlerTargetIsInt && handlerTargetInt == keyCode) {
-						handlerBody(ToGasEvent(e))
+						handlerBody(ToGasEvent(e, false))
 					}
 				})
 				continue
@@ -136,7 +134,7 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 					}
 
 					if correctKey {
-						handlerBody(ToGasEvent(e))
+						handlerBody(ToGasEvent(e, false))
 					}
 				})
 
@@ -144,17 +142,51 @@ func createHtmlElement(el *gas.Element) (*dom.Element, error) {
 			}
 		}
 
+		isCheckbox := isInputCheckbox(el.Tag, el.RAttrs)
 		_node.AddEventListener(handlerName, func(e dom.Event) {
-			handlerBody(ToGasEvent(e))
+			handlerBody(ToGasEvent(e, isCheckbox))
 		})
 	}
 
-	if el.HTML.Render != nil {
-		htmlDirective := el.HTML.Render()
-		_node.SetInnerHTML(_node.InnerHTML() + "\n" + htmlDirective)
+	if el.HTML != nil {
+		_node.SetInnerHTML(_node.InnerHTML() + "\n" + el.RHTML)
 	}
 
 	return _node, nil
+}
+
+func setAttributes(_el *dom.Element, attrs gas.Map) {
+	for attrKey, attrVal := range attrs {
+		if attrKey == "checked" {
+			if attrVal == "false" {
+				_el.JSValue().Set("checked", false)
+				_el.RemoveAttribute("checked")
+				continue
+			}
+
+			_el.JSValue().Set("checked", true)
+		}
+		
+		_el.SetAttribute(attrKey, attrVal)
+		
+		if attrKey == "value" {
+			_el.SetValue(attrVal)
+		}
+	}
+}
+
+func isInputCheckbox(tag string, attrs gas.Map) bool {
+	if tag != "input" {
+		return false
+	}
+
+	for attrKey, attrVal := range attrs {
+		if attrKey == "type" && attrVal == "checkbox" {
+			return true
+		}
+	}
+
+	return false
 }
 
 // createTextNode create TextNode by string

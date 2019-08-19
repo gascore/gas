@@ -4,16 +4,6 @@ import (
 	"errors"
 )
 
-// htmlDirective return compiled element HTMLDirective
-func (e *Element) htmlDirective() string {
-	var htmlDirective string
-	if e.HTML.Render != nil {
-		htmlDirective = e.HTML.Render()
-	}
-
-	return htmlDirective
-}
-
 func (e *Element) Update() error {
 	_el := e.BEElement()
 	if _el == nil {
@@ -29,13 +19,6 @@ func (e *Element) Update() error {
 	e.RC.Exec()
 
 	return nil
-}
-
-// UpdateHTMLDirective trying rerender element html directive
-func (e *Element) UpdateHTMLDirective() {
-	if e.HTML.Render != nil {
-		e.HTML.Rendered = e.HTML.Render()
-	}
 }
 
 // UpdateWithError update component childes
@@ -79,7 +62,10 @@ func (e *Element) UpdateChildes() {
 		}
 
 		childE.UpdateChildes()
-		childE.UpdateHTMLDirective()
+
+		if childE.HTML != nil {
+			childE.RHTML = childE.HTML()
+		}
 	}
 
 	return
@@ -177,7 +163,7 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 
 	// if old and new is equals and they have html directives => they are two commons elements
-	if oldE.HTML.Render != nil && newE.HTML.Render != nil {
+	if oldE.HTML != nil && newE.HTML != nil {
 		return nil
 	}
 

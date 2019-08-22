@@ -68,7 +68,7 @@ func CreateElement(el interface{}) (dom.Node, error) {
 func newNodeEl(tag string) *dom.Element {
 	switch tag {
 	case "animate", "animatemotion", "animatetransform", "circle", "clippath", "color-profile", "defs", "desc", "discard", "ellipse", "feblend", "fecolormatrix", "fecomponenttransfer", "fecomposite", "feconvolvematrix", "fediffuselighting", "fedisplacementmap", "fedistantlight", "fedropshadow", "feflood", "fefunca", "fefuncb", "fefuncg", "fefuncr", "fegaussianblur", "feimage", "femerge", "femergenode", "femorphology", "feoffset", "fepointlight", "fespecularlighting", "fespotlight", "fetile", "feturbulence", "filter", "foreignobject", "g", "hatch", "hatchpath", "image", "line", "lineargradient", "marker", "mask", "mesh", "meshgradient", "meshpatch", "meshrow", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialgradient", "rect", "set", "solidcolor", "stop", "svg", "switch", "symbol", "text", "textpath", "title", "tspan", "unknown", "use", "view", "svg-style", "svg-script", "svg-a":
-		return dom.AsElement(js.Value{dom.Doc.JSValue().Call("createElementNS", "http://www.w3.org/2000/svg", strings.TrimPrefix(tag, "svg-"))})
+		return dom.NewElementNS("http://www.w3.org/2000/svg", strings.TrimPrefix(tag, "svg-"))
 	default:
 		return dom.NewElement(tag)
 	}

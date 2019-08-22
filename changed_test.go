@@ -92,3 +92,21 @@ func TestChanged(t *testing.T) {
 	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{BeforeCreated: m2}}, false, true, false) // with control
 	f(&C{Hooks: Hooks{BeforeCreated: m2}}, &C{Hooks: Hooks{}}, true, false, false)                  // with control
 }
+
+func TestDiffAttrs(t *testing.T) {
+	f := func(newA, oldA Map, excp Map) {
+		got := DiffAttrs(newA, oldA)
+		if !compareAttributes(got, excp) {
+			t.Errorf("error in DiffAttrs: excepted: %v, got: %v", excp, got)
+		}
+	}
+
+	f(Map{"1": "1"}, Map{"1": "1"}, Map{})
+	f(Map{"1": "1"}, Map{"1": "2"}, Map{"1":"1"})
+	f(Map{"1": "3"}, Map{"1": "3"}, Map{})
+	f(Map{"1": "1", "2": "2"}, Map{"1": "1"}, Map{"2": "2"})
+	f(Map{"1": "1", "2": "2"}, Map{"1": "1", "2": "3"}, Map{"2": "2"})
+	f(Map{"1": "1"}, Map{"1": "1", "2": "2"}, Map{"2": ""})
+	f(Map{"1": "1", "2": "3"}, Map{"1": "1", "2": "2", "4": "4"}, Map{"2": "3", "4": ""})
+	f(Map{"1": "1", "4": "4"}, Map{"1": "1", "2": "2", "3": "3"}, Map{"4": "4", "2": "", "3": ""})
+}

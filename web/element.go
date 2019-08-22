@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/gascore/dom"
-	"github.com/gascore/dom/js"
 	"github.com/gascore/gas"
 )
 

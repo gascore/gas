@@ -4,7 +4,7 @@ import "fmt"
 
 // Gas - main application struct
 type Gas struct {
-	*Element
+	Component *Component
 }
 
 // BackEnd interface for calling platform-specific code
@@ -18,9 +18,9 @@ type BackEnd interface {
 }
 
 // New create new gas application with custom backend
-func New(c *Component, be BackEnd) Gas {
+func New(c *Component, be BackEnd) *Gas {
 	c.RC = &RenderCore{BE: be}
-	return Gas{c.Init()}
+	return &Gas{c}
 }
 
 // ToGetComponentList return array by many parameters, because it's pretty

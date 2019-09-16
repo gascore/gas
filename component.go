@@ -1,17 +1,13 @@
 package gas
 
-import "github.com/frankenbeanies/uuid4"
-
 // Component logic node
 type Component struct {
 	Root interface {
-		Render() []interface{}
+		Render() *Element
 	}
 
-	Element            *Element
-	ElementIsImportant bool
-
-	Hooks Hooks
+	Element *Element // last-time render by root element from
+	Hooks   Hooks
 
 	RefsAllowed bool
 	Refs        map[string]*Element
@@ -21,33 +17,12 @@ type Component struct {
 	RC *RenderCore
 }
 
-// Init initialize component: create element and other stuff
-func (c *Component) Init() *Element {
-	var el *Element
-	if c.Element == nil {
-		el = &Element{
-			Tag:       "div",
-			UUID:      uuid4.New().String(),
-			Component: c,
-			RC:        c.RC,
-		}
-	} else {
-		el = c.Element
-		el.Component = c
-		el.RC = c.RC
+// RenderElement create element for elements tree
+func (c *Component) RenderElement() *Element {
+	el := c.Root.Render()
 
-		if len(el.UUID) == 0 {
-			el.UUID = uuid4.New().String()
-		}
-
-		if len(el.Tag) == 0 {
-			el.Tag = "div"
-		}
-	}
-
-	el.getChildes = func() []interface{} {
-		return c.Root.Render()
-	}
+	el.RC = c.RC
+	el.Component = c
 	el.IsPointer = !c.NotPointer
 
 	c.Element = el
@@ -131,6 +106,6 @@ type EmptyRoot struct {
 	Element *Element
 }
 
-func (root *EmptyRoot) Render() []interface{} {
-	return CL(root.Element)
+func (root *EmptyRoot) Render() *Element {
+	return root.Element
 }

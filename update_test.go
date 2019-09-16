@@ -1,6 +1,8 @@
 package gas
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestUpdateChildes(t *testing.T) {
 	tree := NE(
@@ -74,23 +76,24 @@ func TestUpdateElementChildes(t *testing.T) {
 				},
 			},
 		},
-		Root: root,
+		NotPointer: true,
+		Root:       root,
 	}
 	root.c = c
 
 	f := func(i int) {
 		if len(nodes) != i {
-			t.Errorf("not enough render nodes, want: 1, but got: %d, nodes: %v", len(nodes), nodes)
+			t.Errorf("not enough render nodes, want: %d, but got: %d, nodes: %v", i, len(nodes), nodes)
+			return
 		}
 		nodes = []*RenderTask{}
 	}
 
-	el := root.c.Init()
-	el.Update()
-	f(4)
+	root.c.Update()
+	f(1)
 
 	root.counter = 6
 	root.msg = "wow"
 	root.c.Update()
-	f(1)
+	f(2)
 }

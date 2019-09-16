@@ -2,6 +2,7 @@ package web
 
 import (
 	"errors"
+	// "fmt"
 
 	"github.com/gascore/dom"
 	"github.com/gascore/gas"
@@ -10,7 +11,7 @@ import (
 func (w *BackEnd) Executor() {
 	for {
 		select {
-		case task := <- w.queue:
+		case task := <-w.queue:
 			err := w.ExecTask(task)
 			if err != nil {
 				dom.ConsoleError(err.Error())
@@ -39,7 +40,7 @@ func (w *BackEnd) ExecTasks(tasks []*gas.RenderTask) {
 // ExecTask execute render task
 func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 	hook := func(f func(interface{}) error, el interface{}) {
-		if !task.IgnoreHooks {
+		if !task.InReplaced {
 			err := f(el)
 			if err != nil {
 				dom.ConsoleError(err.Error())
@@ -47,7 +48,7 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 		}
 	}
 
-	if !task.IgnoreHooks {
+	if !task.InReplaced {
 		err := gas.CallBeforeUpdate(task.Parent)
 		if err != nil {
 			dom.ConsoleError(err.Error())
@@ -55,18 +56,18 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 	}
 
 	switch task.Type {
-	case gas.ReplaceType:
+	case gas.RReplace:
 		hook(gas.CallBeforeCreated, task.New)
 		hook(gas.CallBeforeDestroy, task.Old)
 
-		// custom logic
-		if task.ReplaceCanGoDeeper { // Update old element attributes
+		// Update old element attributes
+		if task.ReplaceCanGoDeeper {
 			newE := task.New.(*gas.E)
 			_old := task.NodeOld.(*dom.Element)
 
 			setAttributes(_old, gas.DiffAttrs(newE.RAttrs, task.Old.(*gas.E).RAttrs))
-
 			_old.SetAttribute("data-i", newE.UUID)
+
 			return nil
 		}
 
@@ -76,25 +77,26 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 			return err
 		}
 
-		_parent, ok := task.NodeParent.(*dom.Element)
-		if !ok {
-			return errors.New("invalid NodeParent type")
-		}
-
 		_old, ok := task.NodeOld.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeOld type")
 		}
 
-		_parent.ReplaceChild(_new, _old)
+		_old.ParentElement().ReplaceChild(_new, _old)
 
 		hook(gas.CallMounted, task.New)
-	case gas.ReplaceHooks:
+	case gas.RReplaceHooks:
 		hook(gas.CallMounted, task.New)
-	case gas.CreateType:
-		_parent, ok := task.NodeParent.(*dom.Element)
-		if !ok {
-			return errors.New("invalid NodeParent type")
+	case gas.RCreate, gas.RFirstRender:
+		var _parent *dom.Element
+		if task.Type == gas.RCreate {
+			var ok bool
+			_parent, ok = task.NodeParent.(*dom.Element)
+			if !ok {
+				return errors.New("invalid NodeParent type")
+			}
+		} else {
+			_parent = w.startEl
 		}
 
 		hook(gas.CallBeforeCreated, task.New)
@@ -107,7 +109,7 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 		_parent.AppendChild(_new)
 
 		hook(gas.CallMounted, task.New)
-	case gas.DeleteType:
+	case gas.RDelete:
 		_parent, ok := task.NodeParent.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeParent")
@@ -121,7 +123,7 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 		hook(gas.CallBeforeDestroy, task.Old)
 
 		_parent.RemoveChild(_old)
-	case gas.RecreateType:
+	case gas.RRecreate:
 		e := task.New.(*gas.Element)
 		_e, ok := e.BEElement().(*dom.Element)
 		if !ok {
@@ -137,13 +139,13 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 		e.Childes = []interface{}{}
 		e.OldChildes = []interface{}{}
 
-		err := e.Update()
+		err := e.ParentComponent().Component.UpdateWithError()
 		if err != nil {
 			return err
 		}
 	}
 
-	if !task.IgnoreHooks {
+	if !task.InReplaced {
 		err := gas.CallUpdated(task.Parent)
 		if err != nil {
 			dom.ConsoleError(err.Error())

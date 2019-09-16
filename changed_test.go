@@ -36,13 +36,13 @@ func TestChanged(t *testing.T) {
 	}
 
 	c1 := &C{
-		ElementIsImportant: true,
-		Element:            e1,
+		RefsAllowed: true,
+		Element:     e1,
 	}
 
 	c2 := &C{
-		ElementIsImportant: true,
-		Element:            e2,
+		RefsAllowed: false,
+		Element:     e2,
 	}
 
 	// atomic types
@@ -102,7 +102,7 @@ func TestDiffAttrs(t *testing.T) {
 	}
 
 	f(Map{"1": "1"}, Map{"1": "1"}, Map{})
-	f(Map{"1": "1"}, Map{"1": "2"}, Map{"1":"1"})
+	f(Map{"1": "1"}, Map{"1": "2"}, Map{"1": "1"})
 	f(Map{"1": "3"}, Map{"1": "3"}, Map{})
 	f(Map{"1": "1", "2": "2"}, Map{"1": "1"}, Map{"2": "2"})
 	f(Map{"1": "1", "2": "2"}, Map{"1": "1", "2": "3"}, Map{"2": "2"})

@@ -100,6 +100,10 @@ func CallBeforeDestroy(i interface{}) error {
 
 // CallUpdated call Updated hook
 func CallUpdated(p *Element) error {
+	if p == nil {
+		return nil
+	}
+
 	c := p.Component
 	if c == nil {
 		c = p.ParentComponent().Component
@@ -116,10 +120,14 @@ func CallUpdated(p *Element) error {
 }
 
 // CallBeforeUpdate call BeforeUpdate hook
-func CallBeforeUpdate(element *Element) error {
-	c := element.Component
+func CallBeforeUpdate(p *Element) error {
+	if p == nil {
+		return nil
+	}
+
+	c := p.Component
 	if c == nil {
-		c = element.ParentComponent().Component
+		c = p.ParentComponent().Component
 	}
 
 	if c.Hooks.BeforeUpdate != nil {

@@ -9,13 +9,18 @@ func TestNew(t *testing.T) {
 
 	gas := New(c, GetEmptyBackend())
 
-	gas.UpdateChildes()
+	gas.Component.Update()
 
-	if len(gas.Childes) == 0 {
+	el := gas.Component.Element
+	if el == nil {
+		t.Error("component element is nil")
+	}
+
+	if len(el.Childes) == 0 {
 		t.Error("app has no childes")
 	}
 
-	child, ok := gas.Childes[0].(*E)
+	child, ok := el.Childes[0].(*E)
 	if !ok {
 		t.Error("invalid app first child type")
 	}
@@ -32,8 +37,9 @@ type exampleRoot struct {
 	counter int
 }
 
-func (root *exampleRoot) Render() []interface{} {
-	return CL(
+func (root *exampleRoot) Render() *Element {
+	return NE(
+		&E{},
 		NE(
 			&E{
 				Attrs: func() Map {
@@ -48,7 +54,7 @@ func (root *exampleRoot) Render() []interface{} {
 					return "Message is wow"
 				}
 				return nil
-			},
+			}(),
 		),
 		NE(
 			&E{

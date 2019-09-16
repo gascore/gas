@@ -10,7 +10,7 @@ type FunctionalComponent struct {
 	effects        []effectItem
 	cleaners       map[int]func()
 
-	renderer func() []interface{}
+	renderer func() *Element
 }
 
 type effectItem struct {
@@ -22,7 +22,7 @@ type effectItem struct {
 type Effect func() (func(), error)
 
 // Init create *C from *F
-func (f *FunctionalComponent) Init(notPointer bool, renderer func() []interface{}) *E {
+func (f *FunctionalComponent) Init(notPointer bool, renderer func() *E) *C {
 	f.renderer = renderer
 
 	c := &C{
@@ -36,7 +36,7 @@ func (f *FunctionalComponent) Init(notPointer bool, renderer func() []interface{
 	}
 	f.C = c
 
-	return c.Init()
+	return c
 }
 
 // UseState create new state value
@@ -102,7 +102,7 @@ func (root *FunctionalComponent) runCleaners() error {
 }
 
 // Render return functionalComponent childes
-func (root *FunctionalComponent) Render() []interface{} {
+func (root *FunctionalComponent) Render() *Element {
 	root.statesCounter = 0
 	root.effectsCounter = 0
 	return root.renderer()

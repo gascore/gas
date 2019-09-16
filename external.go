@@ -12,3 +12,5 @@ type External struct {
 }
 
 type DynamicElement func(External) *Element
+
+type DynamicComponent func(External) *Component

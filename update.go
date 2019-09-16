@@ -2,28 +2,69 @@ package gas
 
 import (
 	"errors"
+	"fmt"
 )
-
-func (e *Element) Update() error {
-	_el := e.BEElement()
-	if _el == nil {
-		return errors.New("invalid '_el' in update function")
-	}
-
-	e.UpdateChildes()
-	err := e.RC.UpdateElementChildes(_el, e, e.Childes, e.OldChildes, false)
-	if err != nil {
-		return err
-	}
-
-	e.RC.Exec()
-
-	return nil
-}
 
 // UpdateWithError update component childes
 func (component *Component) UpdateWithError() error {
-	return component.Element.Update()
+	oldChild := component.Element // oldChild
+	if oldChild == nil {          // it's Gas in first render
+		component.RC.Add(&RenderTask{
+			Type: RFirstRender,
+			New:  component.RC.updateChild(nil, component.RenderElement()),
+		})
+		component.RC.Exec()
+		return nil
+	}
+
+	_oldChild := oldChild.BEElement()
+	if _oldChild == nil {
+		return errors.New("invalid _oldChild")
+	}
+
+	p := oldChild.Parent
+
+	newChild := component.RC.updateChild(p, component.RenderElement())
+	isChanged, canGoDeeper, err := Changed(newChild, oldChild)
+	if err != nil {
+		return err
+	}
+	if isChanged {
+		component.RC.Add(&RenderTask{
+			Type:               RReplace,
+			NodeOld:            _oldChild,
+			New:                newChild,
+			Old:                oldChild,
+			ReplaceCanGoDeeper: canGoDeeper,
+			Parent:             p,
+		})
+	}
+
+	if canGoDeeper {
+		newChildE, ok := newChild.(*Element)
+		if !ok {
+			return fmt.Errorf("unexpected newE type want: *gas.Element, got: %T", newChild)
+		}
+
+		newChildE.UUID = oldChild.UUID
+
+		err := component.RC.UpdateElementChildes(_oldChild, oldChild, newChildE.Childes, getOldChildes(newChildE, oldChild), true)
+		if err != nil {
+			return err
+		}
+	}
+
+	if isChanged {
+		component.RC.Add(&RenderTask{
+			Type:   RReplaceHooks,
+			Parent: p,
+			New:    newChild,
+		})
+	}
+
+	component.RC.Exec()
+
+	return nil
 }
 
 // Update update component childes with error warning
@@ -34,7 +75,7 @@ func (component *Component) Update() {
 // ReCreate re create element
 func (e *Element) ReCreate() {
 	e.RC.Add(&RenderTask{
-		Type:   RecreateType,
+		Type:   RRecreate,
 		New:    e,
 		Parent: e.Parent,
 	})
@@ -44,31 +85,40 @@ func (e *Element) ReCreate() {
 // UpdateChildes update element childes
 func (e *Element) UpdateChildes() {
 	e.OldChildes = e.Childes
-	e.Childes = []interface{}{}
 
-	for _, child := range UnSpliceBody(e.getChildes()) {
-		e.Childes = append(e.Childes, child)
-
-		childE, ok := child.(*Element)
-		if !ok {
-			continue
-		}
-
-		childE.RC = e.RC
-		childE.Parent = e
-
-		if childE.Attrs != nil {
-			childE.RAttrs = childE.Attrs()
-		}
-
-		childE.UpdateChildes()
-
-		if childE.HTML != nil {
-			childE.RHTML = childE.HTML()
-		}
+	for i, childExt := range e.Childes {
+		e.Childes[i] = e.RC.updateChild(e, childExt)
 	}
 
 	return
+}
+
+func (rc *RenderCore) updateChild(parent *Element, child interface{}) interface{} {
+	if _, ok := child.(*Component); ok {
+		childC := child.(*Component)
+		childC.RC = rc
+		child = childC.RenderElement()
+	}
+
+	childE, ok := child.(*Element)
+	if !ok {
+		return child
+	}
+
+	childE.RC = rc
+	childE.Parent = parent
+
+	if childE.Attrs != nil {
+		childE.RAttrs = childE.Attrs()
+	}
+
+	childE.UpdateChildes()
+
+	if childE.HTML != nil {
+		childE.RHTML = childE.HTML()
+	}
+
+	return child
 }
 
 // UpdateElementChildes compare new and old trees
@@ -98,11 +148,12 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	// if element has created
 	if old == nil {
 		rc.Add(&RenderTask{
-			Type:        CreateType,
-			New:         new,
-			Parent:      parent,
-			NodeParent:  _parent,
-			IgnoreHooks: inReplaced,
+			Type:       RCreate,
+			New:        new,
+			Parent:     parent,
+			NodeParent: _parent,
+
+			InReplaced: inReplaced,
 		})
 
 		return nil
@@ -124,12 +175,12 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	// if element was deleted
 	if new == nil {
 		rc.Add(&RenderTask{
-			Type:        DeleteType,
-			NodeParent:  _parent,
-			Parent:      parent,
-			NodeOld:     _el,
-			Old:         old,
-			IgnoreHooks: inReplaced,
+			Type:       RDelete,
+			NodeParent: _parent,
+			Parent:     parent,
+			NodeOld:    _el,
+			Old:        old,
+			InReplaced: inReplaced,
 		})
 
 		return nil
@@ -142,14 +193,14 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 	if isChanged {
 		rc.Add(&RenderTask{
-			Type:               ReplaceType,
+			Type:               RReplace,
 			NodeParent:         _parent,
 			NodeOld:            _el,
 			Parent:             parent,
 			New:                new,
 			Old:                old,
 			ReplaceCanGoDeeper: canGoDeeper,
-			IgnoreHooks:        inReplaced,
+			InReplaced:         inReplaced,
 		})
 	}
 	if !canGoDeeper {
@@ -158,30 +209,21 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 
 	newE := new.(*Element)
 	oldE := old.(*Element)
-	if newE.UUID != oldE.UUID {
-		newE.UUID = oldE.UUID // little hack
-	}
+	newE.UUID = oldE.UUID // little hack
 
 	// if old and new is equals and they have html directives => they are two commons elements
 	if oldE.HTML != nil && newE.HTML != nil {
 		return nil
 	}
 
-	var oldChildes []interface{}
-	if newE.IsPointer {
-		oldChildes = newE.OldChildes
-	} else {
-		oldChildes = oldE.Childes
-	}
-
-	err = rc.UpdateElementChildes(_el, newE, newE.Childes, oldChildes, isChanged)
+	err = rc.UpdateElementChildes(_el, newE, newE.Childes, getOldChildes(newE, oldE), isChanged)
 	if err != nil {
 		return err
 	}
 
 	if isChanged && !inReplaced {
 		rc.Add(&RenderTask{
-			Type:       ReplaceHooks,
+			Type:       RReplaceHooks,
 			NodeParent: _parent,
 			NodeOld:    _el,
 			Parent:     parent,
@@ -191,4 +233,12 @@ func (rc *RenderCore) updateElement(_parent interface{}, parent *Element, new, o
 	}
 
 	return nil
+}
+
+func getOldChildes(newE, oldE *Element) []interface{} {
+	if newE.IsPointer {
+		return newE.OldChildes
+	} else {
+		return oldE.Childes
+	}
 }

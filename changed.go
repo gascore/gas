@@ -13,8 +13,8 @@ func Changed(newEl, oldEl interface{}) (bool, bool, error) {
 
 	switch newEl.(type) {
 	case *Component:
-		isEquals, canGoDeeper := isComponentsEquals(I2C(newEl), I2C(oldEl))
-		return !isEquals, canGoDeeper, nil
+		isEquals := isComponentsEquals(I2C(newEl), I2C(oldEl))
+		return !isEquals, isEquals, nil
 	case *Element:
 		isEquals, canGoDeeper := isNodesEquals(I2E(newEl), I2E(oldEl))
 		return !isEquals, canGoDeeper, nil
@@ -27,16 +27,8 @@ func Changed(newEl, oldEl interface{}) (bool, bool, error) {
 	}
 }
 
-func isComponentsEquals(newC, oldC *C) (bool, bool) {
-	isEquals := newC.ElementIsImportant == oldC.ElementIsImportant &&
-		newC.RefsAllowed == oldC.RefsAllowed &&
-		compareHooks(newC.Hooks, oldC.Hooks)
-
-	if isEquals && newC.ElementIsImportant {
-		return isElementsEquals(newC.Element, oldC.Element)
-	}
-
-	return isEquals, isEquals
+func isComponentsEquals(newC, oldC *C) bool {
+	return newC.RefsAllowed == oldC.RefsAllowed && compareHooks(newC.Hooks, oldC.Hooks)
 }
 
 func isNodesEquals(newE, oldE *E) (bool, bool) {
@@ -45,7 +37,9 @@ func isNodesEquals(newE, oldE *E) (bool, bool) {
 			return false, false
 		}
 
-		return isComponentsEquals(newE.Component, oldE.Component)
+		if !isComponentsEquals(newE.Component, oldE.Component) {
+			return false, false
+		}
 	}
 
 	return isElementsEquals(newE, oldE)

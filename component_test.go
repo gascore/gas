@@ -9,7 +9,7 @@ func TestComponentInit(t *testing.T) {
 	f := func(c *C) {
 		c.Root = &exampleRoot{}
 
-		el := c.Init()
+		el := c.RenderElement()
 
 		if el.UUID == "" {
 			t.Errorf("empty element UUID")
@@ -78,7 +78,7 @@ func TestRemoveStrings(t *testing.T) {
 func TestEmptyRoot(t *testing.T) {
 	e := &E{Tag: "h1"}
 	root := &EmptyRoot{Element: e}
-	if !reflect.DeepEqual(root.Render(), CL(e)) {
+	if !reflect.DeepEqual(root.Render(), e) {
 		t.Errorf("invalid EmptyRoot.Render() result")
 	}
 }

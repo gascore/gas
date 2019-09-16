@@ -20,9 +20,7 @@ type Element struct {
 	HTML  func() string
 	RHTML string
 
-	getChildes GetChildes
-	Childes    []interface{}
-	OldChildes []interface{}
+	Childes, OldChildes []interface{}
 
 	Parent  *Element // if element is root, parent is nil
 	RefName string
@@ -44,15 +42,10 @@ func NewElement(el *Element, childes ...interface{}) *Element {
 		el.UUID = uuid4.New().String()
 	}
 
-	el.getChildes = func() []interface{} {
-		return childes
-	}
+	el.Childes = UnSpliceBody(childes)
 
 	return el
 }
-
-// GetChildes function returning component/element childes
-type GetChildes func() []interface{}
 
 // Bind dynamic component attribute
 type Bind func() string
@@ -116,4 +109,13 @@ func (e *Element) ParentComponent() *Element {
 	}
 
 	return parent.ParentComponent()
+}
+
+// ElementToComponent create static component from element
+func ElementToComponent(el *Element) *Component {
+	return &Component{
+		Root: &EmptyRoot{
+			Element: el,
+		},
+	}
 }

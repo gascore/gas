@@ -11,12 +11,13 @@ import (
 // BackEnd backend for core library
 type BackEnd struct {
 	newRenderer bool
-	queue chan *gas.RenderTask
+	queue       chan *gas.RenderTask
+	startEl     *dom.Element
 }
 
 // Init initialize gas application
 func Init(c *gas.Component, startPoint string) error {
-	return InitCustom(c,startPoint,false)
+	return InitCustom(c, startPoint, false)
 }
 
 func InitCustom(c *gas.C, startPoint string, newRenderer bool) error {
@@ -25,14 +26,17 @@ func InitCustom(c *gas.C, startPoint string, newRenderer bool) error {
 		return errors.New("invalid startPoint")
 	}
 
-	be := &BackEnd{queue: make(chan *gas.RenderTask),newRenderer:newRenderer}
+	be := &BackEnd{
+		queue:       make(chan *gas.RenderTask),
+		newRenderer: newRenderer,
+		startEl:     _startEl,
+	}
 	if newRenderer {
 		go be.Executor()
 	}
 
 	gas := gas.New(c, be)
-	_startEl.SetAttribute("data-i", gas.UUID)
-	gas.Update()
+	gas.Component.Update()
 
 	return nil
 }

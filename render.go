@@ -17,32 +17,35 @@ type RenderTask struct {
 	NodeParent, NodeNew, NodeOld interface{} // *dom.Element
 
 	ReplaceCanGoDeeper bool
-	IgnoreHooks        bool // don't exec elements hooks
+	InReplaced         bool
 }
 
 // RenderType RenderTask type
 type RenderType int
 
 const (
-	// ReplaceType type for replace node
-	ReplaceType RenderType = iota
+	// RReplace type for replace node
+	RReplace RenderType = iota
 
-	// ReplaceHooks type for run after replace hooks
-	ReplaceHooks
+	// RReplaceHooks type for run after replace hooks
+	RReplaceHooks
 
-	// CreateType type for create nodes
-	CreateType
+	// RCreate type for create nodes
+	RCreate
 
-	// DeleteType type for delete node
-	DeleteType
+	// RFirstRender type for first gas render
+	RFirstRender
 
-	// RecreateType type for ReCreate
-	RecreateType
+	// RDelete type for delete node
+	RDelete
+
+	// RRecreate type for recreate node
+	RRecreate
 )
 
-// Add push render nodes to render queue and trying to execute all queue
-func (rc *RenderCore) Add(node *RenderTask) {
-	rc.queue = append(rc.queue, node)
+// Add push render tasks to render queue and trying to execute all queue
+func (rc *RenderCore) Add(task *RenderTask) {
+	rc.queue = append(rc.queue, task)
 }
 
 // GetAll return render nodes from queue

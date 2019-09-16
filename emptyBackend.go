@@ -1,5 +1,7 @@
 package gas
 
+import "log"
+
 // emptyBackEnd empty backend for testing backend calling methods
 type emptyBackEnd struct {
 	logger func([]*RenderTask)
@@ -58,7 +60,11 @@ func (e emptyBackEnd) GetGasEl(g *Gas) interface{} {
 }
 
 // ConsoleLog return nil
-func (e emptyBackEnd) ConsoleLog(values ...interface{}) {}
+func (e emptyBackEnd) ConsoleLog(values ...interface{}) {
+	log.Println(append([]interface{}{"LOG"}, values...)...)
+}
 
 // ConsoleError return nil
-func (e emptyBackEnd) ConsoleError(values ...interface{}) {}
+func (e emptyBackEnd) ConsoleError(values ...interface{}) {
+	log.Println(append([]interface{}{"ERROR"}, values...)...)
+}

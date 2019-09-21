@@ -4,11 +4,14 @@ package gas
 type RenderCore struct {
 	BE BackEnd
 
-	queue []*RenderTask
+	queue   []*RenderTask
+	counter int64
 }
 
 // RenderTask node storing changes
 type RenderTask struct {
+	ID int64
+
 	Type RenderType
 
 	Parent *Element
@@ -45,7 +48,9 @@ const (
 
 // Add push render tasks to render queue and trying to execute all queue
 func (rc *RenderCore) Add(task *RenderTask) {
+	task.ID = rc.counter
 	rc.queue = append(rc.queue, task)
+	rc.counter++
 }
 
 // GetAll return render nodes from queue
@@ -55,6 +60,7 @@ func (rc *RenderCore) GetAll() []*RenderTask {
 
 // Exec run all render nodes in render core
 func (rc *RenderCore) Exec() {
-	rc.BE.ExecTasks(rc.queue)
+	tQueue := rc.queue
 	rc.queue = []*RenderTask{}
+	rc.BE.ExecTasks(tQueue)
 }

@@ -2,6 +2,7 @@ package web
 
 import (
 	"errors"
+
 	// "fmt"
 
 	"github.com/gascore/dom"
@@ -80,6 +81,10 @@ func (w *BackEnd) ExecTask(task *gas.RenderTask) error {
 		_old, ok := task.NodeOld.(*dom.Element)
 		if !ok {
 			return errors.New("invalid NodeOld type")
+		}
+
+		if _old.ParentElement() == nil {
+			println("PARENT IS NIL")
 		}
 
 		_old.ParentElement().ReplaceChild(_new, _old)

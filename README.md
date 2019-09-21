@@ -1,5 +1,7 @@
 # Gas - Components based frontend framework
 
+[![GoDoc](https://godoc.org/github.com/gascore/gas?status.svg)](https://godoc.org/github.com/gascore/gas)
+
 Example: [gascore.github.io](https://gascore.github.io)
 
 ![Logo](https://raw.githubusercontent.com/gascore/gas/master/logo.png)

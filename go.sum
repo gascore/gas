@@ -3,7 +3,13 @@ github.com/frankenbeanies/uuid4 v0.0.0-20180313125435-68b799ec299a h1:oxdqt7Y3J6
 github.com/frankenbeanies/uuid4 v0.0.0-20180313125435-68b799ec299a/go.mod h1:MmPmk1AfyaEzDM+9n93pi02xKEqUgZMj+AL/oX65TDE=
 github.com/gascore/dom v0.2.3 h1:kFfQvNXeq3nEKJhP0/2Qy59DLHGBN1mUp9RLWet2kd0=
 github.com/gascore/dom v0.2.3/go.mod h1:aZt0YZyRxTJaYwAkAf9mQjzFSMvL4LTasUGKCgZ0DJk=
+github.com/gascore/dom v0.2.4 h1:DHgkdPCd+63b2b5wmd6SB6UbUrx17j1wwD+q/ftEnuM=
+github.com/gascore/dom v0.2.4/go.mod h1:Irpt3cSe8mBq1HW3hUu07mUjcFh4I/0GcDTPMVcZhis=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
+github.com/gorilla/websocket v1.4.1/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
